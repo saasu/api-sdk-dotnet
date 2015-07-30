@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata>
+		<id>Saasu.API.Dotnet.Sdk</id>
+		<title>API SDK for the Saasu API</title>
+		<version>1.0</version>
+		<authors>Saasu</authors>
+		<description>A client SDK for working with the Saasu API.</description>
+		<summary>A client SDK for working with the Saasu API.</summary>
+		<language>en-US</language>
+		<projectUrl>https://github.com/saasu/api-sdk-dotnet</projectUrl>
+		<frameworkAssemblies>
+		  <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework="net40" />
+		  <frameworkAssembly assemblyName="System.Net.Http.Formatting" targetFramework="net40" />
+		</frameworkAssemblies>
+		<dependencies>
+		</dependencies>
+		<tags>Saasu API Legacy Rest SDK</tags>
+	</metadata>
+	 <files>
+		  <file src="lib\*.dll" target="lib" />
+		  <file src="content\app.config.transform" target="content" />
+		  <file src="content\web.config.transform" target="content" />
+		  <file src="content\ReadMe.txt" target="content" />
+	  </files>
+</package>
+

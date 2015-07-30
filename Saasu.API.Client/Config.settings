@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Saasu.API.Client" GeneratedClassName="Config">
+  <Profiles />
+  <Settings>
+    <Setting Name="IgnoreSSLErrors" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">false</Value>
+    </Setting>
+    <Setting Name="BaseUri" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://api.saasu.com/</Value>
+    </Setting>
+    <Setting Name="WsAccessKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">{YOUR-WS-ACCESS-KEY}</Value>
+    </Setting>
+    <Setting Name="FileUid" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

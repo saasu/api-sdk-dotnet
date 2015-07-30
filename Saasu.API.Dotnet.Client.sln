@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saasu.API.Core", "Saasu.API.Core\Saasu.API.Core.csproj", "{17364BF1-4929-440F-B571-2067CF0635EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saasu.API.Client", "Saasu.API.Client\Saasu.API.Client.csproj", "{E3269577-F1A5-471D-829D-F63E6C3599A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Saasu.API.Client.IntegrationTests", "Saasu.API.Client.IntegrationTests\Saasu.API.Client.IntegrationTests.csproj", "{266FADF3-C7EE-4F69-B5DA-F52002959A8F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CI|Any CPU = CI|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Staging|Any CPU = Staging|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17364BF1-4929-440F-B571-2067CF0635EC}.CI|Any CPU.ActiveCfg = CI|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.CI|Any CPU.Build.0 = CI|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{17364BF1-4929-440F-B571-2067CF0635EC}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.CI|Any CPU.ActiveCfg = CI|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.CI|Any CPU.Build.0 = CI|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{E3269577-F1A5-471D-829D-F63E6C3599A2}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.CI|Any CPU.ActiveCfg = CI|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.CI|Any CPU.Build.0 = CI|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{266FADF3-C7EE-4F69-B5DA-F52002959A8F}.Staging|Any CPU.Build.0 = Staging|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

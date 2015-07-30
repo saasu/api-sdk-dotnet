@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{17364BF1-4929-440F-B571-2067CF0635EC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Saasu.API.Core</RootNamespace>
+    <AssemblyName>Saasu.API.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\Saasu.API.Core.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Release\Saasu.API.Core.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CI|AnyCPU'">
+    <OutputPath>bin\CI\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\CI\Saasu.API.Core.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
+    <OutputPath>bin\Staging\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Staging\Saasu.API.Core.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseModel.cs" />
+    <Compile Include="Globals\AuthorisationScope.cs" />
+    <Compile Include="Globals\OAuthTokenType.cs" />
+    <Compile Include="Globals\ResourceNames.cs" />
+    <Compile Include="Globals\RouteNames.cs" />
+    <Compile Include="Hypermedia\Link.cs" />
+    <Compile Include="Hypermedia\RelatedLinkType.cs" />
+    <Compile Include="Models\Accounts\AccountDetail.cs" />
+    <Compile Include="Models\Accounts\AccountListResponse.cs" />
+    <Compile Include="Models\Accounts\InsertAccountResult.cs" />
+    <Compile Include="Models\Accounts\UpdateAccountResult.cs" />
+    <Compile Include="Models\BpayDetails.cs" />
+    <Compile Include="Models\ChequeDetails.cs" />
+    <Compile Include="Models\Company\CompanyDetail.cs" />
+    <Compile Include="Models\Company\UpdateCompanyResult.cs" />
+    <Compile Include="Models\Company\InsertCompanyResult.cs" />
+    <Compile Include="Models\DirectDepositDetails.cs" />
+    <Compile Include="Models\TradingTerms.cs" />
+    <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\Attachments\FileAttachmentInfo.cs" />
+    <Compile Include="Models\Attachments\InsertAttachmentResult.cs" />
+    <Compile Include="Models\Contacts\Contact.cs" />
+    <Compile Include="Globals\ApiConstants.cs" />
+    <Compile Include="Models\Attachments\FileAttachment.cs" />
+    <Compile Include="Models\Email.cs" />
+    <Compile Include="Models\FileIdentity\FileIdentityDetail.cs" />
+    <Compile Include="Models\Contacts\InsertContactResult.cs" />
+    <Compile Include="Models\Contacts\UpdateContactResult.cs" />
+    <Compile Include="Models\IApiResponseCollection.cs" />
+    <Compile Include="Models\Items\InventoryItem.cs" />
+    <Compile Include="Models\Invoices\InsertInvoiceResult.cs" />
+    <Compile Include="Models\Invoices\InvoiceQuickPaymentDetail.cs" />
+    <Compile Include="Models\Invoices\InvoiceStatusType.cs" />
+    <Compile Include="Models\Invoices\InvoiceTradingTerms.cs" />
+    <Compile Include="Models\Payments\InsertPaymentResult.cs" />
+    <Compile Include="Models\Payments\InvoicePaymentTransaction.cs" />
+    <Compile Include="Models\Invoices\PaymentStatusType.cs" />
+    <Compile Include="Models\Invoices\UpdateInvoiceResult.cs" />
+    <Compile Include="Models\Invoices\InvoiceTransactionDetail.cs" />
+    <Compile Include="Models\Invoices\InvoiceTransactionLineItem.cs" />
+    <Compile Include="Models\Invoices\InvoiceTransactionSummary.cs" />
+    <Compile Include="Models\Payments\PaymentItem.cs" />
+    <Compile Include="Models\Payments\UpdatePaymentResult.cs" />
+    <Compile Include="Models\RequestFiltering\RequestPagingFilter.cs" />
+    <Compile Include="Models\Security\OAuthAuthorisationGrantResponse.cs" />
+    <Compile Include="Models\TaxCode\TaxCodeDetail.cs" />
+    <Compile Include="Models\TaxCode\TaxCodesResponse.cs" />
+    <Compile Include="Models\TaxCode\TaxCodeSummary.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialisation\AllowedContractResolver.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

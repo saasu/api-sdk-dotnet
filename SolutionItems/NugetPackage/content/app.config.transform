@@ -1,0 +1,33 @@
+﻿<configuration>
+    <configSections>
+        <sectionGroup name="applicationSettings" type="System.Configuration.ApplicationSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
+            <section name="Saasu.API.Core.Config" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+            <section name="Saasu.API.Client.Config" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+        </sectionGroup>
+    </configSections>
+   <applicationSettings>
+    <Saasu.API.Client.Config>
+      <setting name="IgnoreSSLErrors" serializeAs="String">
+        <value>false</value>
+      </setting>
+      <setting name="BaseUri" serializeAs="String">
+        <value>https://api.saasu.com/</value>
+      </setting>
+      <setting name="WsAccessKey" serializeAs="String">
+        <value>{YOUR-WS-ACCESS-KEY}</value>
+      </setting>
+      <setting name="FileUid" serializeAs="String">
+        <value>0</value>
+      </setting>
+    </Saasu.API.Client.Config>
+  </applicationSettings>
+  <ola.restclient>
+    <proxySettings>
+      <add key="baseUri" value="https://secure.saasu.com/webservices/rest/r1/" />
+      <add key="wsAccessKey" value="YOUR-WS-ACCESS-KEY" />
+      <add key="fileUid" value="YOUR-FILE-ID" />
+      <add key="MerchantFeeAccountUid" value="" />
+    </proxySettings>
+  </ola.restclient>
+
+</configuration>

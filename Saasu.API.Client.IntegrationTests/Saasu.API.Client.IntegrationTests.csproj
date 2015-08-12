@@ -114,6 +114,7 @@
   <ItemGroup>
     <None Include="App.CI.config">
       <DependentUpon>App.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="App.config">
       <SubType>Designer</SubType>

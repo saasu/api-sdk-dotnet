@@ -30,5 +30,6 @@ namespace Saasu.API.Core.Globals
 	    public const string Item = "Item";
         public const string Company = "Company";
         public const string Companies = "Companies";
+        public const string User = "User";
     }
 }

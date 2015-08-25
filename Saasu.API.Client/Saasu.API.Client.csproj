@@ -78,6 +78,7 @@
     </Compile>
     <Compile Include="Proxies\AccountProxy.cs" />
     <Compile Include="Proxies\AccountsProxy.cs" />
+    <Compile Include="Proxies\UserProxy.cs" />
     <Compile Include="Proxies\ContactProxy.cs" />
     <Compile Include="Framework\AuthenticationType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

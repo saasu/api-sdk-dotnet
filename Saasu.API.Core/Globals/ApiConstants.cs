@@ -21,6 +21,7 @@ namespace Saasu.API.Core.Globals
         public const string OptionalQueryArgsTemplate = "{*"+OptionalQueryArgKey+"}";
 
         public const string IdQueryArgParameter = "{id}";
+        public const string ResetPasswordUrlPath = "reset-password/";
 
         public const string UserSessionContext_FileGroupUidKey = "FileGroupUid";
         public const string UserSessionContext_UserUidKey = "UserUid";
@@ -29,7 +30,7 @@ namespace Saasu.API.Core.Globals
         // Filter options for arguments
         public const string FilterHelpDate = "YYYY-MM-DD";
         public const string FilterHelpNumber = "123";
-        public const string FilterHelpText = "SomeText";
+        public const string FilterHelpText = "some text";
         public const string FilterHelpEmail = "email@somewhere.com";
         public const string FilterHelpBool = "1|0|true|false|yes|no";
         public const string FilterHelpInvoiceStatus = "I|Q|O";

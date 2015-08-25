@@ -81,7 +81,13 @@ namespace Saasu.API.Client.Framework
 		/// is 1. The request prefix in this case is 'Contacts' and is consistent for all calls relating to Contacts</example>
 		public abstract string RequestPrefix { get; }
 
-		public AuthenticationType AuthenticationMethod { get; set; }
+        /// <summary>
+        /// Indicates the postfix used to access the action method in the Url.
+        /// </summary>
+        /// <example>In the Url 'http://somehost/test@mailhost.com/reset-password' 'test@mailhost.com' is the identifier (Id) and 'reset-password' is the postfix, indicating the action that will be performed for the identifier</example>
+        public string RequestPostfix { get; set; }
+
+        public AuthenticationType AuthenticationMethod { get; set; }
 
 		/// <summary>
 		/// Indicates whether to request the response in Json, Xml etc..
@@ -112,7 +118,15 @@ namespace Saasu.API.Client.Framework
 				}
 				uri.AppendFormat("{0}", apiMethod);
 			}
-			return uri;
+            if (!string.IsNullOrWhiteSpace(RequestPostfix))
+            {
+                if (!uri.ToString().EndsWith("/"))
+                {
+                    uri.Append("/");
+                }
+                uri.AppendFormat("{0}", RequestPostfix);
+            }
+            return uri;
 		}
 
 		protected void GetPaging(StringBuilder queryArgs, int? pageNumber, int? pageSize, out bool inclPageNumber, out bool inclPageSize)

@@ -14,6 +14,9 @@ namespace Saasu.API.Client.IntegrationTests
 		private int _accountToBeUpdated;
 		private int _bankAccountToBeUpdated;
 		private int _inactiveAccountId;
+        private int _headerAccountId;
+        private int _accountToAssignToHeaderAccount;
+
 
 		public AccountTests()
 		{
@@ -146,6 +149,18 @@ namespace Saasu.API.Client.IntegrationTests
 			response.DataObject.Accounts.ForEach(a => Assert.AreEqual(a.AccountType, "Income"));
 		}
 
+        [Test]
+        public void GetAccountsFilterOnHeaderAccountId()
+        {
+            var accountsProxy = new AccountsProxy();
+            var response = accountsProxy.GetAccounts(headerAccountId: _headerAccountId);
+
+            Assert.IsNotNull(response, "Reponse is null");
+            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+            Assert.AreEqual(response.DataObject.Accounts.Count, 1, "Incorrect number of accounts returned");
+            Assert.AreEqual(response.DataObject.Accounts[0].Id, _accountToAssignToHeaderAccount, "Incorrect account assigned to header account.");
+        }
+
 		[Test]
 		public void GetAccountsPageSize()
 		{
@@ -199,6 +214,7 @@ namespace Saasu.API.Client.IntegrationTests
 			Assert.AreEqual(acct.DataObject.Currency, account.Currency, "Currencies not equal");
 			Assert.AreEqual(acct.DataObject.IsBankAccount, account.IsBankAccount, "IsBankAccount not equal");
 			Assert.AreEqual(acct.DataObject.IncludeInForecaster, false, "IncludeInForecaster should be false for non bank accounts");
+            Assert.Null(acct.DataObject.HeaderAccountId, "Account should not have a header account");
 		}
 
 		[Test]
@@ -233,6 +249,66 @@ namespace Saasu.API.Client.IntegrationTests
 			Assert.AreEqual(acct.DataObject.MerchantFeeAccountId, account.MerchantFeeAccountId, "Merchant accounts not equal");
 			Assert.AreEqual(acct.DataObject.IncludePendingTransactions, account.IncludePendingTransactions, "IncludePendingTransactions not equal");
 		}
+
+        [Test]
+        public void InsertAccountWithHeader()
+        {
+            //Create and Insert
+            var headerAccount = GetTestHeaderAccount();
+            var accountProxy = new AccountProxy();
+            var headerInsertResponse = accountProxy.InsertAccount(headerAccount);
+            Assert.IsNotNull(headerInsertResponse, "Reponse is null");
+            Assert.IsTrue(headerInsertResponse.IsSuccessfull, "Reponse has not been successful");
+            Assert.Greater(headerInsertResponse.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+
+            var headerAccountId = headerInsertResponse.DataObject.InsertedEntityId;
+
+            var account = GetTestAccount();
+            account.HeaderAccountId = headerAccountId;
+
+            var response = accountProxy.InsertAccount(account);
+
+            Assert.IsNotNull(response, "Reponse is null");
+            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+
+            //Get account again and verify inserted fields.
+            var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
+
+            Assert.AreEqual(acct.DataObject.Name, account.Name, "Names not equal");
+            Assert.AreEqual(acct.DataObject.AccountType, account.AccountType, "Account types not equal");
+            Assert.AreEqual(acct.DataObject.DefaultTaxCode, account.DefaultTaxCode, "Tax codes not equal");
+            Assert.AreEqual(acct.DataObject.LedgerCode, account.LedgerCode, "Leadge codes not equal");
+            Assert.AreEqual(acct.DataObject.Currency, account.Currency, "Currencies not equal");
+            Assert.AreEqual(acct.DataObject.IsBankAccount, account.IsBankAccount, "IsBankAccount not equal");
+            Assert.AreEqual(acct.DataObject.IncludeInForecaster, false, "IncludeInForecaster should be false for non bank accounts");
+            Assert.AreEqual(acct.DataObject.HeaderAccountId, headerAccountId);
+        }
+
+        [Test]
+        public void InsertHeaderAccount()
+        {
+            //Create and Insert
+            var account = GetTestHeaderAccount();
+
+            var accountProxy = new AccountProxy();
+            var response = accountProxy.InsertAccount(account);
+
+            Assert.IsNotNull(response, "Reponse is null");
+            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+
+            //Get account again and verify inserted fields.
+            var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
+
+            Assert.AreEqual(acct.DataObject.Name, account.Name, "Names not equal");
+            Assert.AreEqual(acct.DataObject.AccountLevel.ToLower(), "header");
+            Assert.AreEqual(acct.DataObject.AccountType, account.AccountType, "Account types not equal");
+            Assert.IsNull(acct.DataObject.DefaultTaxCode, "Tax code should be null");
+            Assert.AreEqual(acct.DataObject.LedgerCode, account.LedgerCode, "Ledger codes not equal");
+            Assert.IsFalse(Convert.ToBoolean(acct.DataObject.IsBankAccount), "Header accounts cannot be bank accounts");
+            Assert.IsFalse(Convert.ToBoolean(acct.DataObject.IncludeInForecaster), "Header accounts cannot be included in forecaster");
+        }
 
 		[Test]
 		public void UpdateAccount()
@@ -401,6 +477,40 @@ namespace Saasu.API.Client.IntegrationTests
 			Assert.IsNull(acct.DataObject.UserNumber, "User number not null");
 		}
 
+        [Test]
+        public void UpdateHeaderAccount()
+        {
+            //Create and Insert
+            var account = GetTestHeaderAccount();
+
+            var accountProxy = new AccountProxy();
+            var response = accountProxy.InsertAccount(account);
+
+            Assert.IsNotNull(response, "Reponse is null");
+            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+
+            var accountId = response.DataObject.InsertedEntityId;
+
+            //Get account again and verify inserted fields.
+            var insertedAcctFromDb = accountProxy.GetAccount(accountId);
+
+            var newName = string.Format("TestAccount_{0}", Guid.NewGuid());
+            account.Name = newName;
+            account.LastUpdatedId = insertedAcctFromDb.DataObject.LastUpdatedId;
+
+            var updateResponse = accountProxy.UpdateAccount(response.DataObject.InsertedEntityId, account);
+            Assert.IsNotNull(updateResponse, "Reponse is null");
+            Assert.IsTrue(updateResponse.IsSuccessfull, "Reponse has not been successful");
+
+            //Get account again and verify inserted fields.
+            var updatedAcctFromDb = accountProxy.GetAccount(accountId);
+            Assert.IsNotNull(updatedAcctFromDb, "Reponse is null");
+            Assert.IsTrue(updatedAcctFromDb.IsSuccessfull, "Reponse has not been successful");
+
+            Assert.AreEqual(updatedAcctFromDb.DataObject.Name, newName);
+        }
+
 		#region Test Data
 		private void CreateTestData()
 		{
@@ -446,8 +556,24 @@ namespace Saasu.API.Client.IntegrationTests
 
 				_bankAccountToBeUpdated = insertResult.DataObject.InsertedEntityId;
 			}
-		}
 
+            if (_headerAccountId == 0)
+            {
+                var account = GetTestHeaderAccount();
+                
+                var insertResult = accountProxy.InsertAccount(account);
+
+                _headerAccountId = insertResult.DataObject.InsertedEntityId;
+            }
+
+		    if (_accountToAssignToHeaderAccount == 0)
+		    {
+		        var account = GetTestAccount();
+		        account.HeaderAccountId = _headerAccountId;
+		        var insertResult = accountProxy.InsertAccount(account);
+		        _accountToAssignToHeaderAccount = insertResult.DataObject.InsertedEntityId;
+		    }
+		}
 
 		private AccountDetail GetTestAccount()
 		{
@@ -485,6 +611,17 @@ namespace Saasu.API.Client.IntegrationTests
 				IncludePendingTransactions = true
 			};
 		}
+
+        private AccountDetail GetTestHeaderAccount()
+        {
+            return new AccountDetail
+            {
+                Name = string.Format("TestAccount_{0}", Guid.NewGuid()),
+                AccountLevel = "Header",
+                AccountType = "Income",
+                LedgerCode = "AA"
+            };
+        }
 	}
 		#endregion
 }

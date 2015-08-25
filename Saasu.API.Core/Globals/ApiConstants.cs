@@ -40,6 +40,7 @@ namespace Saasu.API.Core.Globals
         public const string FilterHelpTransactionTypePayments = "SP|PP";
         public const string FilterHelpResultSortString = "TransactionDate";
         public const string FilterHelpAccountType = "Income|Expense|Asset|Equity|Liability|OtherIncome|OtherExpense|CostOfSales";
+        public const string FilterHelpHeaderAccountId = "111";
         public const string FilterSearchMethodString = "Contains|StartsWith";
         public const string FilterHelpItemTypes = "I|C";
 
@@ -117,6 +118,9 @@ namespace Saasu.API.Core.Globals
 		public const string FilterExampleIsBankAccount = FilterIsBankAccount + "={" + FilterHelpBool + "}";
 		public const string FilterIncludeBuiltIn = "IncludeBuiltIn";
 		public const string FilterExampleIncludeBuiltIn = FilterIncludeBuiltIn + "={" + FilterHelpBool + "}";
+        public const string FilterHeaderAccountId = "HeaderAccountId";
+        public const string FilterExampleHeaderAccountId = FilterHeaderAccountId + "={" + FilterHelpHeaderAccountId + "}";
+
 
         public const string FilterItemType = "ItemType";
         public const string FilterExampleItemType = FilterItemType + "={" + FilterHelpItemTypes + "}";

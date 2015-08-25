@@ -1,0 +1,12 @@
+Saasu.API.Client.IntegrationTests/bin/Debug/
+Saasu.API.Client.IntegrationTests/obj/Debug/
+Saasu.API.Client/bin/Debug/
+Saasu.API.Client/obj/Debug/
+Saasu.API.Core/bin/Debug/
+Saasu.API.Core/obj/Debug/
+packages/NUnit.2.6.4/
+packages/Newtonsoft.Json.7.0.1/
+Saasu.API.Dotnet.Client.sln.DotSettings.user
+Saasu.API.Dotnet.Client.v12.suo
+packages/Saasu.API.Dotnet.LegacyRestClient.1.0/Saasu.API.Dotnet.LegacyRestClient.1.0.nupkg
+packages/Saasu.API.Dotnet.LegacyRestClient.1.0/lib/Netaccounts.Ola.RestClient.dll

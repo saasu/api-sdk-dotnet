@@ -29,7 +29,7 @@ namespace Saasu.API.Core.Globals
         // Filter options for arguments
         public const string FilterHelpDate = "YYYY-MM-DD";
         public const string FilterHelpNumber = "123";
-        public const string FilterHelpText = "SomeText";
+        public const string FilterHelpText = "some text";
         public const string FilterHelpEmail = "email@somewhere.com";
         public const string FilterHelpBool = "1|0|true|false|yes|no";
         public const string FilterHelpInvoiceStatus = "I|Q|O";
@@ -124,6 +124,18 @@ namespace Saasu.API.Core.Globals
         public const string FilterExampleSearchMethod = FilterSearchMethod + "={" + FilterSearchMethodString + "}";
         public const string FilterSearchText = "SearchText";
         public const string FilterExampleSearchText = FilterSearchText + "={" + FilterHelpText + "}";
+
+        //Search (Jump) filter options
+        public const string FilterKeywords = "Keywords";
+        public const string FilterExampleKeywords = FilterSearchText + "={" + FilterHelpText + "}";
+        
+        public const string FilterHelpSearchScope = "All|Transactions|Contacts|InventoryItems";
+        public const string FilterSearchScope = "Scope";
+        public const string FilterExampleSearchScope = FilterSearchScope + "={" + FilterHelpSearchScope + "}";
+
+        public const string FilterIncludeSearchTermHighlights = "IncludeSearchTermHighlights";
+        public const string FilterExampleIncludeSearchTermHighlights = FilterIncludeSearchTermHighlights + "={" + FilterHelpBool + "}";
+        
     }
 
 }

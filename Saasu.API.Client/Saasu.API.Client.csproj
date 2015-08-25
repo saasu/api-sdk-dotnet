@@ -85,6 +85,7 @@
     <Compile Include="Proxies\AuthorisationProxy.cs" />
     <Compile Include="Proxies\ContactsProxy.cs" />
     <Compile Include="Proxies\FileIdentityProxy.cs" />
+    <Compile Include="Proxies\SearchProxy.cs" />
     <Compile Include="Proxies\ItemProxy.cs" />
     <Compile Include="Proxies\ItemsProxy.cs" />
     <Compile Include="Proxies\PaymentProxy.cs" />

@@ -75,7 +75,7 @@ namespace Saasu.API.Core.Models.Invoices
         /// <summary>
         /// The Id/Key of the attribute.
         /// </summary>
-        public long AttributeId {get; set;}
+        public int AttributeId {get; set;}
         /// <summary>
         /// Name of the attribute.
         /// </summary>

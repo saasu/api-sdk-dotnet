@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Saasu.API.Client.Proxies;
+using Saasu.API.Core.Framework;
+using Saasu.API.Core.Models.Accounts;
+using Saasu.API.Core.Models.Contacts;
+using Saasu.API.Core.Models.Items;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -13,16 +18,23 @@ namespace Saasu.API.Client.IntegrationTests
     /// ToDo: Refactor tests after API has been updated to support INSERT, UPDATE and DELETE of Items to setup test data. 
     /// </summary>
     [TestFixture]
-    public class ItemTests 
-    {        
+    public class ItemTests
+    {
+        
+
+        public ItemTests()
+        {
+            _itemHelper = new ItemHelper();
+        }
+
         [Test]
         public void GetInventoryAndComboItems()
         {
             var itemsProxy = new ItemsProxy();
-            var inventoryAndComboItemResponse = itemsProxy.GetItems(null, null, null, 0, 100); 
+            var inventoryAndComboItemResponse = itemsProxy.GetItems(null, null, null, 0, 100);
 
             Assert.IsTrue(inventoryAndComboItemResponse.IsSuccessfull, "Unsuccessful request.");
-            var inventoryAndComboItemResult = inventoryAndComboItemResponse.DataObject; 
+            var inventoryAndComboItemResult = inventoryAndComboItemResponse.DataObject;
 
             Assert.IsNotNull(inventoryAndComboItemResult, "Could not retrieve inventory and combo items successfully.");
             if (inventoryAndComboItemResult.Items.Count > 0)
@@ -51,7 +63,7 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.IsNotNull(inventoryAndComboItemResult, "Could not retireve inventory items successfully.");
             if (inventoryAndComboItemResult.Items.Count > 0)
             {
-                Assert.IsTrue(inventoryAndComboItemResult.Items.Find(i => i.Type == "C") == null, "Combo items should not have been returned.");                
+                Assert.IsTrue(inventoryAndComboItemResult.Items.Find(i => i.Type == "C") == null, "Combo items should not have been returned.");
             }
         }
 
@@ -84,11 +96,11 @@ namespace Saasu.API.Client.IntegrationTests
             var existingInventoryItemId = inventoryAndComboItemResponse.DataObject.Items.First().Id;
 
             var itemProxy = new ItemProxy();
-            var inventoryItemResponse = itemProxy.GetItem(existingInventoryItemId.Value); 
+            var inventoryItemResponse = itemProxy.GetItem(existingInventoryItemId.Value);
 
             Assert.IsTrue(inventoryItemResponse.IsSuccessfull, "Unsuccessful request.");
-            var inventoryItem = inventoryItemResponse.DataObject; 
-           
+            var inventoryItem = inventoryItemResponse.DataObject;
+
             Assert.IsNotNull(inventoryItem, "No inventory item found.");
             Assert.IsTrue(inventoryItem.Type == "I", "Invalid item type.");
 
@@ -104,7 +116,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Test]
         public void GetComboItemById()
         {
-            
+
             var itemsProxy = new ItemsProxy();
             var inventoryAndComboItemResponse = itemsProxy.GetItems("C", null, null, 0, 25);
             Assert.IsTrue(inventoryAndComboItemResponse.IsSuccessfull && inventoryAndComboItemResponse.DataObject.Items.Count > 0, "Cannot continue test, request for items failed or returned no items");
@@ -112,10 +124,10 @@ namespace Saasu.API.Client.IntegrationTests
             var existingComboItemId = inventoryAndComboItemResponse.DataObject.Items.First().Id;
 
             var itemProxy = new ItemProxy();
-            var comboItemResponse = itemProxy.GetItem(existingComboItemId.Value); 
-            
+            var comboItemResponse = itemProxy.GetItem(existingComboItemId.Value);
+
             Assert.IsTrue(comboItemResponse.IsSuccessfull, "Unsuccessful request.");
-            var comboItem = comboItemResponse.DataObject; 
+            var comboItem = comboItemResponse.DataObject;
 
             Assert.IsNotNull(comboItem, "No combo item found.");
             Assert.IsTrue(comboItem.Type == "C", "Invalid item type.");
@@ -126,5 +138,241 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreNotEqual(DateTime.MinValue, comboItem.CreatedDateUtc.Value);
 
         }
+
+        [Test]
+        public void ShouldInsertInventoryItem()
+        {
+            var inventoryItem = _itemHelper.GetTestInventoryItem();
+            var proxy = new ItemProxy();
+
+            var response = proxy.InsertItem(inventoryItem);
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsNotNull(response.DataObject);
+            Assert.IsTrue(response.DataObject.InsertedItemId > 0);
+            Assert.GreaterOrEqual(response.DataObject.UtcLastModified, DateTime.Today.AddMinutes(-10).ToUniversalTime());
+        }
+
+        [Test]
+        public void ShouldInsertComboItem()
+        {
+            var comboItem = _itemHelper.GetTestComboItem();
+            var proxy = new ItemProxy();
+
+            var response = proxy.InsertItem(comboItem);
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsNotNull(response.DataObject);
+            Assert.IsTrue(response.DataObject.InsertedItemId > 0);
+            Assert.GreaterOrEqual(response.DataObject.UtcLastModified, DateTime.Today.AddMinutes(-10).ToUniversalTime());
+        }
+
+        [Test]
+        public void ShouldInsertWhenUsingOauthAuthentication()
+        {
+            var accessToken = TestHelper.SignInAndGetAccessToken();
+
+            var comboItem = _itemHelper.GetTestComboItem();
+            var proxy = new ItemProxy(accessToken);
+
+            var response = proxy.InsertItem(comboItem);
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsNotNull(response.DataObject);
+            Assert.IsTrue(response.DataObject.InsertedItemId > 0);
+            Assert.GreaterOrEqual(response.DataObject.UtcLastModified, DateTime.Today.AddMinutes(-10).ToUniversalTime());
+
+        }
+
+
+        [Test]
+        public void ShouldFailOnInsertComboItemWithNoBuildItems()
+        {
+            var comboItem = _itemHelper.GetTestComboItem();
+            comboItem.BuildItems = new List<BuildItem>();
+            var proxy = new ItemProxy();
+
+            var response = proxy.InsertItem(comboItem);
+
+            Assert.IsFalse(response.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.IsTrue(response.RawResponse.Contains("Please select at least one item for the combo item."));
+            Assert.IsNull(response.DataObject);
+        }
+
+        [Test]
+        public void ShouldFailOnInsertComboItemWithInvalidBuildItem()
+        {
+            var comboItem = _itemHelper.GetTestComboItem();
+            comboItem.BuildItems.First().Id = 123;
+            var proxy = new ItemProxy();
+
+            var response = proxy.InsertItem(comboItem);
+
+            Assert.IsFalse(response.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.IsTrue(response.RawResponse.Contains("One or more line items of the Combo Item was not found"));
+            Assert.IsNull(response.DataObject);
+        }
+
+        [Test]
+        public void ShouldFailOnInsertSaleInventoryItemWithNoSaleAccount()
+        {
+            var inventoryItem = _itemHelper.GetTestInventoryItem();
+            inventoryItem.SaleIncomeAccountId = null;
+            var proxy = new ItemProxy();
+
+            var response = proxy.InsertItem(inventoryItem);
+
+            Assert.IsFalse(response.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.IsTrue(response.RawResponse.Contains("The Item is marked as 'Sold' and therefore needs to have an Income Account assigned to it.\r\nParameter name: SaleIncomeAccountUid\r\n"));
+            Assert.IsNull(response.DataObject);
+        }
+
+        [Test]
+        public void ShouldFailOnInsertDuplicateInventoryItemCode()
+        {
+            var inventoryItem = _itemHelper.GetTestInventoryItem();
+            var proxy = new ItemProxy();
+
+            var response1 = proxy.InsertItem(inventoryItem);
+            var response2 = proxy.InsertItem(inventoryItem);
+
+            Assert.IsTrue(response1.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.OK, response1.StatusCode);
+            Assert.IsNotNull(response1.DataObject);
+            Assert.IsFalse(response2.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response2.StatusCode);
+            Assert.IsTrue(response2.RawResponse.Contains("You already have an item with code"));
+            Assert.IsNull(response2.DataObject);
+        }
+
+        [Test]
+        public void ShouldUpdateExistingInventoryItem()
+        {
+            var inventoryItem = _itemHelper.GetTestInventoryItem();
+            var proxy = new ItemProxy();
+
+            var insertResponse = proxy.InsertItem(inventoryItem);
+            Assert.IsTrue(insertResponse.IsSuccessfull);
+            Assert.IsTrue(insertResponse.DataObject.InsertedItemId > 0);
+
+            var getResponse = proxy.GetItem(insertResponse.DataObject.InsertedItemId);
+            var retrievedItem = getResponse.DataObject;
+
+            Assert.IsTrue(getResponse.IsSuccessfull);
+            Assert.AreEqual(inventoryItem.Description, retrievedItem.Description);
+
+            retrievedItem.Description = "Updated Item " + Guid.NewGuid();
+
+            var updateResponse = proxy.UpdateItem(retrievedItem, retrievedItem.Id.Value);
+            Assert.IsTrue(updateResponse.IsSuccessfull);
+            Assert.AreEqual(insertResponse.DataObject.InsertedItemId, updateResponse.DataObject.UpdatedItemId);
+
+            var updatedItem = proxy.GetItem(updateResponse.DataObject.UpdatedItemId);
+            Assert.AreEqual(retrievedItem.Description, updatedItem.DataObject.Description);
+
+        }
+
+        [Test]
+        public void ShouldUpdateExistingComboItemBuildItem()
+        {
+            var comboItem = _itemHelper.GetTestComboItem();
+            var proxy = new ItemProxy();
+
+            var insertResponse = proxy.InsertItem(comboItem);
+            Assert.IsTrue(insertResponse.IsSuccessfull);
+            Assert.IsTrue(insertResponse.DataObject.InsertedItemId > 0);
+
+            var getResponse = proxy.GetItem(insertResponse.DataObject.InsertedItemId);
+            var retrievedComboItem = getResponse.DataObject;
+
+            Assert.IsTrue(getResponse.IsSuccessfull);
+            Assert.AreEqual(comboItem.Description, retrievedComboItem.Description);
+
+            retrievedComboItem.BuildItems.OrderBy(x => x.Code).First().Quantity = 99;
+
+            var updateResponse = proxy.UpdateItem(retrievedComboItem, retrievedComboItem.Id.Value);
+            Assert.IsTrue(updateResponse.IsSuccessfull);
+            Assert.AreEqual(insertResponse.DataObject.InsertedItemId, updateResponse.DataObject.UpdatedItemId);
+
+            var updatedItem = proxy.GetItem(updateResponse.DataObject.UpdatedItemId);
+            Assert.AreEqual(retrievedComboItem.BuildItems.OrderBy(x => x.Code).First().Quantity, updatedItem.DataObject.BuildItems.OrderBy(x => x.Code).First().Quantity);
+
+        }
+
+        [Test]
+        public void ShouldReplaceExistingComboItemBuildItem()
+        {
+            var comboItem = _itemHelper.GetTestComboItem();
+            var proxy = new ItemProxy();
+
+            var insertResponse = proxy.InsertItem(comboItem);
+            Assert.IsTrue(insertResponse.IsSuccessfull);
+            Assert.IsTrue(insertResponse.DataObject.InsertedItemId > 0);
+
+            var getResponse = proxy.GetItem(insertResponse.DataObject.InsertedItemId);
+            var retrievedComboItem = getResponse.DataObject;
+
+            var inventoryItem = _itemHelper.GetTestInventoryItem();
+            var insertNewItemResponse = proxy.InsertItem(inventoryItem);
+
+            Assert.IsTrue(insertNewItemResponse.IsSuccessfull);
+
+            retrievedComboItem.BuildItems.RemoveAt(0);
+            retrievedComboItem.BuildItems.Add(new BuildItem
+            {
+                Id = insertNewItemResponse.DataObject.InsertedItemId,
+                Quantity = 444
+            });
+
+            var updateResponse = proxy.UpdateItem(retrievedComboItem, retrievedComboItem.Id.Value);
+            Assert.IsTrue(updateResponse.IsSuccessfull);
+            Assert.AreEqual(insertResponse.DataObject.InsertedItemId, updateResponse.DataObject.UpdatedItemId);
+
+            var updatedItem = proxy.GetItem(updateResponse.DataObject.UpdatedItemId);
+            Assert.AreEqual(2, retrievedComboItem.BuildItems.Count);
+            Assert.IsTrue(retrievedComboItem.BuildItems.Any(x => x.Id == insertNewItemResponse.DataObject.InsertedItemId));
+
+        }
+
+        [Test]
+        public void ShouldDeleteInventoryItem()
+        {
+            var proxy = new ItemProxy();
+            var item = _itemHelper.GetTestInventoryItem();
+
+            var insertResponse = proxy.InsertItem(item);
+            Assert.IsTrue(insertResponse.IsSuccessfull);
+
+            var deleteResponse = proxy.DeleteItem(insertResponse.DataObject.InsertedItemId);
+            Assert.IsTrue(deleteResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.StatusCode);
+
+            var getResponse = proxy.GetItem(insertResponse.DataObject.InsertedItemId);
+            Assert.IsFalse(getResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, getResponse.StatusCode);
+        }
+
+        [Test]
+        public void ShouldDeleteComboItem()
+        {
+            var proxy = new ItemProxy();
+            var comboItem = _itemHelper.GetTestComboItem();
+
+            var insertResponse = proxy.InsertItem(comboItem);
+            Assert.IsTrue(insertResponse.IsSuccessfull);
+
+            var deleteResponse = proxy.DeleteItem(insertResponse.DataObject.InsertedItemId);
+            Assert.IsTrue(deleteResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.StatusCode);
+
+            var getResponse = proxy.GetItem(insertResponse.DataObject.InsertedItemId);
+            Assert.IsFalse(getResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, getResponse.StatusCode);
+        }
+
+        private readonly ItemHelper _itemHelper;
     }
 }

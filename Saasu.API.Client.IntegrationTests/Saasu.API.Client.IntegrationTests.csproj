@@ -89,7 +89,10 @@
   <ItemGroup>
     <Compile Include="AccountTests.cs" />
     <Compile Include="AuthorisationTests.cs" />
+    <Compile Include="Helpers\ContactHelper.cs" />
     <Compile Include="FileIdentityTests.cs" />
+    <Compile Include="Helpers\InvoiceHelper.cs" />
+    <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="ItemTests.cs" />
     <Compile Include="PaymentTests.cs" />
     <Compile Include="InvoiceTests.cs" />
@@ -97,9 +100,10 @@
     <Compile Include="ContactTests.cs" />
     <Compile Include="SerialisationTests.cs" />
     <Compile Include="CompanyTests .cs" />
+    <Compile Include="SearchTests.cs" />
     <Compile Include="TaxCodeTests.cs" />
     <Compile Include="TestConfig.cs" />
-    <Compile Include="TestHelper.cs" />
+    <Compile Include="Helpers\TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Saasu.API.Client\Saasu.API.Client.csproj">

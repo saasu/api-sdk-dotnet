@@ -43,5 +43,7 @@ namespace Saasu.API.Core.Globals
         public const string CompanyWithId = "~/" + ResourceNames.Company+ "/{id}";
         public const string CompanyWithoutId = "~/" + ResourceNames.Company;
         public const string Companies = "~/" + ResourceNames.Companies;
+
+        public const string Search = "~/" + ResourceNames.Search;
     }
 }

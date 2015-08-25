@@ -72,11 +72,11 @@ namespace Saasu.API.Core.Models.Items
         /// </summary>
         public decimal? MinimumStockLevel { get; set; }
         /// <summary>
-        /// The current stock on hand.
+        /// The current stock on hand. This data is returned only and cannot be added or updated when issuing a POST or PUT.
         /// </summary>
         public decimal? StockOnHand { get; set; }
         /// <summary>
-        /// The current value of the item.
+        /// The current value of the item. This data is returned only and cannot be added or updated when issuing a POST or PUT.
         /// </summary>
         public decimal? CurrentValue { get; set; }
         /// <summary>

@@ -68,6 +68,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseInsertResultModel.cs" />
+    <Compile Include="BaseUpdateResultModel.cs" />
     <Compile Include="BaseModel.cs" />
     <Compile Include="Globals\AuthorisationScope.cs" />
     <Compile Include="Globals\OAuthTokenType.cs" />
@@ -85,6 +87,13 @@
     <Compile Include="Models\Company\UpdateCompanyResult.cs" />
     <Compile Include="Models\Company\InsertCompanyResult.cs" />
     <Compile Include="Models\DirectDepositDetails.cs" />
+    <Compile Include="Models\Items\InsertItemResult.cs" />
+    <Compile Include="Models\Items\UpdateItemResult.cs" />
+    <Compile Include="Models\Search\ContactSearchResponse.cs" />
+    <Compile Include="Models\Search\InventoryItemSearchResponse.cs" />
+    <Compile Include="Models\Search\SearchResponse.cs" />
+    <Compile Include="Models\Search\SearchScope.cs" />
+    <Compile Include="Models\Search\TransactionSearchResponse.cs" />
     <Compile Include="Models\TradingTerms.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Attachments\FileAttachmentInfo.cs" />

@@ -9,7 +9,7 @@ namespace Saasu.API.Core.Models.Contacts
 	public class UpdateContactResult : BaseModel
 	{
         /// <summary>
-        /// The id of the newly created/inserted contact.
+        /// The id of the updated contact.
         /// </summary>
         public int UpdatedContactId { get; set; }
         /// <summary>

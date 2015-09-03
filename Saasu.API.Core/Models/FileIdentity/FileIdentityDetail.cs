@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saasu.API.Core.Models.FileIdentity
+﻿namespace Saasu.API.Core.Models.FileIdentity
 {
     public class FileIdentityDetail : BaseModel
     {
@@ -37,7 +31,7 @@ namespace Saasu.API.Core.Models.FileIdentity
         /// Primary telephone number used by the business.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
-        public string PrimaryPhone { get; set; }    
+        public string PrimaryPhone { get; set; }
         /// <summary>
         /// Website used for the business.
         /// </summary>
@@ -78,7 +72,12 @@ namespace Saasu.API.Core.Models.FileIdentity
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string Zone { get; set; }
-        
+
+        /// <summary>
+        /// Currency code of the payment eg: AUD or USD.
+        /// </summary>
+        public string CurrencyCode { get; set; }
+
         public override string ModelKeyValue()
         {
             return string.Empty;

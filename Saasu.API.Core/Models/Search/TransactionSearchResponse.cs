@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Saasu.API.Core.Models.Search
 {
@@ -82,7 +78,7 @@ namespace Saasu.API.Core.Models.Search
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string TotalTaxAmount { get; set; }
-        
+
         /// <summary>
         /// The currrency code of the amounts. Eg. AUD.
         /// </summary>
@@ -113,11 +109,6 @@ namespace Saasu.API.Core.Models.Search
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string Reference { get; set; }
 
-        /// <summary>
-        /// The line items associated with the Sale or Purchase transaction.
-        /// </summary>
-        [System.Xml.Serialization.XmlElement(IsNullable = true)]
-        public ICollection<string> LineItem { get; set; }
         /// <summary>
         /// Invoice number for a Sale or Purchase transaction.
         /// </summary>

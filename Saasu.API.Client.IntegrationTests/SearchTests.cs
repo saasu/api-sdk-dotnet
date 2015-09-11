@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using Ola.RestClient.Dto;
+﻿using NUnit.Framework;
 using Saasu.API.Client.Proxies;
-using Saasu.API.Core.Framework;
-using Saasu.API.Core.Models.Attachments;
-using Saasu.API.Core.Models.Invoices;
 using Saasu.API.Core.Models.Items;
 using Saasu.API.Core.Models.Search;
+using System.Linq;
+using System.Threading;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -37,8 +29,8 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.IsNotNull(results, "No search results returned.");
             Assert.IsTrue(results.DataObject.Transactions.Count > 0, "No transactions returned.");
             Assert.IsTrue(results.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.AreEqual(0,results.DataObject.TotalContactsFound, "Should not return contacts for search scoped to Contacts");
-            Assert.AreEqual(0,results.DataObject.TotalInventoryItemsFound, "Should not return items for search scoped to Contacts");
+            Assert.AreEqual(0, results.DataObject.TotalContactsFound, "Should not return contacts for search scoped to Contacts");
+            Assert.AreEqual(0, results.DataObject.TotalInventoryItemsFound, "Should not return items for search scoped to Contacts");
         }
 
         [Test]
@@ -88,12 +80,12 @@ namespace Saasu.API.Client.IntegrationTests
             var results = searchProxy.Search("qwerty", SearchScope.All, 1, 25);
             Assert.IsNotNull(results, "No search results returned.");
             Assert.IsNotNull(results.DataObject, "No search result object returned.");
-            Assert.AreEqual(0,results.DataObject.InventoryItems.Count);
-            Assert.AreEqual(0,results.DataObject.Contacts.Count);
-            Assert.AreEqual(0,results.DataObject.InventoryItems.Count);
-            Assert.AreEqual(0,results.DataObject.TotalInventoryItemsFound);
-            Assert.AreEqual(0,results.DataObject.TotalContactsFound);
-            Assert.AreEqual(0,results.DataObject.TotalTransactionsFound);
+            Assert.AreEqual(0, results.DataObject.InventoryItems.Count);
+            Assert.AreEqual(0, results.DataObject.Contacts.Count);
+            Assert.AreEqual(0, results.DataObject.InventoryItems.Count);
+            Assert.AreEqual(0, results.DataObject.TotalInventoryItemsFound);
+            Assert.AreEqual(0, results.DataObject.TotalContactsFound);
+            Assert.AreEqual(0, results.DataObject.TotalTransactionsFound);
         }
 
         [Test]
@@ -116,7 +108,6 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(invoice.PurchaseOrderNumber, indexedTransaction.PurchaseOrderNumber);
             Assert.AreEqual(invoice.NotesExternal, indexedTransaction.ExternalNotes);
             Assert.AreEqual(invoice.NotesInternal, indexedTransaction.Notes);
-            Assert.AreEqual(invoice.LineItems.Count, indexedTransaction.LineItem.Count);
             Assert.AreEqual(invoice.TransactionType, indexedTransaction.Type);
         }
 
@@ -151,7 +142,7 @@ namespace Saasu.API.Client.IntegrationTests
             var searchProxy = new SearchProxy();
 
             var inventoryItem = InsertAndGetInventoryItem();
-            
+
             var searchResults = searchProxy.Search(inventoryItem.Code, SearchScope.InventoryItems, 1, 10);
             Assert.IsNotNull(searchResults.DataObject);
             Assert.IsTrue(searchResults.DataObject.InventoryItems.Count > 0);
@@ -183,6 +174,6 @@ namespace Saasu.API.Client.IntegrationTests
         {
             return someString.Replace("<em>", "").Replace("</em>", "");
         }
-        
+
     }
 }

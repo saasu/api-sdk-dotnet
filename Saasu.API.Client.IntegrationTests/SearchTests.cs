@@ -159,6 +159,26 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(inventoryItem.PrimarySupplierItemCode, indexedInventoryItem.SupplierItemCode);
         }
 
+        [Test]
+        public void ShouldReturnSalesOnlyWhenTransactionEntityTypeSpecified()
+        {
+            var searchProxy = new SearchProxy();
+            var results = searchProxy.Search("test", SearchScope.Transactions, 1, 25, "transactions.sale");
+            Assert.IsNotNull(results, "No search results returned.");
+            Assert.IsNotNull(results.DataObject, "No search result object returned.");
+            Assert.IsTrue(results.DataObject.Transactions.TrueForAll(x => x.Type == "S"));
+        }
+
+        [Test]
+        public void ShouldReturnPurchasesOnlyWhenTransactionEntityTypeSpecified()
+        {
+            var searchProxy = new SearchProxy();
+            var results = searchProxy.Search("test", SearchScope.Transactions, 1, 25, "transactions.purchase");
+            Assert.IsNotNull(results, "No search results returned.");
+            Assert.IsNotNull(results.DataObject, "No search result object returned.");
+            Assert.IsTrue(results.DataObject.Transactions.TrueForAll(x => x.Type == "P"));
+        }
+
         private ItemDetail InsertAndGetInventoryItem()
         {
             var itemProxy = new ItemProxy();

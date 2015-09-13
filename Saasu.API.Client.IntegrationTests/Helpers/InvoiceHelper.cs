@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Ola.RestClient.Dto;
 using Ola.RestClient.Proxies;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Attachments;
 using Saasu.API.Core.Models.Invoices;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
@@ -95,6 +93,22 @@ namespace Saasu.API.Client.IntegrationTests
             }
         }
 
+        public int? InvoiceId4
+        {
+            get
+            {
+                return _invoice4Id;
+            }
+        }
+
+        public string InvoiceId4Summary
+        {
+            get
+            {
+                return _invoice4IdSummary;
+            }
+        }
+
         private int _BillingContactId;
         private int _ShippingContactId;
         private int _IncomeAccountId;
@@ -111,9 +125,11 @@ namespace Saasu.API.Client.IntegrationTests
         private int _invoice1Id;
         private int _invoice2Id;
         private int _invoice3Id;
+        private int _invoice4Id;
         private string _invoice1IdSummary;
         private string _invoice2IdSummary;
         private string _invoice3IdSummary;
+        private string _invoice4IdSummary;
 
         private const string AutoNumber = "<auto number>";
 
@@ -123,50 +139,50 @@ namespace Saasu.API.Client.IntegrationTests
             {
                 case "S":
                     return new List<InvoiceTransactionLineItem>
-					{
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 1",
-							AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-							TaxCode = TaxCode.SaleInclGst,
-							TotalAmount = new decimal(10.00),
-							Tags = new List<string> {"item tag 1", "item tag 2"}
-						},
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 2",
-							AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-							TaxCode = TaxCode.SaleInputTaxed,
-							TotalAmount = new decimal(20.00),
-							Tags = new List<string> {"item tag 3", "item tag 4"}
-						}
+                    {
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 1",
+                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
+                            TaxCode = TaxCode.SaleInclGst,
+                            TotalAmount = new decimal(10.00),
+                            Tags = new List<string> {"item tag 1", "item tag 2"}
+                        },
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 2",
+                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
+                            TaxCode = TaxCode.SaleInputTaxed,
+                            TotalAmount = new decimal(20.00),
+                            Tags = new List<string> {"item tag 3", "item tag 4"}
+                        }
 
-					};
+                    };
                 case "I":
                     return new List<InvoiceTransactionLineItem>
-					{
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 1",
-							TaxCode = TaxCode.SaleInclGst,
-							Quantity = 2,
-							UnitPrice = new decimal(15.00),
-							PercentageDiscount = new decimal(3.00),
-							InventoryId =  tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
-							Tags = new List<string> {"item tag 1", "item tag 2"}
-						},
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 2",
-							TaxCode = TaxCode.SaleInputTaxed,
-							Quantity = 3,
-							UnitPrice = new decimal(25.00),
-							PercentageDiscount = new decimal(0.00),
-							InventoryId = tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
-							Tags = new List<string> {"item tag 3", "item tag 4"}
-						}
+                    {
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 1",
+                            TaxCode = TaxCode.SaleInclGst,
+                            Quantity = 2,
+                            UnitPrice = new decimal(15.00),
+                            PercentageDiscount = new decimal(3.00),
+                            InventoryId =  tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            Tags = new List<string> {"item tag 1", "item tag 2"}
+                        },
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 2",
+                            TaxCode = TaxCode.SaleInputTaxed,
+                            Quantity = 3,
+                            UnitPrice = new decimal(25.00),
+                            PercentageDiscount = new decimal(0.00),
+                            InventoryId = tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            Tags = new List<string> {"item tag 3", "item tag 4"}
+                        }
 
-					};
+                    };
                 default:
                     return null;
             }
@@ -430,6 +446,12 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.Greater(inv3.TransactionId, 0);
             _invoice3Id = Convert.ToInt32(inv3.TransactionId);
             _invoice3IdSummary = inv3.Summary;
+
+            var inv4 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, transactionType: "P");
+            Assert.IsNotNull(inv4);
+            Assert.Greater(inv4.TransactionId, 0);
+            _invoice4Id = Convert.ToInt32(inv4.TransactionId);
+            _invoice4IdSummary = inv4.Summary;
         }
 
         private static int? GetTestInvoiceId()

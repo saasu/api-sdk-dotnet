@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-
-namespace Saasu.API.Core.Globals
+﻿namespace Saasu.API.Core.Globals
 {
     public static class ApiConstants
     {
@@ -18,7 +12,7 @@ namespace Saasu.API.Core.Globals
         public const string PageSizeQueryArgDescriptiveName = "PageSize";
         public const string OptionalQueryArgKey = "optionalargs";
         public const string OptionalQueryArgKeyDescriptiveName = "OptionalArgs";
-        public const string OptionalQueryArgsTemplate = "{*"+OptionalQueryArgKey+"}";
+        public const string OptionalQueryArgsTemplate = "{*" + OptionalQueryArgKey + "}";
 
         public const string IdQueryArgParameter = "{id}";
 
@@ -110,13 +104,13 @@ namespace Saasu.API.Core.Globals
         public const string FilterExampleResultsSortString =
             FilterResultsSortString + "={" + FilterHelpResultSortString + "}";
 
-		//Accounts specific filter options.
-	    public const string FilterAccountType = "AccountType";
-		public const string FilterExampleAccountType = FilterAccountType + "={" + FilterHelpAccountType +"}";
-		public const string FilterIsBankAccount = "IsBankAccount";
-		public const string FilterExampleIsBankAccount = FilterIsBankAccount + "={" + FilterHelpBool + "}";
-		public const string FilterIncludeBuiltIn = "IncludeBuiltIn";
-		public const string FilterExampleIncludeBuiltIn = FilterIncludeBuiltIn + "={" + FilterHelpBool + "}";
+        //Accounts specific filter options.
+        public const string FilterAccountType = "AccountType";
+        public const string FilterExampleAccountType = FilterAccountType + "={" + FilterHelpAccountType + "}";
+        public const string FilterIsBankAccount = "IsBankAccount";
+        public const string FilterExampleIsBankAccount = FilterIsBankAccount + "={" + FilterHelpBool + "}";
+        public const string FilterIncludeBuiltIn = "IncludeBuiltIn";
+        public const string FilterExampleIncludeBuiltIn = FilterIncludeBuiltIn + "={" + FilterHelpBool + "}";
 
         public const string FilterItemType = "ItemType";
         public const string FilterExampleItemType = FilterItemType + "={" + FilterHelpItemTypes + "}";
@@ -128,14 +122,18 @@ namespace Saasu.API.Core.Globals
         //Search (Jump) filter options
         public const string FilterKeywords = "Keywords";
         public const string FilterExampleKeywords = FilterSearchText + "={" + FilterHelpText + "}";
-        
+
         public const string FilterHelpSearchScope = "All|Transactions|Contacts|InventoryItems";
         public const string FilterSearchScope = "Scope";
         public const string FilterExampleSearchScope = FilterSearchScope + "={" + FilterHelpSearchScope + "}";
 
+        public const string FilterHelpSearchEntityType = "Transactions.Sale|Transactions.Purchase|Transactions.Journal|Transactions.Payroll";
+        public const string FilterSearchEntityType = "EntityType";
+        public const string FilterExampleSearchEntityType = FilterSearchEntityType + "={" + FilterHelpSearchEntityType + "}";
+
         public const string FilterIncludeSearchTermHighlights = "IncludeSearchTermHighlights";
         public const string FilterExampleIncludeSearchTermHighlights = FilterIncludeSearchTermHighlights + "={" + FilterHelpBool + "}";
-        
+
     }
 
 }

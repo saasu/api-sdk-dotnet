@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Saasu.API.Core.Models.Contacts
 {
@@ -49,7 +48,7 @@ namespace Saasu.API.Core.Models.Contacts
         /// <summary>
         /// Indicates whether the contact is active. Default: true.
         /// </summary>
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
         /// <summary>
         /// Id in Saasu of the Organisation or Company that employs the Contact.
         /// </summary>

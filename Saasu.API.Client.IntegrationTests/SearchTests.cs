@@ -8,6 +8,7 @@ using System.Threading;
 namespace Saasu.API.Client.IntegrationTests
 {
     [TestFixture]
+    [Ignore]  // Ignore for now. requires running server side agent to process messages
     public class SearchTests
     {
         private InvoiceHelper _invoiceHelper;

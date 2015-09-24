@@ -86,6 +86,11 @@
     <Compile Include="Models\Company\CompanyDetail.cs" />
     <Compile Include="Models\Company\UpdateCompanyResult.cs" />
     <Compile Include="Models\Company\InsertCompanyResult.cs" />
+    <Compile Include="Models\ContactAggregates\Company.cs" />
+    <Compile Include="Models\ContactAggregates\ContactAggregate.cs" />
+    <Compile Include="Models\ContactAggregates\ContactManager.cs" />
+    <Compile Include="Models\ContactAggregates\InsertContactAggregateResult.cs" />
+    <Compile Include="Models\ContactAggregates\UpdateContactAggregateResult.cs" />
     <Compile Include="Models\DirectDepositDetails.cs" />
     <Compile Include="Models\Items\InsertItemResult.cs" />
     <Compile Include="Models\Items\UpdateItemResult.cs" />

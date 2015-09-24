@@ -35,7 +35,7 @@ namespace Saasu.API.Client.Proxies
             return base.GetResponse<ContactAggregate>(uri);
         }
 
-        public ProxyResponse<InsertContactAggregateResult> InsertContact(ContactAggregate contactAggregate)
+        public ProxyResponse<InsertContactAggregateResult> InsertContactAggregate(ContactAggregate contactAggregate)
         {
             OperationMethod = HttpMethod.Post;
             var uri = base.GetRequestUri(null);

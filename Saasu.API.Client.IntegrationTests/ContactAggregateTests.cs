@@ -7,6 +7,7 @@ using Saasu.API.Core.Models.Company;
 using Saasu.API.Core.Models.ContactAggregates;
 using Saasu.API.Core.Models.Contacts;
 using System;
+using System.Net;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -188,31 +189,142 @@ namespace Saasu.API.Client.IntegrationTests
         [TestMethod]
         public void ShouldFailAggregateInsertIfCompanyLastUpdatedIdIncorrect()
         {
+            var companyProxy = new CompanyProxy();
+            var contactAggregateProxy = new ContactAggregateProxy();
+            var contactAggregate = GetNewContactAggregate();
+            var companyDetail = GetCompany();
+            var companyResponse = companyProxy.InsertCompany(companyDetail);
 
+            contactAggregate.Company.Id = companyResponse.DataObject.InsertedCompanyId;
+            contactAggregate.Company.LastUpdatedId = companyResponse.DataObject.LastUpdatedId.ToLower();
+
+            var aggregateResponse = contactAggregateProxy.InsertContactAggregate(contactAggregate);
+            Assert.IsFalse(aggregateResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
         }
 
         [TestMethod]
         public void ShouldFailAggregateInsertIfContactManagerLastUpdatedIdIncorrect()
         {
+            var contactProxy = new ContactProxy();
+            var contactAggregateProxy = new ContactAggregateProxy();
+            var contactAggregate = GetNewContactAggregate();
+            var contact = GetContact();
+            var contactResponse = contactProxy.InsertContact(contact);
 
+            contactAggregate.ContactManager.Id = contactResponse.DataObject.InsertedContactId;
+            contactAggregate.ContactManager.LastUpdatedId = contactResponse.DataObject.LastUpdatedId.ToLower();
+
+            var aggregateResponse = contactAggregateProxy.InsertContactAggregate(contactAggregate);
+            Assert.IsFalse(aggregateResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
         }
 
         [TestMethod]
-        public void ShouldFailCompanyUpdateWhenContactLastUpdatedIdIncorrect()
+        public void ShouldNotUpdateCompanyWhenContactLastUpdatedIdIncorrect()
         {
+            var contactProxy = new ContactProxy();
+            var companyProxy = new CompanyProxy();
+            var contactAggregateProxy = new ContactAggregateProxy();
+            var contactAggregate = GetNewContactAggregate();
+            var companyDetail = GetCompany();
+            var companyResponse = companyProxy.InsertCompany(companyDetail);
 
+            var contact = GetContact();
+            var contactResponse = contactProxy.InsertContact(contact);
+
+            contactAggregate.Id = contactResponse.DataObject.InsertedContactId;
+            contactAggregate.LastUpdatedId = contactResponse.DataObject.LastUpdatedId.ToLower();
+            contactAggregate.Company.Id = companyResponse.DataObject.InsertedCompanyId;
+            contactAggregate.Company.LastUpdatedId = companyResponse.DataObject.LastUpdatedId;
+
+            var aggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
+            Assert.IsFalse(aggregateResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
+
+            var updatedCompany = companyProxy.GetCompany(companyResponse.DataObject.InsertedCompanyId);
+            Assert.AreEqual(companyResponse.DataObject.LastUpdatedId, updatedCompany.DataObject.LastUpdatedId);
         }
 
         [TestMethod]
-        public void ShouldFailContactManagerUpdateWhenContactLastUpdatedIdIncorrect()
+        public void ShouldNotUpdateContactManagerWhenContactLastUpdatedIdIncorrect()
         {
+            var contactProxy = new ContactProxy();
+            var contactAggregateProxy = new ContactAggregateProxy();
+            var contactAggregate = GetNewContactAggregate();
+            var contactManager = GetContact();
+            var contactManagerResponse = contactProxy.InsertContact(contactManager);
 
+            var contact = GetContact();
+            var contactResponse = contactProxy.InsertContact(contact);
+
+            contactAggregate.Id = contactResponse.DataObject.InsertedContactId;
+            contactAggregate.LastUpdatedId = contactResponse.DataObject.LastUpdatedId.ToLower();
+            contactAggregate.ContactManager.Id = contactManagerResponse.DataObject.InsertedContactId;
+            contactAggregate.Company.LastUpdatedId = contactManagerResponse.DataObject.LastUpdatedId;
+
+            var aggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
+            Assert.IsFalse(aggregateResponse.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
+
+            var updatedContact = contactProxy.GetContact(contactManagerResponse.DataObject.InsertedContactId);
+            Assert.AreEqual(contactManagerResponse.DataObject.LastUpdatedId, updatedContact.DataObject.LastUpdatedId);
         }
 
         [TestMethod]
         public void ShouldNotModifyExistingContactFieldsNotContainedInAggregateModel()
         {
+            var contactProxy = new ContactProxy();
+            var contactAggregateProxy = new ContactAggregateProxy();
+            var contactAggregate = GetNewContactAggregate();
 
+            var contact = GetCompleteContact();
+            var contactResponse = contactProxy.InsertContact(contact);
+
+            contactAggregate.Id = contactResponse.DataObject.InsertedContactId;
+            contactAggregate.LastUpdatedId = contactResponse.DataObject.LastUpdatedId;
+
+            var aggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
+            Assert.IsTrue(aggregateResponse.IsSuccessfull);
+
+            var updatedContactResponse = contactProxy.GetContact(contactResponse.DataObject.InsertedContactId);
+            Assert.IsTrue(updatedContactResponse.IsSuccessfull);
+            Assert.IsNotNull(updatedContactResponse.DataObject);
+            var updatedContact = updatedContactResponse.DataObject;
+            Assert.AreEqual(contact.AutoSendStatement, updatedContact.AutoSendStatement);
+            Assert.AreEqual(contact.BpayDetails.BillerCode, updatedContact.BpayDetails.BillerCode);
+            Assert.AreEqual(contact.BpayDetails.CRN, updatedContact.BpayDetails.CRN);
+            Assert.AreEqual(contact.ChequeDetails.AcceptCheque, updatedContact.ChequeDetails.AcceptCheque);
+            Assert.AreEqual(contact.ChequeDetails.ChequePayableTo, updatedContact.ChequeDetails.ChequePayableTo);
+            Assert.AreEqual(contact.CustomField1, updatedContact.CustomField1);
+            Assert.AreEqual(contact.CustomField2, updatedContact.CustomField2);
+            Assert.AreEqual(contact.DefaultPurchaseDiscount, updatedContact.DefaultPurchaseDiscount);
+            Assert.AreEqual(contact.DefaultSaleDiscount, updatedContact.DefaultSaleDiscount);
+            Assert.AreEqual(contact.DirectDepositDetails.AcceptDirectDeposit, updatedContact.DirectDepositDetails.AcceptDirectDeposit);
+            Assert.AreEqual(contact.DirectDepositDetails.AccountBSB, updatedContact.DirectDepositDetails.AccountBSB);
+            Assert.AreEqual(contact.DirectDepositDetails.AccountName, updatedContact.DirectDepositDetails.AccountName);
+            Assert.AreEqual(contact.DirectDepositDetails.AccountNumber, updatedContact.DirectDepositDetails.AccountNumber);
+            Assert.AreEqual(contact.HomePhone, updatedContact.HomePhone);
+            Assert.AreEqual(contact.LinkedInProfile, updatedContact.LinkedInProfile);
+            Assert.AreEqual(contact.OtherAddress.City, updatedContact.OtherAddress.City);
+            Assert.AreEqual(contact.OtherAddress.Country, updatedContact.OtherAddress.Country);
+            Assert.AreEqual(contact.OtherAddress.Postcode, updatedContact.OtherAddress.Postcode);
+            Assert.AreEqual(contact.OtherAddress.State, updatedContact.OtherAddress.State);
+            Assert.AreEqual(contact.OtherAddress.Street, updatedContact.OtherAddress.Street);
+            Assert.AreEqual(contact.OtherPhone, updatedContact.OtherPhone);
+            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsInterval, updatedContact.PurchaseTradingTerms.TradingTermsInterval);
+            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsIntervalType, updatedContact.PurchaseTradingTerms.TradingTermsIntervalType);
+            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsType, updatedContact.PurchaseTradingTerms.TradingTermsType);
+            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsInterval, updatedContact.SaleTradingTerms.TradingTermsInterval);
+            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsIntervalType, updatedContact.SaleTradingTerms.TradingTermsIntervalType);
+            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsType, updatedContact.SaleTradingTerms.TradingTermsType);
+            Assert.AreEqual(contact.SkypeId, updatedContact.SkypeId);
+            Assert.AreEqual(contact.TwitterId, updatedContact.TwitterId);
+            Assert.AreEqual(contact.WebsiteUrl, updatedContact.WebsiteUrl);
         }
 
         private ContactAggregate GetNewContactAggregate()
@@ -281,6 +393,47 @@ namespace Saasu.API.Client.IntegrationTests
                 PositionTitle = "Manager",
                 PrimaryPhone = "0222223333",
                 Salutation = "Mrs."
+            };
+            return contact;
+        }
+
+        private Contact GetCompleteContact()
+        {
+            var contact = new Contact()
+            {
+                FamilyName = "Stewart".MakeUnique(),
+                IsActive = true,
+                GivenName = "Jill".MakeUnique(),
+                EmailAddress = "me@test".MakeUnique() + ".com",
+                ContactId = "3333",
+                Fax = "0211112222",
+                IsContractor = false,
+                IsCustomer = false,
+                IsPartner = false,
+                MiddleInitials = "MM",
+                IsSupplier = false,
+                MobilePhone = "0411112222",
+                PositionTitle = "Manager",
+                PrimaryPhone = "0222223333",
+                Salutation = "Mrs.",
+                AutoSendStatement = true,
+                BpayDetails = new BpayDetails { BillerCode = "wer", CRN = "crn1" },
+                ChequeDetails = new ChequeDetails { AcceptCheque = true, ChequePayableTo = "someone" },
+                CustomField1 = "Custom1",
+                CustomField2 = "Custom2",
+                DefaultPurchaseDiscount = 10,
+                DefaultSaleDiscount = 12,
+                DirectDepositDetails = new DirectDepositDetails { AcceptDirectDeposit = true, AccountBSB = "012210", AccountName = "Account name", AccountNumber = "123345" },
+                HomePhone = "0234343434",
+                OtherAddress = new Address { State = "NSW", Street = "Second street", Postcode = "2100", Country = "Australia", City = "Sydney" },
+                PostalAddress = new Address { State = "NSW", Street = "First street", City = "Sydney", Postcode = "2000", Country = "Australia" },
+                OtherPhone = "0221212121",
+                PurchaseTradingTerms = new TradingTerms { TradingTermsInterval = 1, TradingTermsIntervalType = 2, TradingTermsType = 1 },
+                SaleTradingTerms = new TradingTerms { TradingTermsInterval = 2, TradingTermsIntervalType = 2, TradingTermsType = 1 },
+                WebsiteUrl = "http://test.com",
+                LinkedInProfile = "linked",
+                SkypeId = "skype",
+                TwitterId = "@twit"
             };
             return contact;
         }

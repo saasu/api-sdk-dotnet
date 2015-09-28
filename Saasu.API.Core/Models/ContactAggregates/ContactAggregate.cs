@@ -55,6 +55,11 @@ namespace Saasu.API.Core.Models.ContactAggregates
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string MobilePhone { get; set; }
         /// <summary>
+        /// Home contact number for the contact.
+        /// </summary>
+        [System.Xml.Serialization.XmlElement(IsNullable = true)]
+        public string HomePhone { get; set; }
+        /// <summary>
         /// The contacts fax number.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]

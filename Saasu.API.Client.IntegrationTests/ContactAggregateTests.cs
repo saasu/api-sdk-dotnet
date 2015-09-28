@@ -342,6 +342,7 @@ namespace Saasu.API.Client.IntegrationTests
                 MiddleInitials = "PK",
                 IsSupplier = true,
                 MobilePhone = "0412341234",
+                HomePhone = "0245674567",
                 PositionTitle = "Super hero",
                 PostalAddress = new Address()
                 {
@@ -392,6 +393,7 @@ namespace Saasu.API.Client.IntegrationTests
                 MobilePhone = "0411112222",
                 PositionTitle = "Manager",
                 PrimaryPhone = "0222223333",
+                HomePhone = "0245674567",
                 Salutation = "Mrs."
             };
             return contact;
@@ -424,7 +426,7 @@ namespace Saasu.API.Client.IntegrationTests
                 DefaultPurchaseDiscount = 10,
                 DefaultSaleDiscount = 12,
                 DirectDepositDetails = new DirectDepositDetails { AcceptDirectDeposit = true, AccountBSB = "012210", AccountName = "Account name", AccountNumber = "123345" },
-                HomePhone = "0234343434",
+                HomePhone = "0245674567",
                 OtherAddress = new Address { State = "NSW", Street = "Second street", Postcode = "2100", Country = "Australia", City = "Sydney" },
                 PostalAddress = new Address { State = "NSW", Street = "First street", City = "Sydney", Postcode = "2000", Country = "Australia" },
                 OtherPhone = "0221212121",
@@ -498,6 +500,7 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(contactAggregate.IsSupplier, updatedContact.DataObject.IsSupplier);
             Assert.AreEqual(contactAggregate.MiddleInitials, updatedContact.DataObject.MiddleInitials);
             Assert.AreEqual(contactAggregate.MobilePhone, updatedContact.DataObject.MobilePhone);
+            Assert.AreEqual(contactAggregate.HomePhone, updatedContact.DataObject.HomePhone);
             Assert.AreEqual(contactAggregate.PositionTitle, updatedContact.DataObject.PositionTitle);
             Assert.AreEqual(contactAggregate.PostalAddress.City, updatedContact.DataObject.PostalAddress.City);
             Assert.AreEqual(contactAggregate.PostalAddress.Country, updatedContact.DataObject.PostalAddress.Country);

@@ -1561,7 +1561,7 @@ namespace Saasu.API.Client.IntegrationTests
                 {
                     BSB = "111111",
                     AccountNumber = "22222222",
-                    Type = AccountType.Income,
+                    Type = AccountType.Asset,
                     Name = acctname,
                     DisplayName = acctname
                 };

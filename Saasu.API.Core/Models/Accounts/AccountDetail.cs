@@ -16,6 +16,11 @@ namespace Saasu.API.Core.Models.Accounts
 		/// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable=true)]
 		public string Name { get; set; }
+        /// <summary>
+        /// The level of account - either "Header" or "Detail". Default is Detail.
+        /// </summary>
+        [System.Xml.Serialization.XmlElement(IsNullable = true)]
+        public string AccountLevel { get; set; }
 		/// <summary>
 		/// The type of account. E.g. "Income".
 		/// </summary>
@@ -49,6 +54,10 @@ namespace Saasu.API.Core.Models.Accounts
 		/// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string Currency { get; set; }
+        /// <summary>
+        /// The Header account for this detail account.
+        /// </summary>
+        public int? HeaderAccountId { get; set; }
 		/// <summary>
 		/// The base currency account for foreign exchange.
 		/// </summary>

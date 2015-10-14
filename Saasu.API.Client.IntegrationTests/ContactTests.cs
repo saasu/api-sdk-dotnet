@@ -1,15 +1,14 @@
-﻿using System;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
-using System.Net;
+﻿using NUnit.Framework;
+using Ola.RestClient;
+using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models;
 using Saasu.API.Core.Models.Contacts;
-using Saasu.API.Client.Framework;
-using Ola.RestClient;
-using NUnit.Framework;
-using Saasu.API.Client.Proxies;
+using System;
 using System.Collections.Generic;
+//using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Net;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -360,6 +359,63 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         [Test]
+        public void InsertingContactWithoutSpecifyingIsActiveShouldReturnActiveContact()
+        {
+            var contact = GetCompleteContact();
+            contact.IsActive = null;
+
+            var proxy = new ContactProxy();
+            var response = proxy.InsertContact(contact);
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+
+            System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
+            var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
+            Assert.IsNotNull(insertedContact.DataObject);
+            Assert.IsNotNull(insertedContact.DataObject.IsActive);
+            Assert.IsTrue(insertedContact.DataObject.IsActive.Value);
+        }
+
+        [Test]
+        public void InsertingContactWithIsActiveFalseShouldReturnInActiveContact()
+        {
+            var contact = GetCompleteContact();
+            contact.IsActive = false;
+
+            var proxy = new ContactProxy();
+            var response = proxy.InsertContact(contact);
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+
+            System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
+            var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
+            Assert.IsNotNull(insertedContact.DataObject);
+            Assert.IsNotNull(insertedContact.DataObject.IsActive);
+            Assert.IsFalse(insertedContact.DataObject.IsActive.Value);
+        }
+
+        [Test]
+        public void InsertingContactWithIsActiveTrueShouldReturnActiveContact()
+        {
+            var contact = GetCompleteContact();
+            contact.IsActive = true;
+
+            var proxy = new ContactProxy();
+            var response = proxy.InsertContact(contact);
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+
+            System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
+            var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
+            Assert.IsNotNull(insertedContact.DataObject);
+            Assert.IsNotNull(insertedContact.DataObject.IsActive);
+            Assert.IsTrue(insertedContact.DataObject.IsActive.Value);
+        }
+
+        [Test]
         public void UpdateCompleteContact()
         {
             var contact = GetMinimalContact();
@@ -606,10 +662,10 @@ namespace Saasu.API.Client.IntegrationTests
 
             return new Contact()
             {
-                DirectDepositDetails = new DirectDepositDetails {AcceptDirectDeposit = true, AccountBSB = "321-100",AccountName = "DD Account Name", AccountNumber = "1234567899"},
-                ChequeDetails = new ChequeDetails { AcceptCheque = true, ChequePayableTo="me"},
+                DirectDepositDetails = new DirectDepositDetails { AcceptDirectDeposit = true, AccountBSB = "321-100", AccountName = "DD Account Name", AccountNumber = "1234567899" },
+                ChequeDetails = new ChequeDetails { AcceptCheque = true, ChequePayableTo = "me" },
                 AutoSendStatement = false,
-                BpayDetails = new BpayDetails{BillerCode = "45678",CRN = "98755"},
+                BpayDetails = new BpayDetails { BillerCode = "45678", CRN = "98755" },
                 CustomField1 = "CF1",
                 CustomField2 = "CF2",
                 DefaultPurchaseDiscount = 10M,

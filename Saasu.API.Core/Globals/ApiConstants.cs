@@ -16,6 +16,7 @@
 
         public const string IdQueryArgParameter = "{id}";
         public const string EmailInvoiceToContactUrlPath = "email-contact/";
+        public const string ResetPasswordUrlPath = "reset-password/";
 
         public const string UserSessionContext_FileGroupUidKey = "FileGroupUid";
         public const string UserSessionContext_UserUidKey = "UserUid";

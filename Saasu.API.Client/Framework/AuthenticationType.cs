@@ -8,6 +8,7 @@ namespace Saasu.API.Client.Framework
 	public enum AuthenticationType
 	{
 		WsAccessKey,
-		OAuth
+		OAuth,
+        Anonymous
 	}
 }

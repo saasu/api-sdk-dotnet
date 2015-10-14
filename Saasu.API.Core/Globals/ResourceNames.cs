@@ -4,6 +4,7 @@
     {
         public const string Contacts = "Contacts";
         public const string Contact = "Contact";
+        public const string ContactAggregate = "ContactAggregate";
 
         public const string Invoices = "Invoices";
         public const string Invoice = "Invoice";

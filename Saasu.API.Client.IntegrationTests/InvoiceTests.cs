@@ -1071,7 +1071,7 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.IsNotNull(response);
             Assert.IsTrue(response.IsSuccessfull);
             Assert.IsNotNull(response.DataObject);
-            Assert.AreEqual("Invoice has been sent to the billing contact.", response.DataObject.StatusMessage);
+            Assert.AreEqual("Invoice has been emailed.", response.DataObject.StatusMessage);
             Assert.IsNotNull(response.DataObject._links);
             Assert.IsTrue(response.DataObject._links.Count > 0);
         }

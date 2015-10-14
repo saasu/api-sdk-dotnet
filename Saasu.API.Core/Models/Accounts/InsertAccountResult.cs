@@ -2,7 +2,7 @@
 
 namespace Saasu.API.Core.Models.Accounts
 {
-	public class InsertAccountResult : UpdateAccountResult
+	public class InsertAccountResult : BaseInsertResultModel
 	{
         /// <summary>
         /// The Id/key of the newly created/inserted account.

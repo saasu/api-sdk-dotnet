@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saasu.API.Core.Models.Search
+﻿namespace Saasu.API.Core.Models.Search
 {
     /// <summary>
-    /// The search scope determines which entity types will be included in the search.
+    /// The search scope determines which types will be included in the search.
     /// </summary>
     public enum SearchScope
     {

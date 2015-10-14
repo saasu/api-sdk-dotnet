@@ -34,7 +34,7 @@ namespace Saasu.API.Client.Proxies
 
             AppendQueryArg(queryArgs, ApiConstants.FilterKeywords, keywords);
             AppendQueryArg(queryArgs, ApiConstants.FilterSearchScope, scope.ToString("G"));
-            AppendQueryArg(queryArgs, ApiConstants.FilterSearchEntityType, entityType);
+            AppendQueryArg(queryArgs, ApiConstants.FilterSearchTransactionType, entityType);
             AppendQueryArg(queryArgs, ApiConstants.FilterExampleIncludeSearchTermHighlights, includeSearchTermHighlights);
 
             bool inclPageNumber;

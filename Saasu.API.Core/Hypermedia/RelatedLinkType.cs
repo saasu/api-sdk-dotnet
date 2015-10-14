@@ -19,6 +19,7 @@ namespace Saasu.API.Core.Hypermedia
         public const string NextPrevious = "paging";
         public const string RelatedResource = "related";
         public const string DeprecatedApiMethod = "deprecated";
+        public const string Header = "header";
     }
 
     public class RelatedLinkHttpMethod

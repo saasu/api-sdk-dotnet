@@ -30,6 +30,11 @@
         /// </summary>
         public string CurrencyCode { get; set; }
 
+        /// <summary>
+        /// Name of the subscription.
+        /// </summary>
+        public string SubscriptionName { get; set; }
+
         public override string ModelKeyValue()
         {
             return Id.ToString();

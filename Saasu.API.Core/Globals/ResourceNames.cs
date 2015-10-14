@@ -29,6 +29,6 @@
         public const string Companies = "Companies";
 
         public const string Search = "Search";
-        public const string User = "User";
+	    public const string User = "User";
     }
 }

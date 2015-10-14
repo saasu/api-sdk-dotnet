@@ -5,7 +5,7 @@
         /// <summary>
         /// The Id of the emailed invoice.
         /// </summary>
-        public int InvoiceId { get; set; }
+		public int InvoiceId { get; set; }
 
         public override string ModelKeyValue()
         {

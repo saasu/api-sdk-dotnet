@@ -9,7 +9,7 @@ namespace Saasu.API.Core.Models.Search
     public class TransactionSearchResponse : BaseModel
     {
         /// <summary>
-        /// The type of entity transacted.
+        /// The type of entity transacted. Supported types are: Sale, Purchase, Payroll, Journal.
         /// </summary>
         public string EntityType { get; set; }
 
@@ -74,10 +74,10 @@ namespace Saasu.API.Core.Models.Search
         public string Type { get; set; }
 
         /// <summary>
-        /// Total tax amount of an Invoice transaction.
+        /// Total amount of the invoice.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
-        public string TotalTaxAmount { get; set; }
+        public string TotalAmountIncTax { get; set; }
 
         /// <summary>
         /// The currrency code of the amounts. Eg. AUD.
@@ -109,6 +109,13 @@ namespace Saasu.API.Core.Models.Search
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string Reference { get; set; }
 
+        // Removing line items from model as we currently index line items when transactions are saved
+        // but not when reindexing nightly or manually
+        ///// <summary>
+        ///// The line items associated with the Sale or Purchase transaction.
+        ///// </summary>
+        //[System.Xml.Serialization.XmlElement(IsNullable = true)]
+        //public ICollection<string> LineItem { get; set; }
         /// <summary>
         /// Invoice number for a Sale or Purchase transaction.
         /// </summary>

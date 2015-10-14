@@ -40,5 +40,8 @@
         public const string Companies = "~/" + ResourceNames.Companies;
 
         public const string Search = "~/" + ResourceNames.Search;
+
+        public const string ContactAggregateWithId = "~/" + ResourceNames.ContactAggregate + "/{id}";
+        public const string ContactAggregateWithoutId = "~/" + ResourceNames.ContactAggregate;
     }
 }

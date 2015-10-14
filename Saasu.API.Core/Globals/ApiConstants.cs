@@ -15,8 +15,9 @@
         public const string OptionalQueryArgsTemplate = "{*" + OptionalQueryArgKey + "}";
 
         public const string IdQueryArgParameter = "{id}";
-        public const string EmailInvoiceToContactUrlPath = "email-contact/";
         public const string ResetPasswordUrlPath = "reset-password/";
+        public const string EmailInvoiceToContactUrlPath = "email-contact/";
+        public const string EmailInvoiceUrlPath = "email/";
 
         public const string UserSessionContext_FileGroupUidKey = "FileGroupUid";
         public const string UserSessionContext_UserUidKey = "UserUid";
@@ -117,7 +118,6 @@
         public const string FilterHeaderAccountId = "HeaderAccountId";
         public const string FilterExampleHeaderAccountId = FilterHeaderAccountId + "={" + FilterHelpHeaderAccountId + "}";
 
-
         public const string FilterItemType = "ItemType";
         public const string FilterExampleItemType = FilterItemType + "={" + FilterHelpItemTypes + "}";
         public const string FilterSearchMethod = "SearchMethod";
@@ -133,9 +133,9 @@
         public const string FilterSearchScope = "Scope";
         public const string FilterExampleSearchScope = FilterSearchScope + "={" + FilterHelpSearchScope + "}";
 
-        public const string FilterHelpSearchEntityType = "Transactions.Sale|Transactions.Purchase|Transactions.Journal|Transactions.Payroll";
-        public const string FilterSearchEntityType = "EntityType";
-        public const string FilterExampleSearchEntityType = FilterSearchEntityType + "={" + FilterHelpSearchEntityType + "}";
+        public const string FilterHelpSearchTransactionType = "Transactions.Sale|Transactions.Purchase|Transactions.Journal|Transactions.Payroll";
+        public const string FilterSearchTransactionType = "TransactionType";
+        public const string FilterExampleSearchTransactionType = FilterSearchTransactionType + "={" + FilterHelpSearchTransactionType + "}";
 
         public const string FilterIncludeSearchTermHighlights = "IncludeSearchTermHighlights";
         public const string FilterExampleIncludeSearchTermHighlights = FilterIncludeSearchTermHighlights + "={" + FilterHelpBool + "}";

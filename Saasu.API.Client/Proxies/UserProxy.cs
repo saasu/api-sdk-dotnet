@@ -3,6 +3,7 @@ using Saasu.API.Client.Framework;
 using Saasu.API.Core;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Globals;
+using Saasu.API.Core.Models.Users;
 
 namespace Saasu.API.Client.Proxies
 {
@@ -24,8 +25,8 @@ namespace Saasu.API.Client.Proxies
             ContentType = RequestContentType.ApplicationJson;
             AuthenticationMethod = AuthenticationType.Anonymous;
             PagingEnabled = false;
-            var uri = GetRequestUri(username);
-            return GetResponse<BaseResponseModel>(uri);
+            var uri = GetRequestUri(null);
+            return GetResponse<UserCredential, BaseResponseModel>(uri, new UserCredential {Username = username});
         }
     }
 }

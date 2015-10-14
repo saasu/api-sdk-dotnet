@@ -150,7 +150,14 @@ namespace Saasu.API.Core.Models.Items
         /// If this item is a voucher (IsVoucher = true), this indicates the date and time that the voucher item is valid to.
         /// </summary>
         public DateTime? ValidTo { get; set; }
-        
+        /// <summary>
+        /// The number of items currently on order.
+        /// </summary>
+        public decimal? OnOrder { get; set; }
+        /// <summary>
+        /// The number of items currently committed.
+        /// </summary>
+        public decimal? Committed { get; set; }
 
         public override string ModelKeyValue()
         {

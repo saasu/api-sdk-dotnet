@@ -11,7 +11,9 @@ namespace Saasu.API.Core.Models.FileIdentity
         {
             FileIdentities = new List<FileIdentitySummary>();
         }
+
         /// <summary>
+        /// A list of file identity summaries.
         /// </summary>
 		public List<FileIdentitySummary> FileIdentities { get; set; }
 

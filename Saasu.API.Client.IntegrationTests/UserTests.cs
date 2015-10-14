@@ -13,7 +13,7 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new UserProxy();
             var response = proxy.ResetPassword("");
             Assert.IsFalse(response.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Test]
@@ -26,12 +26,12 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         [Test]
-        public void ResetPasswordRequestForNonExistingUserShouldFail()
+        public void ResetPasswordRequestForNonExistingUserShouldReportSuccess()
         {
             var proxy = new UserProxy();
             var response = proxy.ResetPassword("nobody@existmail.com");
-            Assert.IsFalse(response.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.AreEqual("A password reset email has been sent.", response.DataObject.StatusMessage);
         }
     }
 }

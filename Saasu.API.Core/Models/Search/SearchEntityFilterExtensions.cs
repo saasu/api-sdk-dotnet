@@ -1,6 +1,6 @@
 ﻿namespace Saasu.API.Core.Models.Search
 {
-    public enum SearchEntityType
+    public enum SearchTransactionType
     {
         Sale,
         Purchase,
@@ -8,30 +8,30 @@
         Payroll
 
     }
-    public static class SearchEntityFilterExtensions
+    public static class SearchTransactionFilterExtensions
     {
         const string Sale = "transactions.sale";
         const string Purchase = "transactions.purchase";
         const string Journal = "transactions.journal";
         const string Payroll = "transactions.payroll";
-        public static SearchEntityType? ToSearchEntityType(this string searchEntityTypeParameter)
+        public static SearchTransactionType? ToSearchTransactionType(this string searchTransactionTypeParameter)
         {
-            var lowerParamater = searchEntityTypeParameter.ToLowerInvariant();
+            var lowerParamater = searchTransactionTypeParameter.ToLowerInvariant();
             if (lowerParamater == Sale)
             {
-                return SearchEntityType.Sale;
+                return SearchTransactionType.Sale;
             }
             if (lowerParamater == Purchase)
             {
-                return SearchEntityType.Purchase;
+                return SearchTransactionType.Purchase;
             }
             if (lowerParamater == Journal)
             {
-                return SearchEntityType.Journal;
+                return SearchTransactionType.Journal;
             }
             if (lowerParamater == Payroll)
             {
-                return SearchEntityType.Payroll;
+                return SearchTransactionType.Payroll;
             }
 
             return null;

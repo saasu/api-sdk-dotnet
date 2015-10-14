@@ -16,22 +16,22 @@ namespace Saasu.API.Core.Models.ContactAggregates
         /// </summary>
         public string LastUpdatedId { get; set; }
         /// <summary>
-        /// A.K.A "Title". Valid values: Mr., Mrs., Ms., Dr., Prof.
+        /// The salutation or title of the contact. Valid values: Mr., Mrs., Ms., Dr., Prof.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string Salutation { get; set; }
         /// <summary>
-        /// A.K.A "First Name". Name that is unique for an individual in a family. 
+        /// The first or given name of the contact.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string GivenName { get; set; }
         /// <summary>
-        /// A.K.A. "Initial".
+        /// The middle initials of the contact.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string MiddleInitials { get; set; }
         /// <summary>
-        /// A.K.A "Last Name", "Surname".
+        /// The last name or surname of the contact.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string FamilyName { get; set; }
@@ -95,7 +95,7 @@ namespace Saasu.API.Core.Models.ContactAggregates
         /// </summary>
         public bool IsContractor { get; set; }
         /// <summary>
-        /// A.K.A. "Mailing Address".
+        /// The postal or mailing address for the contact.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public Address PostalAddress { get; set; }

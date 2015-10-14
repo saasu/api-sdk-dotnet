@@ -99,6 +99,7 @@
     <Compile Include="Models\Items\UpdateItemResult.cs" />
     <Compile Include="Models\Search\ContactSearchResponse.cs" />
     <Compile Include="Models\Search\InventoryItemSearchResponse.cs" />
+    <Compile Include="Models\Search\SearchEntityFilterExtensions.cs" />
     <Compile Include="Models\Search\SearchResponse.cs" />
     <Compile Include="Models\Search\SearchScope.cs" />
     <Compile Include="Models\Search\TransactionSearchResponse.cs" />

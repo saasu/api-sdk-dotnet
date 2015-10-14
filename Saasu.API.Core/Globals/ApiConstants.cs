@@ -132,6 +132,10 @@
         public const string FilterSearchScope = "Scope";
         public const string FilterExampleSearchScope = FilterSearchScope + "={" + FilterHelpSearchScope + "}";
 
+        public const string FilterHelpSearchEntityType = "Transactions.Sale|Transactions.Purchase|Transactions.Journal|Transactions.Payroll";
+        public const string FilterSearchEntityType = "EntityType";
+        public const string FilterExampleSearchEntityType = FilterSearchEntityType + "={" + FilterHelpSearchEntityType + "}";
+
         public const string FilterIncludeSearchTermHighlights = "IncludeSearchTermHighlights";
         public const string FilterExampleIncludeSearchTermHighlights = FilterIncludeSearchTermHighlights + "={" + FilterHelpBool + "}";
 

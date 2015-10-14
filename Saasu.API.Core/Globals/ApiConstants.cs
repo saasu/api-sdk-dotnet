@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-
-namespace Saasu.API.Core.Globals
+﻿namespace Saasu.API.Core.Globals
 {
     public static class ApiConstants
     {
@@ -18,9 +12,10 @@ namespace Saasu.API.Core.Globals
         public const string PageSizeQueryArgDescriptiveName = "PageSize";
         public const string OptionalQueryArgKey = "optionalargs";
         public const string OptionalQueryArgKeyDescriptiveName = "OptionalArgs";
-        public const string OptionalQueryArgsTemplate = "{*"+OptionalQueryArgKey+"}";
+        public const string OptionalQueryArgsTemplate = "{*" + OptionalQueryArgKey + "}";
 
         public const string IdQueryArgParameter = "{id}";
+        public const string EmailInvoiceToContactUrlPath = "email-contact/";
 
         public const string UserSessionContext_FileGroupUidKey = "FileGroupUid";
         public const string UserSessionContext_UserUidKey = "UserUid";
@@ -111,13 +106,13 @@ namespace Saasu.API.Core.Globals
         public const string FilterExampleResultsSortString =
             FilterResultsSortString + "={" + FilterHelpResultSortString + "}";
 
-		//Accounts specific filter options.
-	    public const string FilterAccountType = "AccountType";
-		public const string FilterExampleAccountType = FilterAccountType + "={" + FilterHelpAccountType +"}";
-		public const string FilterIsBankAccount = "IsBankAccount";
-		public const string FilterExampleIsBankAccount = FilterIsBankAccount + "={" + FilterHelpBool + "}";
-		public const string FilterIncludeBuiltIn = "IncludeBuiltIn";
-		public const string FilterExampleIncludeBuiltIn = FilterIncludeBuiltIn + "={" + FilterHelpBool + "}";
+        //Accounts specific filter options.
+        public const string FilterAccountType = "AccountType";
+        public const string FilterExampleAccountType = FilterAccountType + "={" + FilterHelpAccountType + "}";
+        public const string FilterIsBankAccount = "IsBankAccount";
+        public const string FilterExampleIsBankAccount = FilterIsBankAccount + "={" + FilterHelpBool + "}";
+        public const string FilterIncludeBuiltIn = "IncludeBuiltIn";
+        public const string FilterExampleIncludeBuiltIn = FilterIncludeBuiltIn + "={" + FilterHelpBool + "}";
         public const string FilterHeaderAccountId = "HeaderAccountId";
         public const string FilterExampleHeaderAccountId = FilterHeaderAccountId + "={" + FilterHelpHeaderAccountId + "}";
 
@@ -132,14 +127,14 @@ namespace Saasu.API.Core.Globals
         //Search (Jump) filter options
         public const string FilterKeywords = "Keywords";
         public const string FilterExampleKeywords = FilterKeywords + "={" + FilterHelpText + "}";
-        
+
         public const string FilterHelpSearchScope = "All|Transactions|Contacts|InventoryItems";
         public const string FilterSearchScope = "Scope";
         public const string FilterExampleSearchScope = FilterSearchScope + "={" + FilterHelpSearchScope + "}";
 
         public const string FilterIncludeSearchTermHighlights = "IncludeSearchTermHighlights";
         public const string FilterExampleIncludeSearchTermHighlights = FilterIncludeSearchTermHighlights + "={" + FilterHelpBool + "}";
-        
+
     }
 
 }

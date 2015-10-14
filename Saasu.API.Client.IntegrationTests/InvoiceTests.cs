@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Metadata.Edm;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.Xml;
-using System.Text;
-using System.Web.Script.Serialization;
+﻿using NUnit.Framework;
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ola.RestClient.Dto;
 using Ola.RestClient.Proxies;
-using Saasu.API.Client.Framework;
-using Saasu.API.Core.Models.Invoices;
-using System.IO;
-using Saasu.API.Core.Models.Attachments;
-using Saasu.API.Core.Framework;
-using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
-using NUnit.Framework;
 using Saasu.API.Client.Proxies;
+using Saasu.API.Core.Framework;
+using Saasu.API.Core.Models.Attachments;
+using Saasu.API.Core.Models.Invoices;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -674,17 +668,17 @@ namespace Saasu.API.Client.IntegrationTests
             var updateInvoice = GetUpdatedInvoice(tranId, insertResult.LastUpdatedId, false, insertedInvoice);
 
             //Likewise the change is also made to the original inserted invoice for comparison later.
-            updateInvoice.LineItems = insertedInvoice.LineItems = new List<InvoiceTransactionLineItem> 
-			{
-				new InvoiceTransactionLineItem
-				{
-					Description = "updated line item",
-					AccountId = _IncomeAccountId2,
-					TaxCode = TaxCode.SaleInputTaxed,
-					TotalAmount = new decimal(100.00),                    
-					Tags = new List<string> { "update item tag 1", "update item tag 2" }
-				} 
-			};
+            updateInvoice.LineItems = insertedInvoice.LineItems = new List<InvoiceTransactionLineItem>
+            {
+                new InvoiceTransactionLineItem
+                {
+                    Description = "updated line item",
+                    AccountId = _IncomeAccountId2,
+                    TaxCode = TaxCode.SaleInputTaxed,
+                    TotalAmount = new decimal(100.00),
+                    Tags = new List<string> { "update item tag 1", "update item tag 2" }
+                }
+            };
 
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
@@ -729,20 +723,20 @@ namespace Saasu.API.Client.IntegrationTests
             var updateInvoice = GetUpdatedInvoice(tranId, insertResult.LastUpdatedId, true, insertedInvoice);
 
             //Likewise the change is also made to the original inserted invoice for comparison later.
-            updateInvoice.LineItems = insertedInvoice.LineItems = new List<InvoiceTransactionLineItem> 
-			{
-				new InvoiceTransactionLineItem
-						{
-							Description = "updated line item 1",
-							TaxCode = TaxCode.SaleInputTaxed,
-							Quantity = 20,
-							UnitPrice = new decimal(200.00),
-							PercentageDiscount = new decimal(15.00),
-							InventoryId =  _InventorySaleItemId2,
-							Tags = new List<string> {"updated item tag 1", "updated item tag 2"}
+            updateInvoice.LineItems = insertedInvoice.LineItems = new List<InvoiceTransactionLineItem>
+            {
+                new InvoiceTransactionLineItem
+                        {
+                            Description = "updated line item 1",
+                            TaxCode = TaxCode.SaleInputTaxed,
+                            Quantity = 20,
+                            UnitPrice = new decimal(200.00),
+                            PercentageDiscount = new decimal(15.00),
+                            InventoryId =  _InventorySaleItemId2,
+                            Tags = new List<string> {"updated item tag 1", "updated item tag 2"}
 							//Attributes = GetItemAttributes()
 						},
-			};
+            };
 
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
@@ -787,17 +781,17 @@ namespace Saasu.API.Client.IntegrationTests
             var updateInvoice = GetUpdatedInvoice(tranId, insertResult.LastUpdatedId, false, insertedInvoice);
 
             //Likewise the change is also made to the original inserted invoice for comparison later.
-            updateInvoice.LineItems = new List<InvoiceTransactionLineItem> 
-			{
-				new InvoiceTransactionLineItem
-				{
-					Description = "updated line item",
-					AccountId = _IncomeAccountId2,
-					TaxCode = TaxCode.SaleInputTaxed,
-					TotalAmount = new decimal(100.00),
-					Tags = new List<string> { "update item tag 1", "update item tag 2" }
-				} 
-			};
+            updateInvoice.LineItems = new List<InvoiceTransactionLineItem>
+            {
+                new InvoiceTransactionLineItem
+                {
+                    Description = "updated line item",
+                    AccountId = _IncomeAccountId2,
+                    TaxCode = TaxCode.SaleInputTaxed,
+                    TotalAmount = new decimal(100.00),
+                    Tags = new List<string> { "update item tag 1", "update item tag 2" }
+                }
+            };
 
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
@@ -841,19 +835,19 @@ namespace Saasu.API.Client.IntegrationTests
             //invoice returned after the update has occurred, to make sure all fields are equal.
             var updateInvoice = GetUpdatedInvoice(tranId, insertResult.LastUpdatedId, true, insertedInvoice);
 
-            updateInvoice.LineItems = new List<InvoiceTransactionLineItem> 
-			{
-				new InvoiceTransactionLineItem
-						{
-							Description = "upadated line item 1",
-							TaxCode = TaxCode.SaleInputTaxed,
-							Quantity = 20,
-							UnitPrice = new decimal(200.00),
-							PercentageDiscount = new decimal(15.00),
-							InventoryId =  _InventoryPurchaseItemId2,
-							Tags = new List<string> {"upadated item tag 1", "updated item tag 2"}							
-						}
-			};
+            updateInvoice.LineItems = new List<InvoiceTransactionLineItem>
+            {
+                new InvoiceTransactionLineItem
+                        {
+                            Description = "upadated line item 1",
+                            TaxCode = TaxCode.SaleInputTaxed,
+                            Quantity = 20,
+                            UnitPrice = new decimal(200.00),
+                            PercentageDiscount = new decimal(15.00),
+                            InventoryId =  _InventoryPurchaseItemId2,
+                            Tags = new List<string> {"upadated item tag 1", "updated item tag 2"}
+                        }
+            };
 
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
@@ -1054,6 +1048,33 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(response.ReasonCode.Trim().ToLower(), "bad request");
         }
 
+        [Test]
+        public void EmailInvoiceToBillingContact()
+        {
+            var contactResponse = ContactTests.VerifyTestContactExistsOrCreate(contactType: Ola.RestClient.ContactType.Customer);
+
+            var billingContactId = contactResponse.DataObject.Contacts[0].Id;
+
+            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", billingContactId: billingContactId, emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var insertResponse = new InvoiceProxy().InsertInvoice(invoice);
+
+            Assert.IsTrue(insertResponse.IsSuccessfull);
+
+            var insertResult = insertResponse.DataObject;
+
+            var tranid = insertResult.InsertedEntityId;
+
+            Assert.IsTrue(tranid > 0);
+
+            var response = new InvoiceProxy().EmailInvoice(tranid);
+
+            Assert.IsNotNull(response);
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsNotNull(response.DataObject);
+            Assert.AreEqual("Invoice has been sent to the billing contact.", response.DataObject.StatusMessage);
+            Assert.IsNotNull(response.DataObject._links);
+            Assert.IsTrue(response.DataObject._links.Count > 0);
+        }
 
 
         #endregion
@@ -1275,33 +1296,33 @@ namespace Saasu.API.Client.IntegrationTests
             var tranType = transactionType ?? "S";
 
             var invDetail = new InvoiceTransactionDetail
-                {
-                    LineItems = lineItems ?? GetInsertItems(invoiceLayout, tranType),
-                    NotesInternal = notesInternal ?? "Test internal note",
-                    NotesExternal = notesExternal ?? "Test external note",
-                    Terms = terms ?? GetTradingTerms(),
-                    Attachments = attachments ?? GetAttachments(),
-                    TemplateId = templateId ?? GetTemplateUid(),
-                    SendEmailToContact = emailContact,
-                    EmailMessage = emailMessage ?? GetEmailMessage(),
-                    Currency = currency ?? "AUD",
-                    InvoiceNumber = invoiceNumber ?? AutoNumber,
-                    PurchaseOrderNumber = purchaseOrderNumber ?? AutoNumber,
-                    InvoiceType = invoiceType ?? "Tax Invoice",
-                    TransactionType = tranType,
-                    Layout = invoiceLayout,
-                    Summary = summary ?? "Summary InsertInvoiceWithServiceItemsNoEmailToContact",
-                    TotalAmount = totalAmountInclTax ?? new decimal(20.00),
-                    IsTaxInc = true,
-                    RequiresFollowUp = requiresFollowUp,
-                    TransactionDate = transactionDate ?? DateTime.Now.AddDays(-10),
-                    BillingContactId = billingContactId ?? _BillingContactId,
-                    ShippingContactId = shippingContactId ?? _ShippingContactId,
-                    FxRate = fxRate,
-                    AutoPopulateFxRate = autoPopulateFxRate,
-                    InvoiceStatus = invoiceStatus,
-                    Tags = tags ?? new List<string> { "invoice header tag 1", "invoice header tag 2" }
-                };
+            {
+                LineItems = lineItems ?? GetInsertItems(invoiceLayout, tranType),
+                NotesInternal = notesInternal ?? "Test internal note",
+                NotesExternal = notesExternal ?? "Test external note",
+                Terms = terms ?? GetTradingTerms(),
+                Attachments = attachments ?? GetAttachments(),
+                TemplateId = templateId ?? GetTemplateUid(),
+                SendEmailToContact = emailContact,
+                EmailMessage = emailMessage ?? GetEmailMessage(),
+                Currency = currency ?? "AUD",
+                InvoiceNumber = invoiceNumber ?? AutoNumber,
+                PurchaseOrderNumber = purchaseOrderNumber ?? AutoNumber,
+                InvoiceType = invoiceType ?? "Tax Invoice",
+                TransactionType = tranType,
+                Layout = invoiceLayout,
+                Summary = summary ?? "Summary InsertInvoiceWithServiceItemsNoEmailToContact",
+                TotalAmount = totalAmountInclTax ?? new decimal(20.00),
+                IsTaxInc = true,
+                RequiresFollowUp = requiresFollowUp,
+                TransactionDate = transactionDate ?? DateTime.Now.AddDays(-10),
+                BillingContactId = billingContactId ?? _BillingContactId,
+                ShippingContactId = shippingContactId ?? _ShippingContactId,
+                FxRate = fxRate,
+                AutoPopulateFxRate = autoPopulateFxRate,
+                InvoiceStatus = invoiceStatus,
+                Tags = tags ?? new List<string> { "invoice header tag 1", "invoice header tag 2" }
+            };
 
             if (actuallyInsertAndVerifyResponse)
             {
@@ -1379,50 +1400,50 @@ namespace Saasu.API.Client.IntegrationTests
             {
                 case "S":
                     return new List<InvoiceTransactionLineItem>
-					{
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 1",
-							AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-							TaxCode = TaxCode.SaleInclGst,
-							TotalAmount = new decimal(10.00),
-							Tags = new List<string> {"item tag 1", "item tag 2"}
-						},
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 2",
-							AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-							TaxCode = TaxCode.SaleInputTaxed,
-							TotalAmount = new decimal(20.00),
-							Tags = new List<string> {"item tag 3", "item tag 4"}
-						}
+                    {
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 1",
+                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
+                            TaxCode = TaxCode.SaleInclGst,
+                            TotalAmount = new decimal(10.00),
+                            Tags = new List<string> {"item tag 1", "item tag 2"}
+                        },
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 2",
+                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
+                            TaxCode = TaxCode.SaleInputTaxed,
+                            TotalAmount = new decimal(20.00),
+                            Tags = new List<string> {"item tag 3", "item tag 4"}
+                        }
 
-					};
+                    };
                 case "I":
                     return new List<InvoiceTransactionLineItem>
-					{
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 1",
-							TaxCode = TaxCode.SaleInclGst,
-							Quantity = 2,
-							UnitPrice = new decimal(15.00),
-							PercentageDiscount = new decimal(3.00),
-							InventoryId =  tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
-							Tags = new List<string> {"item tag 1", "item tag 2"}
-						},
-						new InvoiceTransactionLineItem
-						{
-							Description = "line item 2",
-							TaxCode = TaxCode.SaleInputTaxed,
-							Quantity = 3,
-							UnitPrice = new decimal(25.00),
-							PercentageDiscount = new decimal(0.00),
-							InventoryId = tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
-							Tags = new List<string> {"item tag 3", "item tag 4"}
-						}
+                    {
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 1",
+                            TaxCode = TaxCode.SaleInclGst,
+                            Quantity = 2,
+                            UnitPrice = new decimal(15.00),
+                            PercentageDiscount = new decimal(3.00),
+                            InventoryId =  tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            Tags = new List<string> {"item tag 1", "item tag 2"}
+                        },
+                        new InvoiceTransactionLineItem
+                        {
+                            Description = "line item 2",
+                            TaxCode = TaxCode.SaleInputTaxed,
+                            Quantity = 3,
+                            UnitPrice = new decimal(25.00),
+                            PercentageDiscount = new decimal(0.00),
+                            InventoryId = tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            Tags = new List<string> {"item tag 3", "item tag 4"}
+                        }
 
-					};
+                    };
                 default:
                     return null;
             }
@@ -1458,10 +1479,10 @@ namespace Saasu.API.Client.IntegrationTests
             if (response.DataObject.Contacts.Count == 0)
             {
                 var dto = new Ola.RestClient.Dto.ContactDto
-                    {
-                        GivenName = "TestAPIInvoice",
-                        FamilyName = "BillingContact"
-                    };
+                {
+                    GivenName = "TestAPIInvoice",
+                    FamilyName = "BillingContact"
+                };
 
                 Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
                 proxy.Insert(dto);
@@ -1699,17 +1720,18 @@ namespace Saasu.API.Client.IntegrationTests
                 var builder = new StringBuilder();
                 builder.AppendFormat("This is a test attachment written at {0} {1}", DateTime.Now.ToLongDateString(), DateTime.Now.ToLongTimeString());
                 // Ensure we have an attchment of around 100k
-                
-                for (var cnt=0; cnt < 20240; cnt++ )
+
+                for (var cnt = 0; cnt < 20240; cnt++)
                 {
                     builder.Append("This is Some Data man!");
                 }
                 attachmentData = builder.ToString();
-            } else
+            }
+            else
             {
                 attachmentData = string.Format("This is a test attachment written at {0} {1}", DateTime.Now.ToLongDateString(), DateTime.Now.ToLongTimeString());
             }
-            File.WriteAllText(attachmentName, attachmentData );
+            File.WriteAllText(attachmentName, attachmentData);
 
             var byteData = File.ReadAllBytes(attachmentName);
             FileAttachment attachment = new FileAttachment();

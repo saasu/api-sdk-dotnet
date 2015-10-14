@@ -46,6 +46,11 @@ namespace Saasu.API.Core.Models.Invoices
         /// The Id of the inventory item for this line item.
         /// </summary>
         public int? InventoryId { get; set; }
+
+        /// <summary>
+        /// The Inventory Item code for this line item. Not required when inserting a line item.
+        /// </summary>
+        public string ItemCode { get; set; }
  
         private List<string> _tagList;
         /// <summary>

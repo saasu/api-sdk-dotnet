@@ -131,7 +131,7 @@ namespace Saasu.API.Core.Globals
 
         //Search (Jump) filter options
         public const string FilterKeywords = "Keywords";
-        public const string FilterExampleKeywords = FilterSearchText + "={" + FilterHelpText + "}";
+        public const string FilterExampleKeywords = FilterKeywords + "={" + FilterHelpText + "}";
         
         public const string FilterHelpSearchScope = "All|Transactions|Contacts|InventoryItems";
         public const string FilterSearchScope = "Scope";

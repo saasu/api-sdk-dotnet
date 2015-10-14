@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Saasu.API.Core.Globals
+﻿namespace Saasu.API.Core.Globals
 {
     public static class RouteNames
     {
@@ -31,6 +25,7 @@ namespace Saasu.API.Core.Globals
 
         public const string FileIdentityWithId = "~/" + ResourceNames.FileIdentity + "/{id}";
         public const string FileIdentityWithoutId = "~/" + ResourceNames.FileIdentity;
+        public const string FileIdentities = "~/" + ResourceNames.FileIdentities;
 
         public const string TaxCodeWithId = "~/" + ResourceNames.TaxCode + "/{id}";
         public const string TaxCodeWithoutId = "~/" + ResourceNames.TaxCode;
@@ -40,7 +35,7 @@ namespace Saasu.API.Core.Globals
         public const string ItemWithoutId = "~/" + ResourceNames.Item;
         public const string Items = "~/" + ResourceNames.Items;
 
-        public const string CompanyWithId = "~/" + ResourceNames.Company+ "/{id}";
+        public const string CompanyWithId = "~/" + ResourceNames.Company + "/{id}";
         public const string CompanyWithoutId = "~/" + ResourceNames.Company;
         public const string Companies = "~/" + ResourceNames.Companies;
 

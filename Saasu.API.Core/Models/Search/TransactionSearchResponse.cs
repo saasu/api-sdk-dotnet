@@ -123,6 +123,17 @@ namespace Saasu.API.Core.Models.Search
         public string InvoiceNumber { get; set; }
 
         /// <summary>
+        /// The unique Id of the type of invoice this tranaction represents.
+        /// </summary>
+        public int InvoiceTypeId { get; set; }
+
+        /// <summary>
+        /// The description of the invoice type this transaction represnts eg: Tax Invoice, Bill, Sale Order etc.
+        /// </summary>
+        public string InvoiceTypeDescription { get; set; }
+
+
+        /// <summary>
         /// The Purchase Order Number on a Sale or Purchase transaction.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]

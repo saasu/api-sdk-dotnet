@@ -110,6 +110,8 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(invoice.NotesExternal, indexedTransaction.ExternalNotes);
             Assert.AreEqual(invoice.NotesInternal, indexedTransaction.Notes);
             Assert.AreEqual(invoice.TransactionType, indexedTransaction.Type);
+            Assert.Greater(indexedTransaction.InvoiceTypeId, 0);
+            Assert.AreEqual(invoice.InvoiceType, indexedTransaction.InvoiceTypeDescription);
         }
 
         [Test]

@@ -7,6 +7,7 @@ using Saasu.API.Core.Models.Invoices;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.Pkcs;
 using System.Text;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
@@ -109,6 +110,17 @@ namespace Saasu.API.Client.IntegrationTests
             }
         }
 
+        public int? QuoteId1
+        {
+            get { return _quote1Id; }
+        }
+
+        public string QuoteId1Summary
+        {
+            get { return _quote1IdSummary; }
+        }
+        
+
         private int _BillingContactId;
         private int _ShippingContactId;
         private int _IncomeAccountId;
@@ -126,10 +138,12 @@ namespace Saasu.API.Client.IntegrationTests
         private int _invoice2Id;
         private int _invoice3Id;
         private int _invoice4Id;
+        private int _quote1Id;
         private string _invoice1IdSummary;
         private string _invoice2IdSummary;
         private string _invoice3IdSummary;
         private string _invoice4IdSummary;
+        private string _quote1IdSummary;
 
         private const string AutoNumber = "<auto number>";
 
@@ -323,7 +337,7 @@ namespace Saasu.API.Client.IntegrationTests
                 {
                     BSB = "111111",
                     AccountNumber = "22222222",
-                    Type = AccountType.Income,
+                    Type = AccountType.Asset,
                     Name = acctname,
                     DisplayName = acctname
                 };
@@ -452,6 +466,10 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.Greater(inv4.TransactionId, 0);
             _invoice4Id = Convert.ToInt32(inv4.TransactionId);
             _invoice4IdSummary = inv4.Summary;
+
+            var quote1 = GetTestInsertInvoice(InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, invoiceType: "Quote");
+            Assert.IsNotNull(quote1);
+            Assert.Greater(quote1.TransactionId, 0);
         }
 
         private static int? GetTestInvoiceId()

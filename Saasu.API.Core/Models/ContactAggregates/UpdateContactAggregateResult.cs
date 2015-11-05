@@ -18,6 +18,26 @@ namespace Saasu.API.Core.Models.ContactAggregates
         /// </summary>
         public DateTime LastModified { get; set; }
 
+        /// <summary>
+        /// The unique id associated with the Company that was added or updated.
+        /// </summary>
+        public int CompanyId { get; set; }
+        /// <summary>
+        /// The unique id associated with this update for the Company. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// </summary>
+        [System.Xml.Serialization.XmlElement(IsNullable = true)]
+        public string CompanyLastUpdatedId { get; set; }
+
+        /// <summary>
+        /// The unique id associated with the Contact Manager that was added or updated.
+        /// </summary>
+        public int ContactManagerId { get; set; }
+        /// <summary>
+        /// The unique id associated with this update for the Contact Manager. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// </summary>
+        [System.Xml.Serialization.XmlElement(IsNullable = true)]
+        public string ContactManagerLastUpdatedId { get; set; }
+
         public override string ModelKeyValue()
         {
             return UpdatedContactId.ToString();

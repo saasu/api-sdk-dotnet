@@ -161,7 +161,31 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(response.DataObject.Accounts[0].Id, _accountToAssignToHeaderAccount, "Incorrect account assigned to header account.");
         }
 
-		[Test]
+        [Test]
+        public void GetAccountsFilterOnAccountLevelDetail()
+        {
+            var accountsProxy = new AccountsProxy();
+            var response = accountsProxy.GetAccounts(accountLevel: "Detail");
+
+            Assert.IsNotNull(response, "Reponse is null");
+            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+            Assert.Greater(response.DataObject.Accounts.Count, 0, "no accounts returned");
+            Assert.AreEqual(response.DataObject.Accounts.Where(acct => acct.AccountLevel.ToLower() == "header").ToList().Count, 0);
+        }
+
+        [Test]
+        public void GetAccountsFilterOnAccountLevelheader()
+        {
+            var accountsProxy = new AccountsProxy();
+            var response = accountsProxy.GetAccounts(accountLevel: "Header");
+
+            Assert.IsNotNull(response, "Reponse is null");
+            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+            Assert.Greater(response.DataObject.Accounts.Count, 0, "no accounts returned");
+            Assert.AreEqual(response.DataObject.Accounts.Where(acct => acct.AccountLevel.ToLower() == "detail").ToList().Count, 0);
+        }
+
+        [Test]
 		public void GetAccountsPageSize()
 		{
 			var accountsProxy = new AccountsProxy();

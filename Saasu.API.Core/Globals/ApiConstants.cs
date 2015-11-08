@@ -38,6 +38,7 @@
         public const string FilterHelpResultSortString = "TransactionDate";
         public const string FilterHelpAccountType = "Income|Expense|Asset|Equity|Liability|OtherIncome|OtherExpense|CostOfSales";
         public const string FilterHelpHeaderAccountId = "111";
+        public const string FilterHelpAccountLevel = "detail|header";
         public const string FilterSearchMethodString = "Contains|StartsWith";
         public const string FilterHelpItemTypes = "I|C";
 
@@ -117,6 +118,8 @@
         public const string FilterExampleIncludeBuiltIn = FilterIncludeBuiltIn + "={" + FilterHelpBool + "}";
         public const string FilterHeaderAccountId = "HeaderAccountId";
         public const string FilterExampleHeaderAccountId = FilterHeaderAccountId + "={" + FilterHelpHeaderAccountId + "}";
+        public const string FilterAccountLevel = "AccountLevel";
+        public const string FilterExampleAccountLevel = FilterAccountLevel + "={" + FilterHelpAccountLevel + "}";
 
         public const string FilterItemType = "ItemType";
         public const string FilterExampleItemType = FilterItemType + "={" + FilterHelpItemTypes + "}";

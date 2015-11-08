@@ -31,7 +31,7 @@ namespace Saasu.API.Client.Proxies
 
 
 		public ProxyResponse<AccountListResponse> GetAccounts(int? pageNumber = null, int? pageSize = null, bool? isActive = null, bool? isBankAccount = null,
-                    string accountType = null, bool? includeBuiltIn = null, int? headerAccountId = null)
+                    string accountType = null, bool? includeBuiltIn = null, int? headerAccountId = null, string accountLevel = null)
 		{
 			OperationMethod = HttpMethod.Get;
 			var queryArgs = new StringBuilder();
@@ -61,7 +61,12 @@ namespace Saasu.API.Client.Proxies
                 AppendQueryArg(queryArgs, ApiConstants.FilterHeaderAccountId, headerAccountId.Value.ToString());
             }
 
-			bool inclPageNumber;
+            if (!string.IsNullOrEmpty(accountLevel))
+            {
+                AppendQueryArg(queryArgs, ApiConstants.FilterAccountLevel, accountLevel);
+            }
+
+            bool inclPageNumber;
 			bool inclPageSize;
 
 			base.GetPaging(queryArgs, pageNumber, pageSize, out inclPageNumber, out inclPageSize);

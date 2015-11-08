@@ -3,7 +3,7 @@
 	<metadata>
 		<id>Saasu.API.Dotnet.Sdk</id>
 		<title>API SDK for the Saasu API</title>
-		<version>1.2.0</version>
+		<version>1.1.1</version>
 		<authors>Saasu</authors>
 		<description>A client SDK for working with the Saasu API.</description>
 		<summary>A client SDK for working with the Saasu API.</summary>

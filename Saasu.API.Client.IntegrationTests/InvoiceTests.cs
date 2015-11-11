@@ -684,7 +684,7 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResult = updateResponse.DataObject;
 
             Assert.IsFalse(updateResult.SentToContact);
-            Assert.AreEqual(Convert.ToDateTime(updateResult.UtcLastModified).Date, DateTime.UtcNow.Date);
+            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
             Assert.IsNotNull(updateResult.LastUpdatedId);
             Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
@@ -742,7 +742,7 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResult = updateResponse.DataObject;
 
             Assert.IsTrue(updateResult.SentToContact);
-            Assert.AreEqual(Convert.ToDateTime(updateResult.UtcLastModified).Date, DateTime.UtcNow.Date);
+            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
             Assert.IsNotNull(updateResult.LastUpdatedId);
             Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
@@ -797,7 +797,7 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResult = updateResponse.DataObject;
 
             Assert.IsFalse(updateResult.SentToContact);
-            Assert.AreEqual(Convert.ToDateTime(updateResult.UtcLastModified).Date, DateTime.UtcNow.Date);
+            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
             Assert.IsNotNull(updateResult.LastUpdatedId);
             Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
@@ -853,7 +853,7 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResult = updateResponse.DataObject;
 
             Assert.IsTrue(updateResult.SentToContact);
-            Assert.AreEqual(Convert.ToDateTime(updateResult.UtcLastModified).Date, DateTime.UtcNow.Date);
+            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
             Assert.IsNotNull(updateResult.LastUpdatedId);
             Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
@@ -894,7 +894,7 @@ namespace Saasu.API.Client.IntegrationTests
 
             var updateResult = updateResponse.DataObject;
             Assert.IsFalse(updateResult.SentToContact);
-            Assert.AreEqual(Convert.ToDateTime(updateResult.UtcLastModified).Date, DateTime.UtcNow.Date);
+            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
             Assert.IsNotNull(updateResult.LastUpdatedId);
             Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 

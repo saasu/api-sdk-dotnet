@@ -11,7 +11,7 @@ namespace Saasu.API.Core
     {
         /// <summary>
         /// The unique identifier generated as part of the update. This value is required when submitting subsequent update
-        /// to ensure no data loss/overwrites occur.
+        /// to prevent concurrency errors.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string LastUpdatedId { get; set; }

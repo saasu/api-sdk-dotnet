@@ -77,7 +77,10 @@
         /// Currency code of the payment eg: AUD or USD.
         /// </summary>
         public string CurrencyCode { get; set; }
-
+        /// <summary>
+        /// Settings that specify the default behaviour for a file.
+        /// </summary>
+        public FileSettings FileSettings { get; set; }
         public override string ModelKeyValue()
         {
             return string.Empty;

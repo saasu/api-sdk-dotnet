@@ -90,6 +90,7 @@
     <Compile Include="Models\DirectDepositDetails.cs" />
     <Compile Include="Models\FileIdentity\FileIdentitySummaryResponse.cs" />
     <Compile Include="Models\FileIdentity\FileIdentitySummary.cs" />
+    <Compile Include="Models\FileIdentity\FileSettings.cs" />
     <Compile Include="Models\Invoices\EmailInvoice.cs" />
     <Compile Include="Models\Invoices\InvoiceEmailResult.cs" />
     <Compile Include="Models\Items\InsertItemResult.cs" />

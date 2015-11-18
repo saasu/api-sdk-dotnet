@@ -9,7 +9,7 @@ namespace Saasu.API.Core.Models.ContactAggregates
         /// </summary>
 		public int InsertedContactId { get; set; }
         /// <summary>
-        /// The unique id associated with this update. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// The unique id associated with this update. This value is required to be passed in on subsequent updates to prevent concurrency errors.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string LastUpdatedId { get; set; }
@@ -23,7 +23,7 @@ namespace Saasu.API.Core.Models.ContactAggregates
         /// </summary>
         public int CompanyId { get; set; }
         /// <summary>
-        /// The unique id associated with this update for the Company. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// The unique id associated with this update for the Company. This value is required to be passed in on subsequent updates to prevent concurrency errors.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string CompanyLastUpdatedId { get; set; }
@@ -33,7 +33,7 @@ namespace Saasu.API.Core.Models.ContactAggregates
         /// </summary>
         public int ContactManagerId { get; set; }
         /// <summary>
-        /// The unique id associated with this update for the Contact Manager. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// The unique id associated with this update for the Contact Manager. This value is required to be passed in on subsequent updates to prevent concurrency errors.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string ContactManagerLastUpdatedId { get; set; }

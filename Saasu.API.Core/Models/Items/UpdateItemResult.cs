@@ -13,7 +13,7 @@ namespace Saasu.API.Core.Models.Items
         /// </summary>
         public int UpdatedItemId { get; set; }
         /// <summary>
-        /// The unique id associated with this update. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// The unique id associated with this update. This value is required to be passed in on subsequent updates to prevent concurrency errors.
         /// </summary>
 
         public override string ModelKeyValue()

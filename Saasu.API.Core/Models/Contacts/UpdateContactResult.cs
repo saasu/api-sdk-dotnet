@@ -13,7 +13,7 @@ namespace Saasu.API.Core.Models.Contacts
         /// </summary>
         public int UpdatedContactId { get; set; }
         /// <summary>
-        /// The unique id associated with this update. This value is required to be passed in on subsequent updates to prevent data loss/corruption.
+        /// The unique id associated with this update. This value is required to be passed in on subsequent updates to prevent concurrency errors.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string LastUpdatedId { get; set; }

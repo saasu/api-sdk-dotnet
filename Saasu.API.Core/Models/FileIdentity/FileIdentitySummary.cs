@@ -34,7 +34,10 @@
         /// Name of the subscription.
         /// </summary>
         public string SubscriptionName { get; set; }
-
+        /// <summary>
+        /// Settings that specify the default behaviour for a file.
+        /// </summary>
+        public FileSettings FileSettings { get; set; }
         public override string ModelKeyValue()
         {
             return Id.ToString();

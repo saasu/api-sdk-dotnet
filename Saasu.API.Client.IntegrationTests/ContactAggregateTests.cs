@@ -35,6 +35,10 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.IsTrue(Response.DataObject.InsertedContactId > 0, "Invalid InsertedContactId returned from InsertContactAggregate");
             Assert.IsTrue(Response.DataObject.LastUpdatedId.Length > 0, "Invalid LastUpdatedId returned");
             Assert.IsTrue(Response.DataObject.LastModified > DateTime.UtcNow.AddMinutes(-5), "Invalid LastModified returned");
+            Assert.IsTrue(Response.DataObject.CompanyId > 0, "Invalid CompanyId returned from InsertContactAggregate when inserting new company");
+            Assert.IsTrue(Response.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from InsertContactAggregate when inserting new company");
+            Assert.IsTrue(Response.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from InsertContactAggregate when inserting new contact manager");
+            Assert.IsTrue(Response.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from InsertContactAggregate when inserting new contact manager");
 
             var contactResponse = contactProxy.GetContact(Response.DataObject.InsertedContactId);
             Assert.IsTrue(contactResponse.IsSuccessfull, "Contact not found");
@@ -73,6 +77,10 @@ namespace Saasu.API.Client.IntegrationTests
             var contactAggregateResponse = contactAggregateProxy.InsertContactAggregate(contactAggregate);
             Assert.IsTrue(contactAggregateResponse.IsSuccessfull, "Contact aggregate with new contact and updated company and contact manager failed");
             Assert.IsNotNull(contactAggregateResponse.DataObject);
+            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from InsertContactAggregate when updating company");
+            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from InsertContactAggregate when updating company");
+            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from InsertContactAggregate when updating contact manager");
+            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from InsertContactAggregate when updating contact manager");
 
             var dbContactAggregate =
                 contactAggregateProxy.GetContactAggregate(contactAggregateResponse.DataObject.InsertedContactId);
@@ -115,6 +123,10 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.IsTrue(contactAggregateResponse.IsSuccessfull, "Failed to update existing contact and add new company and contact manager");
             Assert.IsNotNull(contactAggregateResponse.DataObject);
             Assert.AreEqual(contactResponse.DataObject.InsertedContactId, contactAggregateResponse.DataObject.UpdatedContactId);
+            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from UpdateContactAggregate when inserting new company");
+            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from UpdateContactAggregate when inserting new company");
+            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from UpdateContactAggregate when inserting new contact manager");
+            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from UpdateContactAggregate when inserting new contact manager");
 
             var updatedContact = contactProxy.GetContact(contactResponse.DataObject.InsertedContactId);
             AssertUpdatedContact(contactAggregate, updatedContact);
@@ -158,6 +170,10 @@ namespace Saasu.API.Client.IntegrationTests
                 contactResponse.DataObject.InsertedContactId);
             Assert.IsTrue(contactAggregateUpdateResponse.IsSuccessfull, "Updating contact and company and contact manager in aggregate failed");
             Assert.IsNotNull(contactAggregateUpdateResponse.DataObject);
+            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from UpdateContactAggregate when updating company");
+            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from UpdateContactAggregate when updating company");
+            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from UpdateContactAggregate when updating contact manager");
+            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from UpdateContactAggregate when updating contact manager");
 
             var updatedContactAggregateResponse =
                 contactAggregateProxy.GetContactAggregate(contactResponse.DataObject.InsertedContactId);

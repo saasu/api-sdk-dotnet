@@ -23,5 +23,27 @@ namespace Saasu.API.Client.IntegrationTests
 
             return authResponse.DataObject.AccessGrant.access_token;
         }
+
+        /// <summary>
+        /// This is used to compare dates where a few seconds needs to added to past and future to account for slight differences in value.
+        /// </summary>
+        public static bool AssertDatetimesEqualWithVariance(DateTime dateToVary, DateTime dateToNotTouch)
+        {
+            var variance = System.Configuration.ConfigurationManager.AppSettings["TestingDateTimeVariance"];
+
+            Int16 varianceInt = 0;
+
+            Int16.TryParse(variance, out varianceInt);
+
+            if (varianceInt == 0)
+            {
+                return dateToVary == dateToNotTouch;
+            }
+
+            var minDate = dateToVary.AddSeconds(-varianceInt);
+            var maxDate = dateToVary.AddSeconds(varianceInt);
+
+            return dateToNotTouch > minDate && dateToNotTouch < maxDate;
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.AreEqual(company.CompanyEmail, companyById.CompanyEmail, "Incorrect company email");
             Assert.AreEqual(company.CreatedDateUtc, companyById.CreatedDateUtc, "Incorrect created date");
             Assert.AreEqual(company.LastModifiedByUserId, companyById.LastModifiedByUserId, "Incorrect last modified by user id");
-            Assert.AreEqual(company.LastModifiedDateUtc, companyById.LastModifiedDateUtc, "Incorrect last modified date");
+            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(company.LastModifiedDateUtc, companyById.LastModifiedDateUtc), "Incorrect last modified date");
             Assert.AreEqual(company.LastUpdatedId, companyById.LastUpdatedId, "Incorrect last updated id");
             Assert.AreEqual(company.LongDescription, companyById.LongDescription, "Incorrect long description");
             Assert.AreEqual(company.Name, companyById.Name, "Incorrect name");

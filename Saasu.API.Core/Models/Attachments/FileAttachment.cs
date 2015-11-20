@@ -12,9 +12,6 @@ namespace Saasu.API.Core.Models.Attachments
     public class FileAttachment : FileAttachmentBaseInfo
 	{
         /// <summary>
-        /// Name of the attachment
-        /// </summary>
-        /// <summary>
         ///  This is an array of bytes and represents the data of the attachment (ie. the attachment itself). 
         ///  You must convert the file you want to attach into a byte array. This is usually done programmatically which our client code does for you. 
         ///  This process is called serialisation and more information on this can be found here http://en.wikipedia.org/wiki/Serialization"

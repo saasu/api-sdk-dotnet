@@ -122,15 +122,11 @@ namespace Saasu.API.Core.Models.Search
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string InvoiceNumber { get; set; }
 
-        /// <summary>
-        /// The unique Id of the type of invoice this tranaction represents.
-        /// </summary>
-        public int InvoiceTypeId { get; set; }
 
         /// <summary>
-        /// The description of the invoice type this transaction represnts eg: Tax Invoice, Bill, Sale Order etc.
+        /// The Invoice type description. Few examples are: "Pre-Quote Opportunity", "Quote" , "Purchase Order", "Sale Order", "Tax Invoice", "Adjustment Note", "RCT Invoice", "Money In (Income)", "Money Out (Expense)". 
         /// </summary>
-        public string InvoiceTypeDescription { get; set; }
+        public string InvoiceType { get; set; }
 
 
         /// <summary>

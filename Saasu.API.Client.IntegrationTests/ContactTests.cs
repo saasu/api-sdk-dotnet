@@ -170,6 +170,35 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         [Test]
+        public void GetContactsFilterOnCompanyId()
+        {
+            var companiesProxy = new CompaniesProxy();
+            var contactsProxy = new ContactsProxy();
+
+            var companies = companiesProxy.GetCompanies("O'Neil Capital", null, null, null, null);
+            var company = companies.DataObject?.Companies?.FirstOrDefault();
+            Assert.IsNotNull(company);
+
+            var contact = contactsProxy.GetContacts(organisationId: company.Id);
+            Assert.IsNotNull(contact);
+            Assert.AreEqual(1, contact.DataObject.Contacts.Count);
+            Assert.AreEqual("Carl", contact.DataObject.Contacts.First().GivenName);
+        }
+
+        [Test]
+        public void GetContactsFilterOnCompanyName()
+        {
+            var companiesProxy = new CompaniesProxy();
+            var contactsProxy = new ContactsProxy();
+            var companyName = "O'Neil Capital";
+
+            var contact = contactsProxy.GetContacts(organisationName: companyName);
+            Assert.IsNotNull(contact);
+            Assert.AreEqual(1,contact.DataObject.Contacts.Count);
+            Assert.AreEqual("Carl", contact.DataObject.Contacts.First().GivenName);
+        }
+
+        [Test]
         public void GetSingleContactWithContactId()
         {
             var contactsProxy = new ContactsProxy();
@@ -244,12 +273,12 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         public static ProxyResponse<ContactResponse> AssertContactProxy(ContactsProxy proxy, int? pageNumber = null, int? pageSize = null, DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null,
-            string givenName = null, string familyName = null, string organisationName = null,
+            string givenName = null, string familyName = null, string organisationName = null, int? organisationId = null,
             bool? isActive = null, bool? isCustomer = null, bool? isSupplier = null, bool? isContractor = null, bool? isPartner = null,
             string tags = null, string tagSelection = null, string email = null, string contactId = null)
         {
             var response = proxy.GetContacts(pageNumber, pageSize, lastModifiedFromDate, lastModifiedToDate,
-                givenName, familyName, organisationName,
+                givenName, familyName, organisationName, organisationId,
                 isActive, isCustomer, isSupplier, isContractor, isPartner,
                 tags, tagSelection, email, contactId);
 

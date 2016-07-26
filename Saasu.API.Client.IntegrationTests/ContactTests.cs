@@ -671,6 +671,7 @@ namespace Saasu.API.Client.IntegrationTests
                 DefaultPurchaseDiscount = 10M,
                 DefaultSaleDiscount = 11M,
                 EmailAddress = "john@cook.com",
+                BillingSecondaryEmailAddress = "john.second@cook.com",
                 FamilyName = "Cook",
                 Fax = "0254112244",
                 GivenName = "John",

@@ -120,6 +120,11 @@ namespace Saasu.API.Core.Models.Contacts
         [System.Xml.Serialization.XmlElement(IsNullable = true)]
         public string EmailAddress { get; set; }
         /// <summary>
+        /// The contact's BillingSecondaryEmailAddress address.
+        /// </summary>
+        [System.Xml.Serialization.XmlElement(IsNullable = true)]
+        public string BillingSecondaryEmailAddress { get; set; }
+        /// <summary>
         /// Is used as an Account or Contact reference for this person if they are a supplier or customer. This is your reference or their reference depending on how you prefer to use this field.
         /// </summary>
         [System.Xml.Serialization.XmlElement(IsNullable = true)]

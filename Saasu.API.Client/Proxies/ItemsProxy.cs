@@ -33,7 +33,8 @@ namespace Saasu.API.Client.Proxies
             get { return ResourceNames.Items; }
         }
 
-        public ProxyResponse<ItemSummaryResponse> GetItems(string itemType, string searchMethod, string searchText, int pageNumber, int pageSize)
+        public ProxyResponse<ItemSummaryResponse> GetItems(string itemType, string searchMethod, 
+            string searchText, int pageNumber, int pageSize, DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null)
         {
             OperationMethod = HttpMethod.Get;
             var queryArgs = new StringBuilder();
@@ -46,6 +47,11 @@ namespace Saasu.API.Client.Proxies
             {
                 AppendQueryArg(queryArgs, ApiConstants.FilterSearchMethod, searchMethod);
                 AppendQueryArg(queryArgs, ApiConstants.FilterSearchText, searchText);
+            }
+            if (lastModifiedFromDate.HasValue && lastModifiedToDate.HasValue)
+            {
+                AppendQueryArg(queryArgs, ApiConstants.FilterLastModifiedFromDate, lastModifiedFromDate.Value.ToString("o"));
+                AppendQueryArg(queryArgs, ApiConstants.FilterLastModifiedToDate, lastModifiedToDate.Value.ToString("o"));
             }
 
             bool inclPageNumber;

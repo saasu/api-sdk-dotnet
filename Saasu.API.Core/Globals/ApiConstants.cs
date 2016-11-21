@@ -52,6 +52,8 @@
         public const string FilterExampleLastModifiedFromDate = FilterLastModifiedFromDate + "={" + FilterHelpDate + "}";
         public const string FilterInvoiceNumber = "InvoiceNumber";
         public const string FilterExampleInvoiceNumber = FilterInvoiceNumber + "={" + FilterHelpNumber + "}";
+        public const string FilterPurchaseOrderNumber = "PurchaseOrderNumber";
+        public const string FilterExamplePurchaseOrderNumber = FilterPurchaseOrderNumber + "={" + FilterHelpNumber + "}";
         public const string FilterTransactionTypeInvoices = "TransactionType";
         public const string FilterExampleTransactionTypeInvoices = FilterTransactionTypeInvoices + "={" + FilterHelpTransactionTypeInvoices + "}";
         public const string FilterBillingContactId = "BillingContactId";

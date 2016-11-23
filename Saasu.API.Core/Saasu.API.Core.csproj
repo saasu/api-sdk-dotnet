@@ -93,6 +93,7 @@
     <Compile Include="Models\FileIdentity\FileSettings.cs" />
     <Compile Include="Models\Invoices\EmailInvoice.cs" />
     <Compile Include="Models\Invoices\InvoiceEmailResult.cs" />
+    <Compile Include="Models\Items\BuildItemResult.cs" />
     <Compile Include="Models\Items\InsertItemResult.cs" />
     <Compile Include="Models\Items\UpdateItemResult.cs" />
     <Compile Include="Models\Search\ContactSearchResponse.cs" />

@@ -165,6 +165,15 @@ namespace Saasu.API.Core.Models.Items
         }
     }
 
+    public class BuildComboItem
+    {
+        /// <summary>
+        /// The quantity to build.
+        /// </summary>
+        public decimal Quantity { get; set; }
+    }
+
+
     public class BuildItem : BaseModel
     {
         /// <summary>

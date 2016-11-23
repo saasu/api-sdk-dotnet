@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Ola.RestClient.Dto;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models.Accounts;
@@ -372,6 +374,67 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.IsFalse(getResponse.IsSuccessfull);
             Assert.AreEqual(HttpStatusCode.BadRequest, getResponse.StatusCode);
         }
+
+        [Test]
+        public void ShouldBuildComboItem()
+        {
+            var proxy = new ItemProxy();
+            var comboItem = _itemHelper.GetTestComboItem(1,1);
+            var insertResponse = proxy.InsertItem(comboItem);
+
+            _itemHelper.InventoryAdjustments(comboItem.BuildItems.Select(s => new Tuple<BuildItem, decimal>(s, 10)).ToList());
+
+            var response = proxy.BuildItem(insertResponse.DataObject.InsertedItemId, new BuildComboItem() {Quantity = 1});
+
+            Assert.IsTrue(response.IsSuccessfull);
+            Assert.IsNotNull(response.DataObject);
+            Assert.AreEqual("1 combo items have been built.", response.DataObject.StatusMessage);
+            Assert.IsNotNull(response.DataObject._links);
+            Assert.IsTrue(response.DataObject._links.Count == 2);
+        }
+
+        [Test]
+        public void ShouldFailBuildComboItemDueToStockQuantity()
+        {
+            var proxy = new ItemProxy();
+            var comboItem = _itemHelper.GetTestComboItem(1, 1);
+            var insertResponse = proxy.InsertItem(comboItem);
+
+            var response = proxy.BuildItem(insertResponse.DataObject.InsertedItemId, new BuildComboItem() { Quantity = 1 });
+
+            Assert.IsFalse(response.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.IsTrue(response.RawResponse.StartsWith("Unable to complete the requested operation as it will cause negative stock-on-hand"));
+        }
+
+        [Test]
+        public void ShouldFailBuildComboItemDueToNegativeQuantity()
+        {
+            var proxy = new ItemProxy();
+            var comboItem = _itemHelper.GetTestComboItem(1, 1);
+            var insertResponse = proxy.InsertItem(comboItem);
+
+            _itemHelper.InventoryAdjustments(comboItem.BuildItems.Select(s => new Tuple<BuildItem, decimal>(s, 10)).ToList());
+
+            var response = proxy.BuildItem(insertResponse.DataObject.InsertedItemId, new BuildComboItem() { Quantity = -1 });
+
+            Assert.IsFalse(response.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.IsTrue(response.RawResponse.StartsWith("Unable to complete the requested operation as it will cause negative stock-on-hand"));
+        }
+
+
+        [Test]
+        public void ShouldFailBuildComboItemDueToBadId()
+        {
+            var proxy = new ItemProxy();
+
+            var response = proxy.BuildItem(-1, new BuildComboItem() { Quantity = 1 });
+
+            Assert.IsFalse(response.IsSuccessfull);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
 
         private readonly ItemHelper _itemHelper;
     }

@@ -60,5 +60,13 @@ namespace Saasu.API.Client.Proxies
             var uri = base.GetRequestUri(itemId.ToString());
             return base.GetResponse<BaseResponseModel>(uri);
         }
+
+        public ProxyResponse<BuildItemResult> BuildItem(int itemId, BuildComboItem buildComboItem)
+        {
+            OperationMethod = HttpMethod.Post;
+            RequestPostfix = ApiConstants.BuildComboItemPath;
+            var uri = base.GetRequestUri(itemId.ToString());
+            return base.GetResponse<BuildComboItem, BuildItemResult>(uri, buildComboItem);
+        }
     }
 }

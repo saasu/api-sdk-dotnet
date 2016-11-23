@@ -18,6 +18,7 @@
         public const string ResetPasswordUrlPath = "reset-password/";
         public const string EmailInvoiceToContactUrlPath = "email-contact/";
         public const string EmailInvoiceUrlPath = "email/";
+        public const string BuildComboItemPath = "build/";
 
         public const string UserSessionContext_FileGroupUidKey = "FileGroupUid";
         public const string UserSessionContext_UserUidKey = "UserUid";

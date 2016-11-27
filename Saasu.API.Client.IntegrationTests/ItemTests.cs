@@ -388,7 +388,7 @@ namespace Saasu.API.Client.IntegrationTests
 
             Assert.IsTrue(response.IsSuccessfull);
             Assert.IsNotNull(response.DataObject);
-            Assert.AreEqual("1 combo items have been built.", response.DataObject.StatusMessage);
+            Assert.AreEqual("1 combo item(s) have been built.", response.DataObject.StatusMessage);
             Assert.IsNotNull(response.DataObject._links);
             Assert.IsTrue(response.DataObject._links.Count == 2);
         }

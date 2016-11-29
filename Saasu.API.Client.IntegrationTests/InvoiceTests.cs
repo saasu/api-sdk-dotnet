@@ -266,6 +266,19 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         [Test]
+        public void GetInvoicesFilterOnPurchaseOrderNumber()
+        {
+            var purchaseOrderNumber = string.Format("Inv{0}", Guid.NewGuid());
+
+            //Create and insert test invoice.
+            GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: purchaseOrderNumber, actuallyInsertAndVerifyResponse: true);
+
+            var response = AssertInvoiceProxy(purchaseOrderNumber: purchaseOrderNumber);
+
+            Assert.AreEqual(1, response.DataObject.Invoices.Count, "Incorrect number of invoices found.");
+        }
+
+        [Test]
         public void GetInvoicesFilterOnPaymentStatus()
         {
             AssertInvoiceProxy(paymentStatus: (int)PaymentStatusType.Unpaid);
@@ -1267,10 +1280,10 @@ namespace Saasu.API.Client.IntegrationTests
         #endregion
 
         public static ProxyResponse<InvoiceTransactionSummaryResponse> AssertInvoiceProxy(int? pageNumber = null, int? pageSize = null, DateTime? fromDate = null, DateTime? toDate = null,
-            DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null, string invoiceNumber = null, string transactionType = null, int? paymentStatus = null,
+            DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null, string invoiceNumber = null, string purchaseOrderNumber = null, string transactionType = null, int? paymentStatus = null,
             int? billingContactId = null, string invoiceStatus = null, string tags = null, string tagFilterType = null)
         {
-            var response = new InvoicesProxy().GetInvoices(pageNumber, pageSize, fromDate, toDate, lastModifiedFromDate, lastModifiedToDate, invoiceNumber, transactionType, paymentStatus,
+            var response = new InvoicesProxy().GetInvoices(pageNumber, pageSize, fromDate, toDate, lastModifiedFromDate, lastModifiedToDate, invoiceNumber, purchaseOrderNumber, transactionType, paymentStatus,
                 billingContactId, invoiceStatus, tags, tagFilterType);
 
             Assert.IsNotNull(response, "Invoice response is null");

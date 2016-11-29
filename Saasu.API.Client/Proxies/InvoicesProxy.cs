@@ -33,7 +33,7 @@ namespace Saasu.API.Client.Proxies
 		}
 
 		public ProxyResponse<InvoiceTransactionSummaryResponse> GetInvoices(int? pageNumber = null, int? pageSize = null, DateTime? invoiceFromDate = null, DateTime? invoiceToDate = null, 
-			DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null, string invoiceNumber = null, string transactionType = null, int? paymentStatus = null,
+			DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null, string invoiceNumber = null, string purchaseOrderNumber = null, string transactionType = null, int? paymentStatus = null,
 			int? billingContactId = null, string invoiceStatus = null, string tags = null, string tagFilterType = null)
         {
             OperationMethod = HttpMethod.Get;
@@ -52,6 +52,10 @@ namespace Saasu.API.Client.Proxies
             if (!string.IsNullOrWhiteSpace(invoiceNumber))
             {
                 AppendQueryArg(queryArgs, ApiConstants.FilterInvoiceNumber, invoiceNumber);
+            }
+            if (!string.IsNullOrWhiteSpace(purchaseOrderNumber))
+            {
+                AppendQueryArg(queryArgs, ApiConstants.FilterPurchaseOrderNumber, purchaseOrderNumber);
             }
             if (!string.IsNullOrWhiteSpace(transactionType))
             {

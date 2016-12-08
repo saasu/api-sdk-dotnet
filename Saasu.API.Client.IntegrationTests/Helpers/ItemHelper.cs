@@ -26,10 +26,14 @@ namespace Saasu.API.Client.IntegrationTests
             GetTestAccounts();
         }
 
-        public ItemDetail GetTestInventoryItem()
+        public ItemDetail GetTestInventoryItem(string code = null)
         {
-            var code = Guid.NewGuid().ToString().ToLower().Replace("-", "").Substring(0, 6);
-            return new ItemDetail()
+	        if (string.IsNullOrEmpty(code))
+	        {
+		        code = Guid.NewGuid().ToString().ToLower().Replace("-", "").Substring(0, 6);
+	        }
+
+	        return new ItemDetail()
             {
                 AssetAccountId = _inventoryAccountId,
                 BuyingPrice = 100M,

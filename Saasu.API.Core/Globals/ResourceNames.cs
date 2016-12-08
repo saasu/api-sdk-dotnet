@@ -19,8 +19,10 @@
         public const string TaxCodes = "TaxCodes";
         public const string TaxCode = "TaxCode";
 
+		public const string ItemAdjustment = "ItemAdjustment";
+		public const string ItemAdjustments = "ItemAdjustments";
 
-        public const string Query = "";
+		public const string Query = "";
 
         public const string Authorisation = "authorisation";
         public const string Items = "Items";

@@ -88,6 +88,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountTests.cs" />
+    <Compile Include="Helpers\ItemAdjustmentHelper.cs" />
+    <Compile Include="ItemAdjustmentTests.cs" />
+    <Compile Include="UserTests.cs" />
     <Compile Include="AuthorisationTests.cs" />
     <Compile Include="ContactAggregateTests.cs" />
     <Compile Include="Helpers\ContactHelper.cs" />

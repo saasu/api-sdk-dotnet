@@ -8,6 +8,8 @@
 
         public const string Invoices = "Invoices";
         public const string Invoice = "Invoice";
+        public const string Journals = "Journals";
+        public const string Journal = "Journal";
         public const string Payments = "Payments";
         public const string Payment = "Payment";
         public const string InvoiceAttachment = "InvoiceAttachment";

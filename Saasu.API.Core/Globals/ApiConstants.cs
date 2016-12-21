@@ -45,6 +45,11 @@
         // Filtering query args
         public const int DefaultPageSize = 25;
         public const int DefaultPageNumber = 1;
+
+        public const string FilterFromDate = "FromDate";
+        public const string FilterExampleFromDate = FilterFromDate + "={" + FilterHelpDate + "}";
+        public const string FilterToDate = "ToDate";
+        public const string FilterExampleToDate = FilterToDate + "={" + FilterHelpDate + "}";
         public const string FilterLastModifiedDate = "LastModifiedDate";
         public const string FilterExampleLastModifiedDate = FilterLastModifiedDate + "={" + FilterHelpDate + "}";
         public const string FilterLastModifiedToDate = "LastModifiedToDate";
@@ -91,6 +96,8 @@
         public const string FilterExampleInvoiceStatus = FilterInvoiceStatus + "={" + FilterHelpInvoiceStatus + "}";
         public const string FilterPaymentStatus = "PaymentStatus";
         public const string FilterExamplePaymentStatus = FilterPaymentStatus + "={" + FilterHelpPaymentStatus + "}";
+        public const string FilterJournalContactId = "JournalContactId";
+        public const string FilterExampleJournalContactId = FilterJournalContactId + "={" + FilterHelpNumber + "}";
 
         // Payments specific filters options
         public const string FilterTransactionTypePayments = FilterTransactionTypeInvoices;  // yes they are the same and this is intentional

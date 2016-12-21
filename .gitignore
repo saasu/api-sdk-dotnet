@@ -12,3 +12,4 @@ Saasu.API.Client.IntegrationTests/bin/
 *.suo
 *.bak
 *.orig
+Saasu.API.Core/Saasu.API.Core.csproj.user

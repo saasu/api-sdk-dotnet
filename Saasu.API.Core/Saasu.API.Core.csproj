@@ -53,9 +53,14 @@
     <DocumentationFile>bin\Staging\Saasu.API.Core.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -94,6 +99,12 @@
     <Compile Include="Models\Invoices\EmailInvoice.cs" />
     <Compile Include="Models\Invoices\InvoiceEmailResult.cs" />
     <Compile Include="Models\Items\BuildItemResult.cs" />
+    <Compile Include="Models\ItemAdjustments\AdjustmentDetail.cs" />
+    <Compile Include="Models\ItemAdjustments\AdjustmentItem.cs" />
+    <Compile Include="Models\ItemAdjustments\AdjustmentSummary.cs" />
+    <Compile Include="Models\ItemAdjustments\InsertItemAdjustmentResult.cs" />
+    <Compile Include="Models\ItemAdjustments\ItemAdjustmentListResponse.cs" />
+    <Compile Include="Models\ItemAdjustments\UpdateItemAdjustmentResult.cs" />
     <Compile Include="Models\Items\InsertItemResult.cs" />
     <Compile Include="Models\Items\UpdateItemResult.cs" />
     <Compile Include="Models\Search\ContactSearchResponse.cs" />
@@ -136,6 +147,9 @@
     <Compile Include="Models\Users\UserCredential.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialisation\AllowedContractResolver.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

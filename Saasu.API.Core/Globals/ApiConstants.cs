@@ -91,9 +91,14 @@
         public const string FilterExampleInvoiceStatus = FilterInvoiceStatus + "={" + FilterHelpInvoiceStatus + "}";
         public const string FilterPaymentStatus = "PaymentStatus";
         public const string FilterExamplePaymentStatus = FilterPaymentStatus + "={" + FilterHelpPaymentStatus + "}";
+		public const string FilterFromDate = "FromDate";
+		public const string FilterToDate = "ToDate";
+		public const string FilterExampleFromDate = FilterFromDate + "={" + FilterHelpDate + "}";
+		public const string FilterExampleToDate = FilterToDate + "={" + FilterHelpDate + "}";
 
-        // Payments specific filters options
-        public const string FilterTransactionTypePayments = FilterTransactionTypeInvoices;  // yes they are the same and this is intentional
+
+		// Payments specific filters options
+		public const string FilterTransactionTypePayments = FilterTransactionTypeInvoices;  // yes they are the same and this is intentional
         public const string FilterExampleTransactionTypePayments = FilterTransactionTypePayments + "={" + FilterHelpTransactionTypePayments + "}";
         public const string FilterDateClearedFromDate = "ClearedFromDate";
         public const string FilterExampleDateClearedFromDate = FilterDateClearedFromDate + "={" + FilterHelpDate + "}";

@@ -56,29 +56,7 @@ namespace Saasu.API.Client.IntegrationTests
 			Assert.IsFalse(response.IsSuccessfull);
 			Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
 			Assert.IsNull(response.DataObject);
-			Assert.IsTrue(response.RawResponse.Contains("The Inventory Adjustment must contain at least one line item."));
-		}
-
-		[Test]
-		public void ShouldFailOnInsertInvalidDate()
-		{
-			var itemProxy = new ItemProxy();
-			var item = _itemHelper.GetTestInventoryItem();
-			var result = itemProxy.InsertItem(item);
-			var newItem = itemProxy.GetItem(result.DataObject.InsertedItemId);
-
-			var adjustmentItem = _adjustmentHelper.GetAdjustmentItem(newItem.DataObject.Id.Value, 1,
-				newItem.DataObject.AssetAccountId.Value, 1, 1);
-
-			var detail = _adjustmentHelper.GetAdjustmentDetail(new List<AdjustmentItem>() { adjustmentItem });
-			detail.Date = DateTime.MinValue;
-			
-			var adjustmentProxy = new ItemAdjustmentProxy();
-			var response = adjustmentProxy.InsertItemAdjustment(detail);
-
-			Assert.IsFalse(response.IsSuccessfull);
-			Assert.IsNull(response.DataObject);
-			Assert.IsTrue(response.RawResponse.Contains("Transaction date is not specified or invalid."));
+			Assert.IsTrue(response.RawResponse.Contains("Please specify AdjustmentItems for this transaction."));
 		}
 
 		[Test]

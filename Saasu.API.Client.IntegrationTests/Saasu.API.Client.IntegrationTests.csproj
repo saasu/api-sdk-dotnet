@@ -98,6 +98,7 @@
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\StringExtensionMethods.cs" />
     <Compile Include="ItemTests.cs" />
+    <Compile Include="JournalTests.cs" />
     <Compile Include="PaymentTests.cs" />
     <Compile Include="InvoiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

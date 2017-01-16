@@ -107,6 +107,12 @@
     <Compile Include="Models\ItemAdjustments\UpdateItemAdjustmentResult.cs" />
     <Compile Include="Models\Items\InsertItemResult.cs" />
     <Compile Include="Models\Items\UpdateItemResult.cs" />
+    <Compile Include="Models\Journals\InsertJournalResult.cs" />
+    <Compile Include="Models\Journals\JournalDetail.cs" />
+    <Compile Include="Models\Journals\JournalItem.cs" />
+    <Compile Include="Models\Journals\JournalSummary.cs" />
+    <Compile Include="Models\Journals\JournalTransactionSummaryResponse.cs" />
+    <Compile Include="Models\Journals\UpdateJournalResult.cs" />
     <Compile Include="Models\Search\ContactSearchResponse.cs" />
     <Compile Include="Models\Search\InventoryItemSearchResponse.cs" />
     <Compile Include="Models\Search\SearchEntityFilterExtensions.cs" />

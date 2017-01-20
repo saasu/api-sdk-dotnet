@@ -20,8 +20,10 @@
         public const string FileIdentities = "FileIdentities";
         public const string TaxCodes = "TaxCodes";
         public const string TaxCode = "TaxCode";
+        public const string Activities = "Activities";
+        public const string Activity = "Activity";
 
-		public const string ItemAdjustment = "ItemAdjustment";
+        public const string ItemAdjustment = "ItemAdjustment";
 		public const string ItemAdjustments = "ItemAdjustments";
 
 		public const string Query = "";

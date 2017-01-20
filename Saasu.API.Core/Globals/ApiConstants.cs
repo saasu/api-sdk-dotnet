@@ -41,6 +41,9 @@
         public const string FilterHelpHeaderAccountId = "111";
         public const string FilterSearchMethodString = "Contains|StartsWith";
         public const string FilterHelpItemTypes = "I|C";
+        public const string FilterHelpActivityType = "Any tags with activity flag set to true";
+        public const string FilterHelpActivityStatus = "todo|done|overdue";
+        public const string FilterHelpActivityAttachedToType = "Contact|Employee|Sale|Purchase";
 
         // Filtering query args
         public const int DefaultPageSize = 25;
@@ -135,6 +138,22 @@
         public const string FilterExampleSearchMethod = FilterSearchMethod + "={" + FilterSearchMethodString + "}";
         public const string FilterSearchText = "SearchText";
         public const string FilterExampleSearchText = FilterSearchText + "={" + FilterHelpText + "}";
+
+        //Activity specific filter options.
+        public const string FilterActivityType = "ActivityType";
+        public const string FilterActivityTypeExmaple = FilterActivityType + "={" + FilterHelpActivityType + "}";
+
+        public const string FilterActivityStatus = "ActivityStatus";
+        public const string FilterActivityStatusExmaple = FilterActivityStatus + "={" + FilterHelpActivityStatus + "}";
+
+        public const string FilterActivityOwnerEmail = "OwnerEmail";
+        public const string FilterActivityOwnerEmailExmaple = FilterActivityOwnerEmail + "={" + FilterHelpEmail + "}";
+
+        public const string FilterActivityAttachedToType = "AttachedToType";
+        public const string FilterActivityAttachedToTypeExmaple = FilterActivityAttachedToType + "={" + FilterHelpActivityAttachedToType + "}";
+
+        public const string FilterAttachedToId = "AttachedToId";
+        public const string FilterAttachedToIdExample = FilterAttachedToId + IdQueryArgParameter;
 
         //Search (Jump) filter options
         public const string FilterKeywords = "Keywords";

@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace Saasu.API.Client.IntegrationTests
 {
+    [TestFixture]
     public class JournalTests
     {
         private int _assetAccountId;

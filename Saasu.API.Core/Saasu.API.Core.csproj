@@ -82,6 +82,11 @@
     <Compile Include="Models\Accounts\AccountListResponse.cs" />
     <Compile Include="Models\Accounts\InsertAccountResult.cs" />
     <Compile Include="Models\Accounts\UpdateAccountResult.cs" />
+    <Compile Include="Models\Activities\ActivityDetail.cs" />
+    <Compile Include="Models\Activities\ActivitySummary.cs" />
+    <Compile Include="Models\Activities\ActivitySummaryReponse.cs" />
+    <Compile Include="Models\Activities\InsertActivityResult.cs" />
+    <Compile Include="Models\Activities\UpdateActivityResult.cs" />
     <Compile Include="Models\BpayDetails.cs" />
     <Compile Include="Models\ChequeDetails.cs" />
     <Compile Include="Models\Company\CompanyDetail.cs" />

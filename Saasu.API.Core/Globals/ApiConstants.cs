@@ -99,9 +99,17 @@
 
         public const string FilterJournalContactId = "JournalContactId";
         public const string FilterExampleJournalContactId = FilterJournalContactId + "={" + FilterHelpNumber + "}";
+        public const string FilterEntityType = "EntityType";
+        public const string FilterExampleEntityType = FilterEntityType + "={" + FilterHelpNumber + "}";
+        public const string FilterUtcDeletedFromDate = "UtcDeletedFromDate";
+        public const string FilterExampleUtcDeletedFromDate = FilterUtcDeletedFromDate + "={" + FilterHelpDate + "}";
+        public const string FilterUtcDeletedToDate = "UtcDeletedToDate";
+        public const string FilterExampleUtcDeletedToDate = FilterUtcDeletedToDate + "={" + FilterHelpDate + "}";
 
-		// Payments specific filters options
-		public const string FilterTransactionTypePayments = FilterTransactionTypeInvoices;  // yes they are the same and this is intentional
+
+
+        // Payments specific filters options
+        public const string FilterTransactionTypePayments = FilterTransactionTypeInvoices;  // yes they are the same and this is intentional
         public const string FilterExampleTransactionTypePayments = FilterTransactionTypePayments + "={" + FilterHelpTransactionTypePayments + "}";
         public const string FilterDateClearedFromDate = "ClearedFromDate";
         public const string FilterExampleDateClearedFromDate = FilterDateClearedFromDate + "={" + FilterHelpDate + "}";

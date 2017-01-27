@@ -82,6 +82,7 @@
     <Compile Include="Proxies\AccountProxy.cs" />
     <Compile Include="Proxies\AccountsProxy.cs" />
     <Compile Include="Proxies\ContactAggregateProxy.cs" />
+    <Compile Include="Proxies\DeletedEntitiesProxy.cs" />
     <Compile Include="Proxies\ItemAdjustmentProxy.cs" />
     <Compile Include="Proxies\ItemAdjustmentsProxy.cs" />
     <Compile Include="Proxies\JournalProxy.cs" />

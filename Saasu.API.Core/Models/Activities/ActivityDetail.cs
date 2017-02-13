@@ -14,7 +14,7 @@ namespace Saasu.API.Core.Models.Activities
         public string Details { get; set; }
 
         /// <summary>
-        /// List of attachments associated with this invoice. This data is returned only and cannot be added or updated when issuing a POST or PUT.
+        /// List of attachments associated with this activity. This data is returned only and cannot be added or updated when issuing a POST or PUT.
         /// </summary>
         public List<FileAttachmentInfo> Attachments { get; set; }
     }

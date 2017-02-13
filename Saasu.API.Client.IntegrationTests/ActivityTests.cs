@@ -42,11 +42,11 @@ namespace Saasu.API.Client.IntegrationTests
         public void GetActivitiesFilterOnType()
         {
             var proxy = new ActivitiesProxy();
-            var response = proxy.GetActivities(activityType: "Purchase");
+            var response = proxy.GetActivities(activityType: "Task");
 
             Assert.IsTrue(response.IsSuccessfull, "Call to GetActivities was not successful");
             Assert.IsNotNull(response.DataObject, "Call to GetActivities returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.AttachedToType != "Purchase").FirstOrDefault());
+            Assert.IsNull(response.DataObject.Activities.Where(a => a.ActivityType != "Task").FirstOrDefault());
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace Saasu.API.Client.IntegrationTests
             var done = !activity.DataObject.Done;
             var due = activity.DataObject.Due.AddDays(1);
             var ownerEmail = string.IsNullOrWhiteSpace(activity.DataObject.OwnerEmail) ? TestConfig.TestUser : null;
-            var attachedToType = string.IsNullOrWhiteSpace(activity.DataObject.AttachedToType) ? "Sale" : null;
+            var attachedToType = string.IsNullOrWhiteSpace(activity.DataObject.AttachedToType) ? null : "Sale";
             int? attachedToId = null;
             if (activity.DataObject.AttachedToId != null && activity.DataObject.AttachedToId > 0)
             {
@@ -242,7 +242,7 @@ namespace Saasu.API.Client.IntegrationTests
         private void CreateTestSaleInvoices()
         {
             var accountProxy = new AccountsProxy();
-            var accountResponse = accountProxy.GetAccounts();
+            var accountResponse = accountProxy.GetAccounts(accountType: "Income");
             var incomeAccountId = accountResponse.DataObject.Accounts.Where(a => a.AccountType == "Income").Take(1).SingleOrDefault().Id;
 
             var invoice = new InvoiceTransactionDetail
@@ -299,7 +299,7 @@ namespace Saasu.API.Client.IntegrationTests
         {
             var activity1 = GetActivityDetail(done: true, tags: "blue" );
             var activity2 = GetActivityDetail(ownerEmail: TestConfig.TestUser, tags: "blue, red");
-            var activity3 = GetActivityDetail();
+            var activity3 = GetActivityDetail(type: "Task");
             var activity4 = GetActivityDetail(attachedToId: _saleInvoiceTranId2, due: DateTime.Now.AddDays(1), tags: "yellow");
             var activity5 = GetActivityDetail(attachedToId: _saleInvoiceTranId2, due: DateTime.Now.AddDays(1), tags: "orange");
 

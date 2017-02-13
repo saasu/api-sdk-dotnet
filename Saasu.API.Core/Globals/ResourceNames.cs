@@ -36,5 +36,7 @@
 
         public const string Search = "Search";
 	    public const string User = "User";
+
+        public const string DeletedEntities = "DeletedEntities";
     }
 }

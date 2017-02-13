@@ -323,7 +323,7 @@ namespace Saasu.API.Client.IntegrationTests
                 {
                     BSB = "111111",
                     AccountNumber = "22222222",
-                    Type = AccountType.Income,
+                    Type = AccountType.Asset,
                     Name = acctname,
                     DisplayName = acctname
                 };
@@ -452,6 +452,17 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.Greater(inv4.TransactionId, 0);
             _invoice4Id = Convert.ToInt32(inv4.TransactionId);
             _invoice4IdSummary = inv4.Summary;
+        }
+
+        public InvoiceTransactionDetail CreateASingleInvoice(string tranType = "S", decimal? amount = null)
+        {
+            //if test data has not been created before call.
+            if (_invoice1Id == 0)
+            {
+                CreateTestData();
+            }
+
+            return GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: tranType, actuallyInsertAndVerifyResponse: true);
         }
 
         private static int? GetTestInvoiceId()

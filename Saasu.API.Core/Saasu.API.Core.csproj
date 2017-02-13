@@ -97,6 +97,8 @@
     <Compile Include="Models\ContactAggregates\ContactManager.cs" />
     <Compile Include="Models\ContactAggregates\InsertContactAggregateResult.cs" />
     <Compile Include="Models\ContactAggregates\UpdateContactAggregateResult.cs" />
+    <Compile Include="Models\DeletedEntities\DeletedEntitiesListResponse.cs" />
+    <Compile Include="Models\DeletedEntities\DeletedEntityDetail.cs" />
     <Compile Include="Models\DirectDepositDetails.cs" />
     <Compile Include="Models\FileIdentity\FileIdentitySummaryResponse.cs" />
     <Compile Include="Models\FileIdentity\FileIdentitySummary.cs" />

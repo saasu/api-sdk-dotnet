@@ -87,6 +87,8 @@
     <Compile Include="Proxies\DeletedEntitiesProxy.cs" />
     <Compile Include="Proxies\ItemAdjustmentProxy.cs" />
     <Compile Include="Proxies\ItemAdjustmentsProxy.cs" />
+    <Compile Include="Proxies\ItemTransferProxy.cs" />
+    <Compile Include="Proxies\ItemTransfersProxy.cs" />
     <Compile Include="Proxies\JournalProxy.cs" />
     <Compile Include="Proxies\JournalsProxy.cs" />
     <Compile Include="Proxies\UserProxy.cs" />

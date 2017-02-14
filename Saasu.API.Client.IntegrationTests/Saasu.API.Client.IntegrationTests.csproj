@@ -91,6 +91,7 @@
     <Compile Include="ActivityTests.cs" />
     <Compile Include="DeletedEntityTests.cs" />
     <Compile Include="Helpers\ItemAdjustmentHelper.cs" />
+    <Compile Include="Helpers\ItemTransferHelper.cs" />
     <Compile Include="ItemAdjustmentTests.cs" />
     <Compile Include="AuthorisationTests.cs" />
     <Compile Include="ContactAggregateTests.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\StringExtensionMethods.cs" />
     <Compile Include="ItemTests.cs" />
+    <Compile Include="ItemTransferTests.cs" />
     <Compile Include="JournalTests.cs" />
     <Compile Include="PaymentTests.cs" />
     <Compile Include="InvoiceTests.cs" />

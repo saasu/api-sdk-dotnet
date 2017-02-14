@@ -114,6 +114,12 @@
     <Compile Include="Models\ItemAdjustments\UpdateItemAdjustmentResult.cs" />
     <Compile Include="Models\Items\InsertItemResult.cs" />
     <Compile Include="Models\Items\UpdateItemResult.cs" />
+    <Compile Include="Models\ItemTransfers\InsertItemTransferResult.cs" />
+    <Compile Include="Models\ItemTransfers\ItemTransfersListResponse.cs" />
+    <Compile Include="Models\ItemTransfers\TransferDetail.cs" />
+    <Compile Include="Models\ItemTransfers\TransferItem.cs" />
+    <Compile Include="Models\ItemTransfers\TransferSummary.cs" />
+    <Compile Include="Models\ItemTransfers\UpdateItemTransferResult.cs" />
     <Compile Include="Models\Journals\InsertJournalResult.cs" />
     <Compile Include="Models\Journals\JournalDetail.cs" />
     <Compile Include="Models\Journals\JournalItem.cs" />
@@ -164,6 +170,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

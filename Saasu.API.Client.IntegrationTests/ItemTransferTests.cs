@@ -226,6 +226,7 @@ namespace Saasu.API.Client.IntegrationTests
                 Date = DateTime.Now
             };
 
+            //Insert adjustment so there is enough Stock on hand for tests.
             var adjustmentResponse = new ItemAdjustmentProxy().InsertItemAdjustment(adjustment);
         }
     }

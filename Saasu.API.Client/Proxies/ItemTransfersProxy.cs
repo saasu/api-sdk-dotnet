@@ -43,6 +43,7 @@ namespace Saasu.API.Client.Proxies
             {
                 AppendQueryArg(queryArgs, ApiConstants.FilterTagFilterType, tagFilterType);
             }
+
             bool inclPageNumber;
             bool inclPageSize;
 

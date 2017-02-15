@@ -25,7 +25,7 @@
 
         /// <summary>
         /// The total price(excluding tax) for this transfer line item.
-        /// If not provided or Quantity x UnitCost does not match the provided value it will be recalculated.
+        /// If not provided or Quantity x UnitCost does not match the provided value it will be re-calculated.
         /// </summary>
         public decimal LineTotal { get; set; }
 

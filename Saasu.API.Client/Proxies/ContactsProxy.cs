@@ -32,8 +32,8 @@ namespace Saasu.API.Client.Proxies
 
 		public ProxyResponse<ContactResponse> GetContacts(int? pageNumber = null, int? pageSize = null, DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null,
 			string givenName = null, string familyName = null, string organisationName = null,
-			bool? isActive = null, bool? isCustomer = null, bool? isSupplier = null, bool? isContractor = null, bool? isPartner = null,
-			string tags = null, string tagSelection = null, string email = null, string contactId = null)
+            bool? isActive = null, bool? isCustomer = null, bool? isSupplier = null, bool? isContractor = null, bool? isPartner = null,
+			string tags = null, string tagSelection = null, string email = null, string contactId = null, string companyName = null, int? companyId = null)
 		{
 
 			OperationMethod = HttpMethod.Get;
@@ -56,7 +56,15 @@ namespace Saasu.API.Client.Proxies
 			{
 				AppendQueryArg(queryArgs, "organisationName", organisationName);
 			}
-			if (isActive != null)
+            if (!string.IsNullOrWhiteSpace(companyName))
+            {
+                AppendQueryArg(queryArgs, "companyName", companyName);
+            }
+            if (companyId != null)
+            {
+                AppendQueryArg(queryArgs, "companyId", companyId.ToString());
+            }
+            if (isActive != null)
 			{
 				AppendQueryArg(queryArgs, "isActive", (bool)isActive ? "1" : "0");
 			}

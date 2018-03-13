@@ -21,9 +21,10 @@
 		<tags>Saasu API SDK</tags>
 	</metadata>
 	 <files>
-		  <!--<file src="lib\*.dll" target="lib" />-->
+		  <file src="bin\Release\Saasu.API.Client.dll" target="lib" />
+	    <file src="bin\Release\Saasu.API.Core.dll" target="lib" />
 		  <file src="content\app.config.transform" target="content" />
 		  <file src="content\web.config.transform" target="content" />
-		  <file src="content\ReadMe.txt" target="content" />
+		  <file src="content\ReadMe.txt" target="" />
 	  </files>
 </package>

@@ -8,6 +8,8 @@
 
         public const string Invoices = "Invoices";
         public const string Invoice = "Invoice";
+        public const string Journals = "Journals";
+        public const string Journal = "Journal";
         public const string Payments = "Payments";
         public const string Payment = "Payment";
         public const string InvoiceAttachment = "InvoiceAttachment";
@@ -18,7 +20,14 @@
         public const string FileIdentities = "FileIdentities";
         public const string TaxCodes = "TaxCodes";
         public const string TaxCode = "TaxCode";
+        public const string Activities = "Activities";
+        public const string Activity = "Activity";
 
+        public const string ItemAdjustment = "ItemAdjustment";
+		public const string ItemAdjustments = "ItemAdjustments";
+
+        public const string ItemTransfer = "ItemTransfer";
+        public const string ItemTransfers = "ItemTransfers";
 
         public const string Query = "";
 
@@ -30,5 +39,7 @@
 
         public const string Search = "Search";
 	    public const string User = "User";
+
+        public const string DeletedEntities = "DeletedEntities";
     }
 }

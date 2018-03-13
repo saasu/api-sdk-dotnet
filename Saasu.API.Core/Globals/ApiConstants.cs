@@ -18,6 +18,7 @@
         public const string ResetPasswordUrlPath = "reset-password/";
         public const string EmailInvoiceToContactUrlPath = "email-contact/";
         public const string EmailInvoiceUrlPath = "email/";
+        public const string BuildComboItemPath = "build/";
 
         public const string UserSessionContext_FileGroupUidKey = "FileGroupUid";
         public const string UserSessionContext_UserUidKey = "UserUid";
@@ -40,10 +41,20 @@
         public const string FilterHelpHeaderAccountId = "111";
         public const string FilterSearchMethodString = "Contains|StartsWith";
         public const string FilterHelpItemTypes = "I|C";
+        public const string FilterHelpActivityType = "Any tags with activity flag set to true";
+        public const string FilterHelpActivityStatus = "todo|done|overdue";
+        public const string FilterHelpActivityAttachedToType = "Contact|Employee|Sale|Purchase";
+        public const string FilterHelpSearchText = "some text (max 128 characters)";
+        public const string FilterDeletedEntitiesEntityTypes = "Sale|Purchase|SalePayment|PurchasePayment|Item|Contact|Journal";
 
         // Filtering query args
         public const int DefaultPageSize = 25;
         public const int DefaultPageNumber = 1;
+
+        public const string FilterFromDate = "FromDate";
+        public const string FilterExampleFromDate = FilterFromDate + "={" + FilterHelpDate + "}";
+        public const string FilterToDate = "ToDate";
+        public const string FilterExampleToDate = FilterToDate + "={" + FilterHelpDate + "}";
         public const string FilterLastModifiedDate = "LastModifiedDate";
         public const string FilterExampleLastModifiedDate = FilterLastModifiedDate + "={" + FilterHelpDate + "}";
         public const string FilterLastModifiedToDate = "LastModifiedToDate";
@@ -52,6 +63,8 @@
         public const string FilterExampleLastModifiedFromDate = FilterLastModifiedFromDate + "={" + FilterHelpDate + "}";
         public const string FilterInvoiceNumber = "InvoiceNumber";
         public const string FilterExampleInvoiceNumber = FilterInvoiceNumber + "={" + FilterHelpNumber + "}";
+        public const string FilterPurchaseOrderNumber = "PurchaseOrderNumber";
+        public const string FilterExamplePurchaseOrderNumber = FilterPurchaseOrderNumber + "={" + FilterHelpNumber + "}";
         public const string FilterTransactionTypeInvoices = "TransactionType";
         public const string FilterExampleTransactionTypeInvoices = FilterTransactionTypeInvoices + "={" + FilterHelpTransactionTypeInvoices + "}";
         public const string FilterBillingContactId = "BillingContactId";
@@ -89,6 +102,17 @@
         public const string FilterPaymentStatus = "PaymentStatus";
         public const string FilterExamplePaymentStatus = FilterPaymentStatus + "={" + FilterHelpPaymentStatus + "}";
 
+        public const string FilterJournalContactId = "JournalContactId";
+        public const string FilterExampleJournalContactId = FilterJournalContactId + "={" + FilterHelpNumber + "}";
+        public const string FilterEntityType = "EntityType";
+        public const string FilterExampleEntityType = FilterEntityType + "={" + FilterHelpNumber + "}";
+        public const string FilterUtcDeletedFromDate = "UtcDeletedFromDate";
+        public const string FilterExampleUtcDeletedFromDate = FilterUtcDeletedFromDate + "={" + FilterHelpDate + "}";
+        public const string FilterUtcDeletedToDate = "UtcDeletedToDate";
+        public const string FilterExampleUtcDeletedToDate = FilterUtcDeletedToDate + "={" + FilterHelpDate + "}";
+
+
+
         // Payments specific filters options
         public const string FilterTransactionTypePayments = FilterTransactionTypeInvoices;  // yes they are the same and this is intentional
         public const string FilterExampleTransactionTypePayments = FilterTransactionTypePayments + "={" + FilterHelpTransactionTypePayments + "}";
@@ -124,6 +148,22 @@
         public const string FilterExampleSearchMethod = FilterSearchMethod + "={" + FilterSearchMethodString + "}";
         public const string FilterSearchText = "SearchText";
         public const string FilterExampleSearchText = FilterSearchText + "={" + FilterHelpText + "}";
+
+        //Activity specific filter options.
+        public const string FilterActivityType = "ActivityType";
+        public const string FilterActivityTypeExmaple = FilterActivityType + "={" + FilterHelpActivityType + "}";
+
+        public const string FilterActivityStatus = "ActivityStatus";
+        public const string FilterActivityStatusExmaple = FilterActivityStatus + "={" + FilterHelpActivityStatus + "}";
+
+        public const string FilterActivityOwnerEmail = "OwnerEmail";
+        public const string FilterActivityOwnerEmailExmaple = FilterActivityOwnerEmail + "={" + FilterHelpEmail + "}";
+
+        public const string FilterActivityAttachedToType = "AttachedToType";
+        public const string FilterActivityAttachedToTypeExmaple = FilterActivityAttachedToType + "={" + FilterHelpActivityAttachedToType + "}";
+
+        public const string FilterAttachedToId = "AttachedToId";
+        public const string FilterAttachedToIdExample = FilterAttachedToId + IdQueryArgParameter;
 
         //Search (Jump) filter options
         public const string FilterKeywords = "Keywords";

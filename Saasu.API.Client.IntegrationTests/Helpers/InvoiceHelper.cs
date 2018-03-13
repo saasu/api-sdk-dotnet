@@ -472,6 +472,17 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.Greater(quote1.TransactionId, 0);
         }
 
+        public InvoiceTransactionDetail CreateASingleInvoice(string tranType = "S", decimal? amount = null)
+        {
+            //if test data has not been created before call.
+            if (_invoice1Id == 0)
+            {
+                CreateTestData();
+            }
+
+            return GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: tranType, actuallyInsertAndVerifyResponse: true);
+        }
+
         private static int? GetTestInvoiceId()
         {
             var response = new InvoicesProxy().GetInvoices(invoiceNumber: "TestInv1");

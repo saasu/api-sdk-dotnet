@@ -3,7 +3,7 @@
 	<metadata>
 		<id>Saasu.API.Dotnet.Sdk</id>
 		<title>API SDK for the Saasu API</title>
-		<version>1.1.0</version>
+		<version>1.1.1</version>
 		<authors>Saasu</authors>
 		<description>A client SDK for working with the Saasu API.</description>
 		<summary>A client SDK for working with the Saasu API.</summary>
@@ -11,10 +11,11 @@
 		<projectUrl>https://github.com/saasu/api-sdk-dotnet</projectUrl>
 		<frameworkAssemblies>
 		  <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework="net40" />
-		  <frameworkAssembly assemblyName="System.Net.Http.Formatting" targetFramework="net40" />
+		  
 		</frameworkAssemblies>
 		<dependencies>
 			<dependency id="Newtonsoft.Json" version="7.0.1" />
+			<dependency id="Microsoft.AspNet.WebApi.Client" version="5.2.3" />
 		</dependencies>
 		<copyright>Saasu Pty. Ltd.</copyright>
 		<tags>Saasu API SDK</tags>

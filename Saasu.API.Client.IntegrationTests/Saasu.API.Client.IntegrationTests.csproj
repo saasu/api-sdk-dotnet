@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,10 +11,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Saasu.API.Client.IntegrationTests</RootNamespace>
     <AssemblyName>Saasu.API.Client.IntegrationTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <CurrentConfigFileName>app.config</CurrentConfigFileName>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,15 +59,12 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Netaccounts.Ola.RestClient, Version=1.0.5689.19968, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Saasu.API.Dotnet.LegacyRestClient.1.0\lib\Netaccounts.Ola.RestClient.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -75,6 +73,10 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
@@ -88,7 +90,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountTests.cs" />
-    <Compile Include="UserTests.cs" />
+    <Compile Include="ActivityTests.cs" />
+    <Compile Include="DeletedEntityTests.cs" />
+    <Compile Include="Helpers\ItemAdjustmentHelper.cs" />
+    <Compile Include="Helpers\ItemTransferHelper.cs" />
+    <Compile Include="ItemAdjustmentTests.cs" />
     <Compile Include="AuthorisationTests.cs" />
     <Compile Include="ContactAggregateTests.cs" />
     <Compile Include="Helpers\ContactHelper.cs" />
@@ -97,6 +103,8 @@
     <Compile Include="Helpers\ItemHelper.cs" />
     <Compile Include="Helpers\StringExtensionMethods.cs" />
     <Compile Include="ItemTests.cs" />
+    <Compile Include="ItemTransferTests.cs" />
+    <Compile Include="JournalTests.cs" />
     <Compile Include="PaymentTests.cs" />
     <Compile Include="InvoiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

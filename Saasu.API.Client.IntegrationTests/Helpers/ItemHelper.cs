@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Ola.RestClient.Dto;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Accounts;
 using Saasu.API.Core.Models.Contacts;
@@ -24,10 +26,14 @@ namespace Saasu.API.Client.IntegrationTests
             GetTestAccounts();
         }
 
-        public ItemDetail GetTestInventoryItem()
+        public ItemDetail GetTestInventoryItem(string code = null)
         {
-            var code = Guid.NewGuid().ToString().ToLower().Replace("-", "").Substring(0, 6);
-            return new ItemDetail()
+	        if (string.IsNullOrEmpty(code))
+	        {
+		        code = Guid.NewGuid().ToString().ToLower().Replace("-", "").Substring(0, 6);
+	        }
+
+	        return new ItemDetail()
             {
                 AssetAccountId = _inventoryAccountId,
                 BuyingPrice = 100M,
@@ -58,7 +64,7 @@ namespace Saasu.API.Client.IntegrationTests
             };
         }
 
-        public ItemDetail GetTestComboItem()
+        public ItemDetail GetTestComboItem(decimal quantity1, decimal quantity2)
         {
             var item1InsertResponse = new ItemProxy().InsertItem(GetTestInventoryItem());
             var item2InsertResponse = new ItemProxy().InsertItem(GetTestInventoryItem());
@@ -69,18 +75,51 @@ namespace Saasu.API.Client.IntegrationTests
                 new BuildItem()
                 {
                     Id = item1InsertResponse.DataObject.InsertedItemId,
-                    Quantity = 10
+                    Quantity = quantity1
                 },
                 new BuildItem()
                 {
                     Id = item2InsertResponse.DataObject.InsertedItemId,
-                    Quantity = 15
+                    Quantity = quantity2
                 }
             };
 
 
 
             return comboItem;
+        }
+
+        public ItemDetail GetTestComboItem()
+        {
+            return GetTestComboItem(10, 15);
+        }
+
+        public void InventoryAdjustments(List<Tuple<BuildItem, decimal>> itemQuantityList)
+        {
+            var itemList = new ArrayList();
+
+            itemQuantityList.ForEach(iq =>
+            {
+                var dtoItem = new InventoryAdjustmentItemDto()
+                {
+                    AccountUid = _inventoryAccountId,
+                    InventoryItemUid = iq.Item1.Id,
+                    Quantity = iq.Item2,
+                    TotalPriceExclTax = 1,
+                    UnitPriceExclTax = 10
+                };
+                itemList.Add(dtoItem);
+            });
+
+            var legacyProxy = new Ola.RestClient.Proxies.InventoryAdjustmentProxy();
+
+            var dtoAdjustment = new InventoryAdjustmentDto()
+            {
+                Date = DateTime.Now,
+                Items = itemList
+            };
+
+            legacyProxy.Insert(dtoAdjustment);
         }
 
         private void GetTestAccounts()
@@ -142,5 +181,7 @@ namespace Saasu.API.Client.IntegrationTests
                 return accountsResponse.DataObject.Accounts.First().Id.Value;
             }
         }
+
+
     }
 }

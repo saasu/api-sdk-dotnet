@@ -124,6 +124,7 @@
       <LastGenOutput>Config.Designer.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <None Include="Saasu.API.Client.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj">

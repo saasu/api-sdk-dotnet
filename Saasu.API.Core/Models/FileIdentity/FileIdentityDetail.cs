@@ -77,6 +77,12 @@
         /// Currency code of the payment eg: AUD or USD.
         /// </summary>
         public string CurrencyCode { get; set; }
+
+        /// <summary>
+        /// Is the business registered for tax or not(eg: GST, VAT).
+        /// </summary>
+        public bool IsTaxRegistered { get; set; }        
+
         /// <summary>
         /// Settings that specify the default behaviour for a file.
         /// </summary>

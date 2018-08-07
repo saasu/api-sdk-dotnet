@@ -8,7 +8,6 @@ using System.Threading;
 namespace Saasu.API.Client.IntegrationTests
 {
     [TestFixture]
-    [Ignore]  // Ignore for now. requires running server side agent to process messages
     public class SearchTests
     {
         private InvoiceHelper _invoiceHelper;
@@ -120,7 +119,7 @@ namespace Saasu.API.Client.IntegrationTests
             var contactHelper = new ContactHelper();
 
             var contactResponse = contactHelper.AddContact();
-            Thread.Sleep(2000);
+            Thread.Sleep(5000);
             var contact = new ContactProxy().GetContact(contactResponse.InsertedContactId).DataObject;
 
             var searchResults = searchProxy.Search(contact.EmailAddress, SearchScope.Contacts, 1, 10);
@@ -144,7 +143,7 @@ namespace Saasu.API.Client.IntegrationTests
             var searchProxy = new SearchProxy();
 
             var inventoryItem = InsertAndGetInventoryItem();
-
+            Thread.Sleep(5000);
             var searchResults = searchProxy.Search(inventoryItem.Code, SearchScope.InventoryItems, 1, 10);
             Assert.IsNotNull(searchResults.DataObject);
             Assert.IsTrue(searchResults.DataObject.InventoryItems.Count > 0);

@@ -8,6 +8,7 @@ using System.Threading;
 namespace Saasu.API.Client.IntegrationTests
 {
     [TestFixture]
+    [Ignore]
     public class SearchTests
     {
         private InvoiceHelper _invoiceHelper;

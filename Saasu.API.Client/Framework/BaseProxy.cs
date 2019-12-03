@@ -246,6 +246,14 @@ namespace Saasu.API.Client.Framework
             return new ProxyResponse(rawResponse, responseMsg.IsSuccessStatusCode, responseMsg.StatusCode, responseMsg.ReasonPhrase);
         }
 
+        public virtual ProxyResponse<byte[]> GetBinaryResponse(string requestUrl)
+        {
+            var responseMsg = GetResponseMessage(requestUrl);
+            var content = responseMsg.Content.ReadAsByteArrayAsync().Result;
+            var rawResponse = string.Empty;
+            return new ProxyResponse<byte[]>(rawResponse, content, responseMsg.IsSuccessStatusCode, responseMsg.StatusCode, responseMsg.ReasonPhrase);
+        }
+
         public virtual ProxyResponse<T> GetResponse<T>(string requestUri) where T : class
         {
             return GetResponse<T, T>(requestUri, null);
@@ -292,10 +300,20 @@ namespace Saasu.API.Client.Framework
         {
             return GetResponseMessage<object>(requestUri, null);
         }
+
         protected virtual System.Net.Http.HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData)
         {
+            return GetResponseMessage<T>(requestUri, postData, ContentType.AsContentTypeString());
+        }
+
+
+        protected virtual System.Net.Http.HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData, string contentType)
+        {
             HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType.AsContentTypeString()));
+
+            if(!string.IsNullOrEmpty(contentType))
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(contentType));
+
             if (AuthenticationMethod == AuthenticationType.OAuth && !string.IsNullOrEmpty(_bearerToken))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
@@ -343,6 +361,7 @@ namespace Saasu.API.Client.Framework
 
             return responseMsg;
         }
+        
 
         public T Deserialise<T>(string data) where T : class
         {

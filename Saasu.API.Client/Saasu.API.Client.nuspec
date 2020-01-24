@@ -3,9 +3,9 @@
 	<metadata>
 		<id>Saasu.API.Dotnet.Sdk</id>
 		<title>API SDK for the Saasu API</title>
-		<version>1.1.7</version>
+		<version>1.1.7.2</version>
 		<authors>Saasu</authors>
-		<description>A client SDK for working with the Saasu API.</description>
+		<description>A client SDK for working with the Saasu API. Modified for Intellis internal use.</description>
 		<summary>A client SDK for working with the Saasu API.</summary>
 		<language>en-US</language>
 		<projectUrl>https://github.com/saasu/api-sdk-dotnet</projectUrl>

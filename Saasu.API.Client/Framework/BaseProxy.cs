@@ -307,7 +307,12 @@ namespace Saasu.API.Client.Framework
             return GetResponseMessage<T>(requestUri, postData, ContentType.AsContentTypeString());
         }
 
-        private static Lazy<HttpClient> Client {get;} = new Lazy<HttpClient>(() => new HttpClient());
+        private static Lazy<HttpClient> Client {get;} = new Lazy<HttpClient>(() =>
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+            return client;
+        });
         
 
         protected virtual HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData, string contentType)

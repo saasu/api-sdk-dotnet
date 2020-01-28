@@ -5,6 +5,7 @@ using Saasu.API.Core.Globals;
 using Saasu.API.Core.Models.Attachments;
 using Saasu.API.Core.Models.Invoices;
 using System.Net.Http;
+using System.Text;
 
 namespace Saasu.API.Client.Proxies
 {
@@ -108,6 +109,24 @@ namespace Saasu.API.Client.Proxies
             PagingEnabled = false;
             var uri = base.GetRequestUri(invoiceId.ToString());
             return base.GetResponse<InvoiceEmailResult>(uri);
+        }
+
+        public ProxyResponse<byte[]> GenerateInvoicePdf(int invoiceId, int? templateId = null)
+        {
+            _requestPrefix = ResourceNames.Invoice;
+            RequestPostfix = ApiConstants.GenerateInvoicePdfPath;
+            OperationMethod = HttpMethod.Get;
+            PagingEnabled = false;
+
+            var queryArgs = new StringBuilder();
+
+            if (templateId.HasValue)
+            {
+                AppendQueryArg(queryArgs, ApiConstants.FilterTemplateId, templateId.Value.ToString());
+            }
+
+            var uri = base.GetRequestUri(invoiceId.ToString());
+            return base.GetBinaryResponse(uri);
         }
 
     }

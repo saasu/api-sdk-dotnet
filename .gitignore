@@ -13,3 +13,4 @@ Saasu.API.Client.IntegrationTests/bin/
 *.bak
 *.orig
 Saasu.API.Core/Saasu.API.Core.csproj.user
+/.vs/Saasu.API.Dotnet.Client/v15/Server/sqlite3

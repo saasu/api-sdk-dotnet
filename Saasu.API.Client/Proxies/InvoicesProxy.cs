@@ -61,7 +61,7 @@ namespace Saasu.API.Client.Proxies
             {
                 AppendQueryArg(queryArgs, ApiConstants.FilterTransactionTypeInvoices, transactionType);
             }
-			if (paymentStatus != null && paymentStatus > 0)
+			if (!string.IsNullOrWhiteSpace(invoiceStatus))
 			{
                 AppendQueryArg(queryArgs, ApiConstants.FilterPaymentStatus, paymentStatus.ToString());
 			}

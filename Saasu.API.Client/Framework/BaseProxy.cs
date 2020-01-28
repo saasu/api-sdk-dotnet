@@ -1,4 +1,5 @@
-﻿using Saasu.API.Core.Framework;
+﻿using System;
+using Saasu.API.Core.Framework;
 using Saasu.API.Core.Globals;
 using Saasu.API.Core.Models.RequestFiltering;
 using System.IO;
@@ -246,6 +247,14 @@ namespace Saasu.API.Client.Framework
             return new ProxyResponse(rawResponse, responseMsg.IsSuccessStatusCode, responseMsg.StatusCode, responseMsg.ReasonPhrase);
         }
 
+        public virtual ProxyResponse<byte[]> GetBinaryResponse(string requestUrl)
+        {
+            var responseMsg = GetResponseMessage(requestUrl);
+            var content = responseMsg.Content.ReadAsByteArrayAsync().Result;
+            var rawResponse = string.Empty;
+            return new ProxyResponse<byte[]>(rawResponse, content, responseMsg.IsSuccessStatusCode, responseMsg.StatusCode, responseMsg.ReasonPhrase);
+        }
+
         public virtual ProxyResponse<T> GetResponse<T>(string requestUri) where T : class
         {
             return GetResponse<T, T>(requestUri, null);
@@ -292,57 +301,48 @@ namespace Saasu.API.Client.Framework
         {
             return GetResponseMessage<object>(requestUri, null);
         }
+
         protected virtual System.Net.Http.HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData)
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType.AsContentTypeString()));
-            if (AuthenticationMethod == AuthenticationType.OAuth && !string.IsNullOrEmpty(_bearerToken))
-            {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
-            }
-
-            MediaTypeFormatter mediaFormatter;
-
-            if (ContentType == RequestContentType.ApplicationXml)
-            {
-                mediaFormatter = new System.Net.Http.Formatting.XmlMediaTypeFormatter();
-
-            }
-            else
-            {
-                mediaFormatter = new System.Net.Http.Formatting.JsonMediaTypeFormatter();
-            }
-
-
-            HttpResponseMessage responseMsg = null;
-            if (OperationMethod == HttpMethod.Get)
-            {
-                responseMsg = client.GetAsync(requestUri).Result;
-            }
-            else if (OperationMethod == HttpMethod.Delete && postData == null)
-            {
-                responseMsg = client.DeleteAsync(requestUri).Result;
-            }
-            else if (OperationMethod == HttpMethod.Head)
-            {
-                var rqstMsg = new HttpRequestMessage(HttpMethod.Head, requestUri);
-                responseMsg = client.SendAsync(rqstMsg).Result;
-            }
-            else
-            {
-                //Note: Need to explicitly specify the content type here otherwise this call fails.
-                if (OperationMethod == HttpMethod.Put)
-                {
-                    responseMsg = client.PutAsync<T>(requestUri, postData, mediaFormatter).Result;
-                }
-                else
-                {
-                    responseMsg = client.PostAsync<T>(requestUri, postData, mediaFormatter).Result;
-                }
-            }
-
-            return responseMsg;
+            return GetResponseMessage<T>(requestUri, postData, ContentType.AsContentTypeString());
         }
+
+        private static Lazy<HttpClient> Client {get;} = new Lazy<HttpClient>(() =>
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.ConnectionClose = true;
+            return client;
+        });
+        
+
+        protected virtual HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData, string contentType)
+        {
+            var client = Client.Value;
+
+            using (var request = new HttpRequestMessage(OperationMethod, requestUri))
+            {
+                
+                if (!string.IsNullOrEmpty(contentType))
+                    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(contentType));
+
+                if (AuthenticationMethod == AuthenticationType.OAuth && !string.IsNullOrEmpty(_bearerToken))
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
+                }
+
+                if (postData != null)
+                {
+                    request.Content = new ObjectContent<T>(postData, ContentType == RequestContentType.ApplicationXml
+                        ? (MediaTypeFormatter) new XmlMediaTypeFormatter()
+                        : new JsonMediaTypeFormatter());
+                }
+
+                return client.SendAsync(request).Result;
+
+            }
+
+        }
+        
 
         public T Deserialise<T>(string data) where T : class
         {

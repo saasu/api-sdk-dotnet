@@ -16,6 +16,8 @@
 
         public const string IdQueryArgParameter = "{id}";
         public const string ResetPasswordUrlPath = "reset-password/";
+
+        public const string GenerateInvoicePdfPath = "generate-pdf/";
         public const string EmailInvoiceToContactUrlPath = "email-contact/";
         public const string EmailInvoiceUrlPath = "email/";
         public const string BuildComboItemPath = "build/";
@@ -92,6 +94,7 @@
         public const string FilterEmail = "Email";
         public const string FilterExampleEmail = FilterEmail + "={" + FilterHelpEmail + "}";
         public const string FilterContactId = "ContactId";
+        public const string FilterTemplateId = "TemplateId";
         public const string FilterExampleContactId = FilterContactId + "={" + FilterHelpText + "}";
         public const string FilterInvoiceFromDate = "InvoiceFromDate";
         public const string FilterExampleInvoiceFromDate = FilterInvoiceFromDate + "={" + FilterHelpDate + "}";

@@ -7,7 +7,9 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Saasu.API.Client.Framework
 {
@@ -17,6 +19,7 @@ namespace Saasu.API.Client.Framework
         private int _fileId;
         private string _baseUri;
         private string _bearerToken; // for OAuth
+        private readonly IHttpClientFactory _clientFactory;
 
         public BaseProxy()
         {
@@ -26,6 +29,7 @@ namespace Saasu.API.Client.Framework
             ContentType = RequestContentType.ApplicationJson;
             OperationMethod = HttpMethod.Get;
             PagingEnabled = true;
+            _clientFactory = DependencyInjectionWrapper.Instance.ServiceProvider.GetService<IHttpClientFactory>();
 
             SetSslCommunicationsHandling();
         }
@@ -292,10 +296,34 @@ namespace Saasu.API.Client.Framework
         {
             return GetResponseMessage<object>(requestUri, null);
         }
-        protected virtual System.Net.Http.HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData)
+
+        protected virtual HttpResponseMessage GetResponseMessage<T>(string requestUri, T postData)
         {
-            HttpClient client = new HttpClient();
+            var httpClientFactory = DependencyInjectionWrapper.Instance.ServiceProvider.GetService<IHttpClientFactory>();
+            var client = httpClientFactory.CreateClient();
+            
+            var request = CreateRequest(requestUri, postData, client);
+
+            var task = Task.Run(() => client.SendAsync(request)); 
+            task.Wait();
+            return task.Result;
+            
+        }
+        
+        protected virtual async Task<HttpResponseMessage> GetResponseMessageAsync<T>(string requestUri, T postData)
+        {
+            var client = _clientFactory.CreateClient();
+            
+            var request = CreateRequest(requestUri, postData, client);
+
+            return await client.SendAsync(request);
+
+        }
+
+        private HttpRequestMessage CreateRequest<T>(string requestUri, T postData, HttpClient client)
+        {
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType.AsContentTypeString()));
+
             if (AuthenticationMethod == AuthenticationType.OAuth && !string.IsNullOrEmpty(_bearerToken))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
@@ -306,42 +334,20 @@ namespace Saasu.API.Client.Framework
             if (ContentType == RequestContentType.ApplicationXml)
             {
                 mediaFormatter = new System.Net.Http.Formatting.XmlMediaTypeFormatter();
-
             }
             else
             {
                 mediaFormatter = new System.Net.Http.Formatting.JsonMediaTypeFormatter();
             }
 
+            var request = new HttpRequestMessage(OperationMethod, requestUri);
 
-            HttpResponseMessage responseMsg = null;
-            if (OperationMethod == HttpMethod.Get)
+            if (OperationMethod == HttpMethod.Post || OperationMethod == HttpMethod.Put)
             {
-                responseMsg = client.GetAsync(requestUri).Result;
-            }
-            else if (OperationMethod == HttpMethod.Delete && postData == null)
-            {
-                responseMsg = client.DeleteAsync(requestUri).Result;
-            }
-            else if (OperationMethod == HttpMethod.Head)
-            {
-                var rqstMsg = new HttpRequestMessage(HttpMethod.Head, requestUri);
-                responseMsg = client.SendAsync(rqstMsg).Result;
-            }
-            else
-            {
-                //Note: Need to explicitly specify the content type here otherwise this call fails.
-                if (OperationMethod == HttpMethod.Put)
-                {
-                    responseMsg = client.PutAsync<T>(requestUri, postData, mediaFormatter).Result;
-                }
-                else
-                {
-                    responseMsg = client.PostAsync<T>(requestUri, postData, mediaFormatter).Result;
-                }
+                request.Content = new ObjectContent<T>(postData, mediaFormatter);
             }
 
-            return responseMsg;
+            return request;
         }
 
         public T Deserialise<T>(string data) where T : class

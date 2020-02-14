@@ -128,7 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj">
-      <Project>{17364BF1-4929-440F-B571-2067CF0635EC}</Project>
+      <Project>{70eb4b54-6ef7-4d01-956d-4d48067eaba6}</Project>
       <Name>Saasu.API.Core</Name>
     </ProjectReference>
   </ItemGroup>

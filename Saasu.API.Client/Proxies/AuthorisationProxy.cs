@@ -6,9 +6,21 @@ using Saasu.API.Client.Framework;
 using Saasu.API.Core.Globals;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models.Security;
-using System.Web.Script.Serialization;
+
 using System.Net;
 using System.Net.Http;
+
+
+#if NETSTANDARD2_0
+
+using Newtonsoft.Json;
+
+#else
+
+using System.Web.Script.Serialization;
+
+#endif
+
 
 namespace Saasu.API.Client.Proxies
 {
@@ -52,17 +64,31 @@ namespace Saasu.API.Client.Proxies
 			{
 				try
 				{
+#if NETSTANDARD2_0
+                    var dto = JsonConvert.DeserializeObject<OAuthAccessTokenGrant>(response.RawResponse);
+                    result.IsSuccessfull = true;
+                    result.AccessGrant = dto;
+
+#else
 					JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
 					var dto = jsonSerializer.Deserialize<OAuthAccessTokenGrant>(response.RawResponse);
 					result.IsSuccessfull = true;
 					result.AccessGrant = dto;
+#endif
 				}
 				catch
 				{
+#if NETSTANDARD2_0
+                    var dto = JsonConvert.DeserializeObject<OAuthGrantRequestError>(response.RawResponse);
+                    result.IsSuccessfull = false;
+                    result.ErrorDetails = dto;
+#else
 					JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
 					var dto = jsonSerializer.Deserialize<OAuthGrantRequestError>(response.RawResponse);
 					result.IsSuccessfull = false;
 					result.ErrorDetails = dto;
+#endif
+
 				}
 			}
 			else
@@ -100,17 +126,31 @@ namespace Saasu.API.Client.Proxies
 			{
 				try
 				{
+#if NETSTANDARD2_0
+                    var dto = JsonConvert.DeserializeObject<OAuthAccessTokenGrant>(response.RawResponse);
+                    result.IsSuccessfull = true;
+                    result.AccessGrant = dto;
+#else
 					JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
 					var dto = jsonSerializer.Deserialize<OAuthAccessTokenGrant>(response.RawResponse);
 					result.IsSuccessfull = true;
 					result.AccessGrant = dto;
-				}
+#endif
+
+                }
 				catch
 				{
+#if NETSTANDARD2_0
+                    var dto = JsonConvert.DeserializeObject<OAuthGrantRequestError>(response.RawResponse);
+                    result.IsSuccessfull = false;
+                    result.ErrorDetails = dto;
+#else
 					JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
 					var dto = jsonSerializer.Deserialize<OAuthGrantRequestError>(response.RawResponse);
 					result.IsSuccessfull = false;
 					result.ErrorDetails = dto;
+#endif
+
 				}
 			}
 			else

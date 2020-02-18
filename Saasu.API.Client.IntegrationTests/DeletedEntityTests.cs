@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using Xunit;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Accounts;
 using Saasu.API.Core.Models.Journals;
@@ -9,7 +9,6 @@ using System.Linq;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    [TestFixture]
     public class DeletedEntityTests
     {
         private int _DeletedContactId;
@@ -66,107 +65,107 @@ namespace Saasu.API.Client.IntegrationTests
 
         #region Tests
 
-        [Test]
+        [Fact]
         public void GetAllNoFilters()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities();
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
 
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e =>_allNotDeleted.Contains(e.EntityId)), "Not deleted transactions contained in result set");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => _allNotDeleted.Contains(e.EntityId)));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypeSale()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "Sale");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Sale"), "Non-sale entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Sale"));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypePurchase()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "Purchase");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Purchase"), "Non-purchase entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Purchase"));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypeSalePayment()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "SalePayment");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "SalePayment"), "Non-salepayment entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "SalePayment"));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypePurchasePayment()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "PurchasePayment");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "PurchasePayment"), "Non-purchasepayment entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "PurchasePayment"));
         }
 
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypeContact()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "Contact");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Contact"), "Non-contact entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Contact"));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypeInventoryItem()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "Item");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Item"), "Non-item entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Item"));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnEntityTypeJournal()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "Journal");
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Journal"), "Non-journal entity type in result set");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.EntityType != "Journal"));
         }
 
-        [Test]
+        [Fact]
         public void FilterOnInvalidEntityTypeJournal()
         {
             var result = new DeletedEntitiesProxy().GetDeletedEntities(entityType: "aaaa");
 
             Assert.False(result.IsSuccessfull, "Filter on invalid entity type should not have succeded");
-            Assert.IsNull(result.DataObject, "Filter on invalid entity type should not have returned a result set");
+            Assert.Null(result.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void FilterOnUtcDeletedDateTime()
         {
             var fromDate = DateTime.UtcNow.AddHours(-1);
             var toDate = DateTime.UtcNow;
             var result = new DeletedEntitiesProxy().GetDeletedEntities(utcDeletedFromDate: fromDate, utcDeletedToDate: toDate);
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
-            Assert.IsNull(result.DataObject.Entities.SingleOrDefault(e => e.Timestamp < fromDate || e.Timestamp > toDate), "Entity outside of specified deleted times was returned");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
+            Assert.Null(result.DataObject.Entities.SingleOrDefault(e => e.Timestamp < fromDate || e.Timestamp > toDate));
         }
 
-        [Test]
+        [Fact]
         public void TestPaging()
         {
             var proxy = new DeletedEntitiesProxy();
             var result = proxy.GetDeletedEntities(pageNumber: 1, pageSize: 3);
-            Assert.NotNull(result.DataObject, "Error with response object");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection");
+            Assert.True(result.DataObject != null, "Error with response object");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
             Assert.True(result.DataObject.Entities.Count == 3);
 
             var idsFromResult = new List<int>
@@ -177,8 +176,8 @@ namespace Saasu.API.Client.IntegrationTests
             };
 
             result = proxy.GetDeletedEntities(pageNumber: 2, pageSize: 3);
-            Assert.NotNull(result.DataObject, "Error with response object, second request");
-            Assert.NotNull(result.DataObject.Entities, "Error with response object entity collection, second request");
+            Assert.True(result.DataObject != null, "Error with response object, second request");
+            Assert.True(result.DataObject.Entities != null, "Error with response object entity collection, second request");
 
             result.DataObject.Entities.ForEach(e => Assert.False(idsFromResult.Contains(e.EntityId), "Entity from first page also contained in second"));
         }

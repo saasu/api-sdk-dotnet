@@ -1,20 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Saasu.API.Client.Framework;
-using NUnit.Framework;
+using Xunit;
 using Saasu.API.Client.Proxies;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    //[TestClass]
-    [TestFixture]
     public class SerialisationTests
     {
-        [Test]
+        [Fact]
         public void ShouldBeAbleToReturnApiResultsAsJson()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
@@ -25,7 +23,7 @@ namespace Saasu.API.Client.IntegrationTests
 
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToReturnApiResultsAsXml()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();

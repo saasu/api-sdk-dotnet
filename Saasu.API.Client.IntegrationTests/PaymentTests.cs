@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Ola.RestClient.Dto;
 using Saasu.API.Client.Proxies;
@@ -8,13 +8,12 @@ using Saasu.API.Core.Framework;
 using Ola.RestClient.Proxies;
 using System.Collections.Specialized;
 using System.Configuration;
-using NUnit.Framework;
+using Xunit;
 using Saasu.API.Core.Models.Payments;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
 {	
-    [TestFixture]
 	public class PaymentTests 
 	{		
 		#region test data properties		
@@ -99,15 +98,14 @@ namespace Saasu.API.Client.IntegrationTests
 		    SetupBankAccounts();
 		}
 
-	    [Test]        
+	    [Fact]        
 	    public void InsertAndGetPaymentForSingleInvoice()
 	    {
 	        var invoice = GetInvoiceTransaction01();
 	        var invoiceProxy = new InvoiceProxy();
 	        var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-	        Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-	            "There was an error creating the invoice for payment test.");
+	        Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
 	        var invoicePayment = new PaymentTransaction
 	                             {
@@ -132,42 +130,39 @@ namespace Saasu.API.Client.IntegrationTests
 	        var invoicePaymentProxy = new PaymentProxy();
 	        var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-	        Assert.IsNotNull(insertInvoicePaymentResponse);
-	        Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-	        Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+	        Assert.NotNull(insertInvoicePaymentResponse);
+	        Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+	        Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
             var insertInvoicePaymentResult = insertInvoicePaymentResponse.DataObject;
 
 
-	        Assert.IsTrue(insertInvoicePaymentResult.InsertedEntityId > 0,
-	            string.Format("There was an error creating the invoice payment for Invoice Id {0}",
-	                insertInvoiceResult.DataObject.InsertedEntityId));
+	        Assert.True(insertInvoicePaymentResult.InsertedEntityId > 0, string.Format("There was an error creating the invoice payment for Invoice Id {0}", insertInvoiceResult.DataObject.InsertedEntityId));
 
 	        var getInvoicePaymentResponse = invoicePaymentProxy.GetPayment(insertInvoicePaymentResult.InsertedEntityId);
             var getInvoicePaymentResult = getInvoicePaymentResponse.DataObject;
 
-            Assert.IsNotNull(getInvoicePaymentResult);
-            Assert.IsTrue(getInvoicePaymentResult.TransactionId == insertInvoicePaymentResult.InsertedEntityId, "Incorrect payment transaction ID");
-            Assert.AreEqual(110M, getInvoicePaymentResult.TotalAmount, "Incorrect payment amount.");
-            Assert.IsTrue(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
-            Assert.IsNull(getInvoicePaymentResult.ClearedDate, "Incorrect cleared date.");
+            Assert.NotNull(getInvoicePaymentResult);
+            Assert.True(getInvoicePaymentResult.TransactionId == insertInvoicePaymentResult.InsertedEntityId, "Incorrect payment transaction ID");
+            Assert.Equal(110M, getInvoicePaymentResult.TotalAmount);
+            Assert.True(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
+            Assert.Null(getInvoicePaymentResult.ClearedDate);
 
 	        foreach (var paymentItem in getInvoicePaymentResult.PaymentItems)
 	        {
-	            Assert.AreEqual(paymentItem.InvoiceTransactionId, insertInvoiceResult.DataObject.InsertedEntityId, "Incorrect invoice payment item invoice transaction Id.");
-                Assert.AreEqual(paymentItem.AmountPaid, 110M, "Incorrect invoice payment item paid amount.");
+	            Assert.Equal(paymentItem.InvoiceTransactionId, insertInvoiceResult.DataObject.InsertedEntityId);
+                Assert.Equal(paymentItem.AmountPaid, 110M);
 	        }
 	    }
 
-		[Test]
+		[Fact]
 	    public void InsertAndGetPaymentForMultipleInvoiecs()
 	    {
             var invoice = GetInvoiceTransaction01();
             var invoiceProxy = new InvoiceProxy();
             var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-               "There was an error creating the invoice for payment test.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
 	        var invoice01TransctionId = insertInvoiceResult.DataObject.InsertedEntityId; 
 
@@ -175,8 +170,7 @@ namespace Saasu.API.Client.IntegrationTests
             invoiceProxy = new InvoiceProxy();
             insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-              "There was an error creating the invoice for payment test.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
 	        var invoice02TransactionId = insertInvoiceResult.DataObject.InsertedEntityId;
 
@@ -210,38 +204,36 @@ namespace Saasu.API.Client.IntegrationTests
             var invoicePaymentProxy = new PaymentProxy();
             var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-            Assert.IsNotNull(insertInvoicePaymentResponse);
-            Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-            Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+            Assert.NotNull(insertInvoicePaymentResponse);
+            Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
             var insertInvoicePaymentResult = insertInvoicePaymentResponse.DataObject;
 
 
-            Assert.IsTrue(insertInvoicePaymentResult.InsertedEntityId > 0,
-                string.Format("There was an error creating the invoice payment for Invoice Id {0}",
-                    insertInvoiceResult.DataObject.InsertedEntityId));
+            Assert.True(insertInvoicePaymentResult.InsertedEntityId > 0, string.Format("There was an error creating the invoice payment for Invoice Id {0}", insertInvoiceResult.DataObject.InsertedEntityId));
 
             var getInvoicePaymentResponse = invoicePaymentProxy.GetPayment(insertInvoicePaymentResult.InsertedEntityId);
             var getInvoicePaymentResult = getInvoicePaymentResponse.DataObject;
 
-            Assert.IsNotNull(getInvoicePaymentResult);
-            Assert.IsTrue(getInvoicePaymentResult.TransactionId == insertInvoicePaymentResult.InsertedEntityId, "Incorrect payment transaction ID");
-            Assert.AreEqual(260M, getInvoicePaymentResult.TotalAmount, "Incorrect payment amount.");
-            Assert.IsTrue(getInvoicePaymentResult.PaymentItems.Count == 2, "Incorrect number of payment items.");
+            Assert.NotNull(getInvoicePaymentResult);
+            Assert.True(getInvoicePaymentResult.TransactionId == insertInvoicePaymentResult.InsertedEntityId, "Incorrect payment transaction ID");
+            Assert.Equal(260M, getInvoicePaymentResult.TotalAmount);
+            Assert.True(getInvoicePaymentResult.PaymentItems.Count == 2, "Incorrect number of payment items.");
 
 	        var invoicePaymentItem01 =
 	            getInvoicePaymentResult.PaymentItems.Find(i => i.InvoiceTransactionId == invoice01TransctionId);
 	        var invoicePaymentItem02 =
 	            getInvoicePaymentResult.PaymentItems.Find(i => i.InvoiceTransactionId == invoice02TransactionId);
 
-	        Assert.IsNotNull(invoicePaymentItem01, string.Format("No payment item found for invoice transaction Id {0}", invoice01TransctionId));
-            Assert.IsNotNull(invoicePaymentItem02, string.Format("No payment item found for invoice transaction Id {0}", invoice02TransactionId));
-            Assert.AreEqual(110M, invoicePaymentItem01.AmountPaid, "Incorrect amount paid in payment item for invoice transaction Id {0}", invoice01TransctionId);
-            Assert.AreEqual(150M, invoicePaymentItem02.AmountPaid, "Incorrect amount paid in payment item for invoice transaction Id {0}", invoice02TransactionId);
+	        Assert.NotNull(invoicePaymentItem01);
+            Assert.NotNull(invoicePaymentItem02);
+            Assert.True(invoicePaymentItem01.AmountPaid == 110M, $"Incorrect amount paid in payment item for invoice transaction Id {invoice01TransctionId}");
+            Assert.True(150M == invoicePaymentItem02.AmountPaid,$"Incorrect amount paid in payment item for invoice transaction Id {invoice02TransactionId}");
                    
 	    }
 
-        [Test]
+        [Fact]
         public void InsertAndGetInvoicePaymentForMultiCcyInvoice()
         {
             var invoice = GetInvoiceTransaction01();
@@ -250,8 +242,7 @@ namespace Saasu.API.Client.IntegrationTests
             var invoiceProxy = new InvoiceProxy();
             var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-                "There was an error creating the invoice for payment test.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
             var insertedInvoiceFromDb = invoiceProxy.GetInvoice(insertInvoiceResult.DataObject.InsertedEntityId);
             var insertedInvoiceAutoPopulatedFxRate = insertedInvoiceFromDb.DataObject.FxRate;
@@ -280,37 +271,34 @@ namespace Saasu.API.Client.IntegrationTests
             var invoicePaymentProxy = new PaymentProxy();
             var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-            Assert.IsNotNull(insertInvoicePaymentResponse);
-            Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-            Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+            Assert.NotNull(insertInvoicePaymentResponse);
+            Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
             var insertInvoicePaymentResult = insertInvoicePaymentResponse.DataObject;
 
 
-            Assert.IsTrue(insertInvoicePaymentResult.InsertedEntityId > 0,
-                string.Format("There was an error creating the invoice payment for Invoice Id {0}",
-                    insertInvoiceResult.DataObject.InsertedEntityId));
+            Assert.True(insertInvoicePaymentResult.InsertedEntityId > 0, string.Format("There was an error creating the invoice payment for Invoice Id {0}", insertInvoiceResult.DataObject.InsertedEntityId));
 
             var getInvoicePaymentResponse = invoicePaymentProxy.GetPayment(insertInvoicePaymentResult.InsertedEntityId);
             var getInvoicePaymentResult = getInvoicePaymentResponse.DataObject;
 
-            Assert.IsNotNull(getInvoicePaymentResult);
-            Assert.IsTrue(getInvoicePaymentResult.TransactionId == insertInvoicePaymentResult.InsertedEntityId, "Incorrect payment transaction ID");
-            Assert.AreEqual(110M, getInvoicePaymentResult.TotalAmount, "Incorrect payment amount.");
-            Assert.IsTrue(getInvoicePaymentResult.AutoPopulateFxRate, "Incorrect auto populate Fx Rate status.");
-            Assert.AreEqual(insertedInvoiceAutoPopulatedFxRate, getInvoicePaymentResult.FxRate, "Incorrect Auto Populated FX Rate");
-            Assert.IsTrue(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
+            Assert.NotNull(getInvoicePaymentResult);
+            Assert.True(getInvoicePaymentResult.TransactionId == insertInvoicePaymentResult.InsertedEntityId, "Incorrect payment transaction ID");
+            Assert.Equal(110M, getInvoicePaymentResult.TotalAmount);
+            Assert.True(getInvoicePaymentResult.AutoPopulateFxRate, "Incorrect auto populate Fx Rate status.");
+            Assert.Equal(insertedInvoiceAutoPopulatedFxRate, getInvoicePaymentResult.FxRate);
+            Assert.True(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
         }
 
-	    [Test]
+	    [Fact]
 	    public void UpdatePaymentForSingleInvoice()
 	    {
             var invoice = GetInvoiceTransaction01();
             var invoiceProxy = new InvoiceProxy();
             var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-                "There was an error creating the invoice for payment test.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
             var invoicePayment = new PaymentTransaction
             {
@@ -335,15 +323,13 @@ namespace Saasu.API.Client.IntegrationTests
             var invoicePaymentProxy = new PaymentProxy();
             var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-            Assert.IsNotNull(insertInvoicePaymentResponse);
-            Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-            Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+            Assert.NotNull(insertInvoicePaymentResponse);
+            Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
 	        var insertedInvoicePaymentEntityId = insertInvoicePaymentResponse.DataObject.InsertedEntityId;
 	        var insertedInvoicePaymentLastUpdatedId = insertInvoicePaymentResponse.DataObject.LastUpdatedId; 
-            Assert.IsTrue(insertedInvoicePaymentEntityId > 0,
-                string.Format("There was an error creating the invoice payment for Invoice Id {0}",
-                    insertInvoiceResult.DataObject.InsertedEntityId));
+            Assert.True(insertedInvoicePaymentEntityId > 0, string.Format("There was an error creating the invoice payment for Invoice Id {0}", insertInvoiceResult.DataObject.InsertedEntityId));
 
             invoicePayment = new PaymentTransaction
             {
@@ -371,41 +357,40 @@ namespace Saasu.API.Client.IntegrationTests
 
 	        var updateInvoicePaymentResponse = invoicePaymentProxy.UpdateInvoicePayment(insertedInvoicePaymentEntityId,
 	            invoicePayment);
-            Assert.IsNotNull(updateInvoicePaymentResponse);
-            Assert.IsTrue(updateInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(updateInvoicePaymentResponse);
+            Assert.True(updateInvoicePaymentResponse.IsSuccessfull);
 
             var getInvoicePaymentResponse = invoicePaymentProxy.GetPayment(insertedInvoicePaymentEntityId);
             var getInvoicePaymentResult = getInvoicePaymentResponse.DataObject;
 
-            Assert.IsNotNull(getInvoicePaymentResult);
-            Assert.IsTrue(getInvoicePaymentResult.TransactionId == insertedInvoicePaymentEntityId, "Incorrect payment transaction ID.");
-            Assert.AreEqual(DateTime.Now.Date, getInvoicePaymentResult.TransactionDate, "Incorrect payment date.");
-            Assert.AreEqual(DateTime.Now.Date.AddDays(2), getInvoicePaymentResult.ClearedDate, "Incorrect cleared date.");
-            Assert.AreEqual("AUD", getInvoicePaymentResult.Currency, "Incorrect invoice payment currency.");
-            Assert.AreEqual("SP", getInvoicePaymentResult.TransactionType, "Incorrect payment transaction type.");
-            Assert.AreEqual(string.Format("Test Update Payment for Inv# {0}", insertInvoiceResult.DataObject.GeneratedInvoiceNumber), getInvoicePaymentResult.Summary);
-            Assert.AreEqual(60M, getInvoicePaymentResult.TotalAmount, "Incorrect payment amount.");
-            Assert.IsTrue(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
-            Assert.AreEqual(_bankAccount02Id, getInvoicePaymentResult.PaymentAccountId, "Incorrect payment account");
-            Assert.AreEqual("Update payment amount to $60", getInvoicePaymentResult.Notes, "Incorrect invoice payment notes.");
-            Assert.IsTrue(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
-            Assert.IsTrue(getInvoicePaymentResult.RequiresFollowUp, "Incorrect requires follow up status.");
+            Assert.NotNull(getInvoicePaymentResult);
+            Assert.True(getInvoicePaymentResult.TransactionId == insertedInvoicePaymentEntityId, "Incorrect payment transaction ID.");
+            Assert.Equal(DateTime.Now.Date, getInvoicePaymentResult.TransactionDate);
+            Assert.Equal(DateTime.Now.Date.AddDays(2), getInvoicePaymentResult.ClearedDate);
+            Assert.Equal("AUD", getInvoicePaymentResult.Currency);
+            Assert.Equal("SP", getInvoicePaymentResult.TransactionType);
+            Assert.Equal(string.Format("Test Update Payment for Inv# {0}", insertInvoiceResult.DataObject.GeneratedInvoiceNumber), getInvoicePaymentResult.Summary);
+            Assert.Equal(60M, getInvoicePaymentResult.TotalAmount);
+            Assert.True(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
+            Assert.Equal(_bankAccount02Id, getInvoicePaymentResult.PaymentAccountId);
+            Assert.Equal("Update payment amount to $60", getInvoicePaymentResult.Notes);
+            Assert.True(getInvoicePaymentResult.PaymentItems.Count == 1, "Incorrect number of payment items.");
+            Assert.True(getInvoicePaymentResult.RequiresFollowUp, "Incorrect requires follow up status.");
 	        var paymentItem =
 	            getInvoicePaymentResult.PaymentItems.Find(
 	                i => i.InvoiceTransactionId == insertInvoiceResult.DataObject.InsertedEntityId);
-            Assert.IsNotNull(paymentItem, "No payment item for invoice transaction Id {0}", insertInvoiceResult.DataObject.InsertedEntityId);
-            Assert.AreEqual(60M, paymentItem.AmountPaid, "Incorrect amount paid in payment item for invoie transaction Id {0}", paymentItem.InvoiceTransactionId);
+            Assert.True(paymentItem !=null, $"No payment item for invoice transaction Id {insertInvoiceResult.DataObject.InsertedEntityId}");
+            Assert.True(60M == paymentItem.AmountPaid, $"Incorrect amount paid in payment item for invoie transaction Id {paymentItem.InvoiceTransactionId}");
 	    }
 
-	    [Test]
+	    [Fact]
 	    public void DeleteInvoicePayment()
 	    {
 	        var invoice = GetInvoiceTransaction01();
 	        var invoiceProxy = new InvoiceProxy();
 	        var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-	        Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-	            "There was an error creating the invoice for payment test.");
+	        Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
 	        var invoicePayment = new PaymentTransaction
 	                             {
@@ -430,26 +415,25 @@ namespace Saasu.API.Client.IntegrationTests
 	        var invoicePaymentProxy = new PaymentProxy();
 	        var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-	        Assert.IsNotNull(insertInvoicePaymentResponse);
-	        Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-	        Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+	        Assert.NotNull(insertInvoicePaymentResponse);
+	        Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+	        Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
 	        var deleteInvoicePaymentResponse =
 	            invoicePaymentProxy.DeleteInvoicePayment(insertInvoicePaymentResponse.DataObject.InsertedEntityId);
 
-	        Assert.IsNotNull(deleteInvoicePaymentResponse);
-	        Assert.IsTrue(deleteInvoicePaymentResponse.IsSuccessfull, "Invoice payment was not deleted successfully.");
+	        Assert.NotNull(deleteInvoicePaymentResponse);
+	        Assert.True(deleteInvoicePaymentResponse.IsSuccessfull, "Invoice payment was not deleted successfully.");
 	    }
 
-        [Test]
+        [Fact]
         public void CannotSavePaymentWithInvalidPaymentItemAmount()
         {
             var invoice = GetInvoiceTransaction01();
             var invoiceProxy = new InvoiceProxy();
             var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-               "There was an error creating the invoice for payment test.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
             var invoicePayment = new PaymentTransaction
             {
@@ -474,19 +458,18 @@ namespace Saasu.API.Client.IntegrationTests
             var invoicePaymentProxy = new PaymentProxy();
             var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-            Assert.IsNotNull(insertInvoicePaymentResponse);
-            Assert.IsFalse(insertInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(insertInvoicePaymentResponse);
+            Assert.False(insertInvoicePaymentResponse.IsSuccessfull);
         }
 
-        [Test]
+        [Fact]
         public void CannotApplyPaymentToIncorrectInvoiceTransactionType()
         {
             var invoice = GetInvoiceTransaction01();
             var invoiceProxy = new InvoiceProxy();
             var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-               "There was an error creating the invoice for payment test.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
             var invoicePayment = new PaymentTransaction
             {
@@ -511,61 +494,60 @@ namespace Saasu.API.Client.IntegrationTests
             var invoicePaymentProxy = new PaymentProxy();
             var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-            Assert.IsNotNull(insertInvoicePaymentResponse);
-            Assert.IsFalse(insertInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(insertInvoicePaymentResponse);
+            Assert.False(insertInvoicePaymentResponse.IsSuccessfull);
         }
 
-        [Test]
+        [Fact]
         public void ShouldRetreivePaymentSummaryUsingTransactionType()
         {
             var paymentsResponse = new PaymentsProxy().GetPayments(null, null, null, null, "SP", null, null, null, null, null, null,
                 null);
-            Assert.IsNotNull(paymentsResponse, "Payments response is NULL.");
-            Assert.IsTrue(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
-            Assert.IsNotNull(paymentsResponse.DataObject.PaymentTransactions, "Payments response does not contain a payments summary.");
-            Assert.IsTrue(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type SP");
+            Assert.NotNull(paymentsResponse);
+            Assert.True(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
+            Assert.NotNull(paymentsResponse.DataObject.PaymentTransactions);
+            Assert.True(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type SP");
             foreach (var payment in paymentsResponse.DataObject.PaymentTransactions)
             {
-                Assert.IsTrue(payment.TransactionType.Equals("SP"), "Incorrect payment transaction type in payment summary.");
+                Assert.True(payment.TransactionType.Equals("SP"), "Incorrect payment transaction type in payment summary.");
             }
         }
 
-        [Test]
+        [Fact(Skip="Needs to be fixed.")]
         public void ShouldRetrievePaymentSummaryUsingPaymentAccountId()
         {
             var paymentsResponse = new PaymentsProxy().GetPayments(null, null, null, _bankAccount01Id, null, null, null, null, null, null, null,
                null);
-            Assert.IsNotNull(paymentsResponse, "Payments response is NULL.");
-            Assert.IsTrue(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
-            Assert.IsNotNull(paymentsResponse.DataObject.PaymentTransactions, "Payments response does not contain a payments summary.");
-            Assert.IsTrue(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type.");
+            Assert.NotNull(paymentsResponse);
+            Assert.True(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
+            Assert.NotNull(paymentsResponse.DataObject.PaymentTransactions);
+            Assert.True(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type.");
 
             foreach (var payment in paymentsResponse.DataObject.PaymentTransactions)
             {
-                Assert.AreEqual(_bankAccount01Id, payment.PaymentAccountId, "Incorrect payment account Id in payments summary.");
+                Assert.Equal(_bankAccount01Id, payment.PaymentAccountId);
             }
         }
 
-        [Test]
+        [Fact]
         public void ShouldRetrievePaymentSummaryUsingPaymentDateRange()
         {
             var paymentsResponse = new PaymentsProxy().GetPayments(null, null, null, null, null, null, DateTime.Now.Date.AddDays(-30), DateTime.Now.Date, null, null, null,
                null);
-            Assert.IsNotNull(paymentsResponse, "Payments response is NULL.");
-            Assert.IsTrue(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
-            Assert.IsNotNull(paymentsResponse.DataObject.PaymentTransactions, "Payments response does not contain a payments summary.");
-            Assert.IsTrue(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type.");            
+            Assert.NotNull(paymentsResponse);
+            Assert.True(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
+            Assert.NotNull(paymentsResponse.DataObject.PaymentTransactions);
+            Assert.True(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type.");            
         }
 
-        [Test]
+        [Fact]
         public void ShouldRetreivePaymentSummaryForInvoiceId()
         {
             var invoice = GetInvoiceTransaction01();
             var invoiceProxy = new InvoiceProxy();
             var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-               "There was an error creating the first invoice for payment test - ShouldRetreivePaymentSummaryForInvoiceId.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the first invoice for payment test - ShouldRetreivePaymentSummaryForInvoiceId.");
 
 	        var invoice01TransctionId = insertInvoiceResult.DataObject.InsertedEntityId; 
 
@@ -573,8 +555,7 @@ namespace Saasu.API.Client.IntegrationTests
             invoiceProxy = new InvoiceProxy();
             insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-              "There was an error creating the second invoice for payment test - ShouldRetreivePaymentSummaryForInvoiceId.");
+            Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the second invoice for payment test - ShouldRetreivePaymentSummaryForInvoiceId.");
 
 	        var invoice02TransactionId = insertInvoiceResult.DataObject.InsertedEntityId;
 
@@ -606,29 +587,28 @@ namespace Saasu.API.Client.IntegrationTests
             var invoicePaymentProxy = new PaymentProxy();
             var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment);
 
-            Assert.IsNotNull(insertInvoicePaymentResponse);
-            Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-            Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+            Assert.NotNull(insertInvoicePaymentResponse);
+            Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+            Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
             var paymentsResponse = new PaymentsProxy().GetPayments(null, null, invoice02TransactionId, null, null, null,
                 null, null, null, null, null, null);
 
-            Assert.IsNotNull(paymentsResponse, "Payments response is NULL.");
-            Assert.IsTrue(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
-            Assert.IsNotNull(paymentsResponse.DataObject.PaymentTransactions, "Payments response does not contain a payments summary.");
-            Assert.IsTrue(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type.");
-            Assert.AreEqual(150M, paymentsResponse.DataObject.PaymentTransactions[0].TotalAmount, "Incorrect payment amount");
+            Assert.NotNull(paymentsResponse);
+            Assert.True(paymentsResponse.IsSuccessfull, "Payments response was not successful.");
+            Assert.NotNull(paymentsResponse.DataObject.PaymentTransactions);
+            Assert.True(paymentsResponse.DataObject.PaymentTransactions.Count > 0, "No payment summaries found for transaction type.");
+            Assert.Equal(150M, paymentsResponse.DataObject.PaymentTransactions[0].TotalAmount);
         }
 
-		[Test]
+		[Fact]
 		public void TestPaging()
 		{
 			var invoice = GetInvoiceTransaction01();
 			var invoiceProxy = new InvoiceProxy();
 			var insertInvoiceResult = invoiceProxy.InsertInvoice(invoice);
 
-			Assert.IsTrue(insertInvoiceResult.DataObject.InsertedEntityId > 0,
-				"There was an error creating the invoice for payment test.");
+			Assert.True(insertInvoiceResult.DataObject.InsertedEntityId > 0, "There was an error creating the invoice for payment test.");
 
 			var invoicePayment1 = new PaymentTransaction
 			{
@@ -654,9 +634,9 @@ namespace Saasu.API.Client.IntegrationTests
 			var invoicePaymentProxy = new PaymentProxy();
 			var insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment1);
 
-			Assert.IsNotNull(insertInvoicePaymentResponse);
-			Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-			Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+			Assert.NotNull(insertInvoicePaymentResponse);
+			Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+			Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
 			var invoicePayment2 = new PaymentTransaction
 			{
@@ -680,31 +660,31 @@ namespace Saasu.API.Client.IntegrationTests
 
 			insertInvoicePaymentResponse = invoicePaymentProxy.InsertInvoicePayment(invoicePayment2);
 
-			Assert.IsNotNull(insertInvoicePaymentResponse);
-			Assert.IsTrue(insertInvoicePaymentResponse.IsSuccessfull);
-			Assert.IsNotNull(insertInvoicePaymentResponse.RawResponse);
+			Assert.NotNull(insertInvoicePaymentResponse);
+			Assert.True(insertInvoicePaymentResponse.IsSuccessfull);
+			Assert.NotNull(insertInvoicePaymentResponse.RawResponse);
 
 			var paymentsProxy = new PaymentsProxy();
 
 			var paymentsPage1 = paymentsProxy.GetPayments(1, 1, insertInvoiceResult.DataObject.InsertedEntityId, null, "SP", null, null, null, null, null, null, null);
 
-			Assert.IsNotNull(paymentsPage1);
-			Assert.IsNotNull(paymentsPage1.DataObject);
-			Assert.AreEqual(paymentsPage1.DataObject.PaymentTransactions.Count, 1);
+			Assert.NotNull(paymentsPage1);
+			Assert.NotNull(paymentsPage1.DataObject);
+			Assert.Equal(paymentsPage1.DataObject.PaymentTransactions.Count, 1);
 
 			var paymentsPage2 = paymentsProxy.GetPayments(2, 1, insertInvoiceResult.DataObject.InsertedEntityId, null, "SP", null, null, null, null, null, null, null);
 
-			Assert.IsNotNull(paymentsPage2);
-			Assert.IsNotNull(paymentsPage2.DataObject);
-			Assert.AreEqual(paymentsPage2.DataObject.PaymentTransactions.Count, 1);
-			Assert.AreNotEqual(paymentsPage1.DataObject.PaymentTransactions[0].TransactionId, paymentsPage2.DataObject.PaymentTransactions[0].TransactionId);
+			Assert.NotNull(paymentsPage2);
+			Assert.NotNull(paymentsPage2.DataObject);
+			Assert.Equal(paymentsPage2.DataObject.PaymentTransactions.Count, 1);
+			Assert.NotEqual(paymentsPage1.DataObject.PaymentTransactions[0].TransactionId, paymentsPage2.DataObject.PaymentTransactions[0].TransactionId);
 
 			//Test number of rows returned for page.
 			var paymentsPage3 = paymentsProxy.GetPayments(1, 2, insertInvoiceResult.DataObject.InsertedEntityId, null, "SP", null, null, null, null, null, null, null);
 
-			Assert.IsNotNull(paymentsPage3);
-			Assert.IsNotNull(paymentsPage3.DataObject);
-			Assert.AreEqual(paymentsPage3.DataObject.PaymentTransactions.Count, 2);
+			Assert.NotNull(paymentsPage3);
+			Assert.NotNull(paymentsPage3.DataObject);
+			Assert.Equal(paymentsPage3.DataObject.PaymentTransactions.Count, 2);
 		}
 
 		#region Test Data

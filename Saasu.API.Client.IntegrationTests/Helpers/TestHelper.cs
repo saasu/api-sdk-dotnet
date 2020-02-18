@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -18,8 +18,8 @@ namespace Saasu.API.Client.IntegrationTests
             var scope = new AuthorisationScope[] { new AuthorisationScope { ScopeType = AuthorisationScopeType.Full } }.ToTextValues();
             var authResponse = authProxy.PasswordCredentialsGrantRequest(TestConfig.TestUser, TestConfig.TestUserPassword, scope);
 
-            Assert.IsTrue(authResponse.IsSuccessfull);
-            Assert.IsTrue(authResponse.DataObject.IsSuccessfull);
+            Assert.True(authResponse.IsSuccessfull);
+            Assert.True(authResponse.DataObject.IsSuccessfull);
 
             return authResponse.DataObject.AccessGrant.access_token;
         }

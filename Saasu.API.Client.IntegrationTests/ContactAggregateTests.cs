@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Saasu.API.Client.IntegrationTests.Helpers;
+﻿using Saasu.API.Client.IntegrationTests.Helpers;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models;
@@ -8,10 +7,11 @@ using Saasu.API.Core.Models.ContactAggregates;
 using Saasu.API.Core.Models.Contacts;
 using System;
 using System.Net;
+using Xunit;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    [TestClass]
+
     public class ContactAggregateTests
     {
         private ContactHelper _contactHelper;
@@ -21,7 +21,7 @@ namespace Saasu.API.Client.IntegrationTests
             _contactHelper = new ContactHelper();
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldAddNewContactWithNewCompanyAndContactManager()
         {
             var contactAggregateProxy = new ContactAggregateProxy();
@@ -30,32 +30,32 @@ namespace Saasu.API.Client.IntegrationTests
             var contactAggregate = GetNewContactAggregate();
             var Response = contactAggregateProxy.InsertContactAggregate(contactAggregate);
 
-            Assert.IsTrue(Response.IsSuccessfull, "Contact aggregate insert failed.");
-            Assert.IsNotNull(Response.DataObject);
-            Assert.IsTrue(Response.DataObject.InsertedContactId > 0, "Invalid InsertedContactId returned from InsertContactAggregate");
-            Assert.IsTrue(Response.DataObject.LastUpdatedId.Length > 0, "Invalid LastUpdatedId returned");
-            Assert.IsTrue(Response.DataObject.LastModified > DateTime.UtcNow.AddMinutes(-5), "Invalid LastModified returned");
-            Assert.IsTrue(Response.DataObject.CompanyId > 0, "Invalid CompanyId returned from InsertContactAggregate when inserting new company");
-            Assert.IsTrue(Response.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from InsertContactAggregate when inserting new company");
-            Assert.IsTrue(Response.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from InsertContactAggregate when inserting new contact manager");
-            Assert.IsTrue(Response.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from InsertContactAggregate when inserting new contact manager");
+            Assert.True(Response.IsSuccessfull, "Contact aggregate insert failed.");
+            Assert.NotNull(Response.DataObject);
+            Assert.True(Response.DataObject.InsertedContactId > 0, "Invalid InsertedContactId returned from InsertContactAggregate");
+            Assert.True(Response.DataObject.LastUpdatedId.Length > 0, "Invalid LastUpdatedId returned");
+            Assert.True(Response.DataObject.LastModified > DateTime.UtcNow.AddMinutes(-5), "Invalid LastModified returned");
+            Assert.True(Response.DataObject.CompanyId > 0, "Invalid CompanyId returned from InsertContactAggregate when inserting new company");
+            Assert.True(Response.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from InsertContactAggregate when inserting new company");
+            Assert.True(Response.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from InsertContactAggregate when inserting new contact manager");
+            Assert.True(Response.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from InsertContactAggregate when inserting new contact manager");
 
             var contactResponse = contactProxy.GetContact(Response.DataObject.InsertedContactId);
-            Assert.IsTrue(contactResponse.IsSuccessfull, "Contact not found");
-            Assert.IsNotNull(contactResponse.DataObject);
-            Assert.IsNotNull(contactResponse.DataObject.CompanyId);
-            Assert.IsNotNull(contactResponse.DataObject.ContactManagerId);
+            Assert.True(contactResponse.IsSuccessfull, "Contact not found");
+            Assert.NotNull(contactResponse.DataObject);
+            Assert.NotNull(contactResponse.DataObject.CompanyId);
+            Assert.NotNull(contactResponse.DataObject.ContactManagerId);
 
             var contactManagerResponse = contactProxy.GetContact(contactResponse.DataObject.ContactManagerId.Value);
-            Assert.IsTrue(contactManagerResponse.IsSuccessfull, "Contact manager not found");
-            Assert.AreEqual(contactAggregate.ContactManager.FamilyName, contactManagerResponse.DataObject.FamilyName);
+            Assert.True(contactManagerResponse.IsSuccessfull, "Contact manager not found");
+            Assert.Equal(contactAggregate.ContactManager.FamilyName, contactManagerResponse.DataObject.FamilyName);
 
             var companyResponse = companyProxy.GetCompany(contactResponse.DataObject.CompanyId.Value);
-            Assert.IsTrue(companyResponse.IsSuccessfull, "Company not found");
-            Assert.AreEqual(contactAggregate.Company.Name, companyResponse.DataObject.Name);
+            Assert.True(companyResponse.IsSuccessfull, "Company not found");
+            Assert.Equal(contactAggregate.Company.Name, companyResponse.DataObject.Name);
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldAddNewContactAndUpdateCompanyAndContactManager()
         {
             var contactAggregateProxy = new ContactAggregateProxy();
@@ -75,75 +75,75 @@ namespace Saasu.API.Client.IntegrationTests
             contactAggregate.ContactManager.LastUpdatedId = contactManagerResponse.DataObject.LastUpdatedId;
 
             var contactAggregateResponse = contactAggregateProxy.InsertContactAggregate(contactAggregate);
-            Assert.IsTrue(contactAggregateResponse.IsSuccessfull, "Contact aggregate with new contact and updated company and contact manager failed");
-            Assert.IsNotNull(contactAggregateResponse.DataObject);
-            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from InsertContactAggregate when updating company");
-            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from InsertContactAggregate when updating company");
-            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from InsertContactAggregate when updating contact manager");
-            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from InsertContactAggregate when updating contact manager");
+            Assert.True(contactAggregateResponse.IsSuccessfull, "Contact aggregate with new contact and updated company and contact manager failed");
+            Assert.NotNull(contactAggregateResponse.DataObject);
+            Assert.True(contactAggregateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from InsertContactAggregate when updating company");
+            Assert.True(contactAggregateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from InsertContactAggregate when updating company");
+            Assert.True(contactAggregateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from InsertContactAggregate when updating contact manager");
+            Assert.True(contactAggregateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from InsertContactAggregate when updating contact manager");
 
             var dbContactAggregate =
                 contactAggregateProxy.GetContactAggregate(contactAggregateResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(dbContactAggregate.IsSuccessfull);
-            Assert.IsNotNull(dbContactAggregate.DataObject);
-            Assert.IsNotNull(dbContactAggregate.DataObject.ContactManager.Id);
-            Assert.IsNotNull(dbContactAggregate.DataObject.Company.Id);
-            Assert.AreEqual(companyResponse.DataObject.InsertedCompanyId, dbContactAggregate.DataObject.Company.Id.Value, "Existing company not attached to contact aggregate");
-            Assert.AreEqual(contactManagerResponse.DataObject.InsertedContactId, dbContactAggregate.DataObject.ContactManager.Id.Value, "Existing contact (manager) not attached to contact aggregate");
+            Assert.True(dbContactAggregate.IsSuccessfull);
+            Assert.NotNull(dbContactAggregate.DataObject);
+            Assert.NotNull(dbContactAggregate.DataObject.ContactManager.Id);
+            Assert.NotNull(dbContactAggregate.DataObject.Company.Id);
+            Assert.True(companyResponse.DataObject.InsertedCompanyId == dbContactAggregate.DataObject.Company.Id.Value, "Existing company not attached to contact aggregate");
+            Assert.True(contactManagerResponse.DataObject.InsertedContactId == dbContactAggregate.DataObject.ContactManager.Id.Value, "Existing contact (manager) not attached to contact aggregate");
 
             var dbContactManager = contactProxy.GetContact(dbContactAggregate.DataObject.ContactManager.Id.Value);
-            Assert.IsTrue(dbContactManager.IsSuccessfull);
-            Assert.IsNotNull(dbContactManager.DataObject);
+            Assert.True(dbContactManager.IsSuccessfull);
+            Assert.NotNull(dbContactManager.DataObject);
 
             AssertContactManager(dbContactAggregate.DataObject.ContactManager, dbContactManager.DataObject);
-            Assert.AreEqual(dbContactAggregate.DataObject.ContactManager.LastUpdatedId,
+            Assert.True(dbContactAggregate.DataObject.ContactManager.LastUpdatedId ==
                 dbContactManager.DataObject.LastUpdatedId, "LastUpdatedId not updated for contact manager");
 
             var dbCompany = companyProxy.GetCompany(dbContactAggregate.DataObject.Company.Id.Value);
-            Assert.IsTrue(dbCompany.IsSuccessfull);
-            Assert.IsNotNull(dbCompany.DataObject);
+            Assert.True(dbCompany.IsSuccessfull);
+            Assert.NotNull(dbCompany.DataObject);
 
             AssertCompany(dbContactAggregate.DataObject.Company, dbCompany.DataObject);
-            Assert.AreEqual(dbContactAggregate.DataObject.Company.LastUpdatedId, dbCompany.DataObject.LastUpdatedId,
+            Assert.True(dbContactAggregate.DataObject.Company.LastUpdatedId == dbCompany.DataObject.LastUpdatedId,
                 "LastUpdatedId not updated for company");
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldUpdateContactAndAddNewCompanyAndContactManager()
         {
             var contactProxy = new ContactProxy();
             var contactAggregateProxy = new ContactAggregateProxy();
             var contact = GetContact();
             var contactResponse = contactProxy.InsertContact(contact);
-            Assert.IsTrue(contactResponse.IsSuccessfull);
+            Assert.True(contactResponse.IsSuccessfull);
 
             var contactAggregate = GetNewContactAggregate();
 
             var contactAggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(contactAggregateResponse.IsSuccessfull, "Failed to update existing contact and add new company and contact manager");
-            Assert.IsNotNull(contactAggregateResponse.DataObject);
-            Assert.AreEqual(contactResponse.DataObject.InsertedContactId, contactAggregateResponse.DataObject.UpdatedContactId);
-            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from UpdateContactAggregate when inserting new company");
-            Assert.IsTrue(contactAggregateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from UpdateContactAggregate when inserting new company");
-            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from UpdateContactAggregate when inserting new contact manager");
-            Assert.IsTrue(contactAggregateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from UpdateContactAggregate when inserting new contact manager");
+            Assert.True(contactAggregateResponse.IsSuccessfull, "Failed to update existing contact and add new company and contact manager");
+            Assert.NotNull(contactAggregateResponse.DataObject);
+            Assert.Equal(contactResponse.DataObject.InsertedContactId, contactAggregateResponse.DataObject.UpdatedContactId);
+            Assert.True(contactAggregateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from UpdateContactAggregate when inserting new company");
+            Assert.True(contactAggregateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from UpdateContactAggregate when inserting new company");
+            Assert.True(contactAggregateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from UpdateContactAggregate when inserting new contact manager");
+            Assert.True(contactAggregateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from UpdateContactAggregate when inserting new contact manager");
 
             var updatedContact = contactProxy.GetContact(contactResponse.DataObject.InsertedContactId);
             AssertUpdatedContact(contactAggregate, updatedContact);
 
             var insertedAggregate =
                 contactAggregateProxy.GetContactAggregate(contactResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(insertedAggregate.IsSuccessfull);
-            Assert.IsNotNull(insertedAggregate.DataObject);
-            Assert.IsNotNull(insertedAggregate.DataObject.Company, "New company not associated with existing contact");
-            Assert.IsNotNull(insertedAggregate.DataObject.ContactManager, "New contact manager not associated with existing contact");
-            Assert.AreEqual(contactAggregate.Company.Name, insertedAggregate.DataObject.Company.Name);
-            Assert.AreEqual(contactAggregate.ContactManager.GivenName, insertedAggregate.DataObject.ContactManager.GivenName);
+            Assert.True(insertedAggregate.IsSuccessfull);
+            Assert.NotNull(insertedAggregate.DataObject);
+            Assert.True(insertedAggregate.DataObject.Company != null, "New company not associated with existing contact");
+            Assert.True(insertedAggregate.DataObject.ContactManager != null, "New contact manager not associated with existing contact");
+            Assert.Equal(contactAggregate.Company.Name, insertedAggregate.DataObject.Company.Name);
+            Assert.Equal(contactAggregate.ContactManager.GivenName, insertedAggregate.DataObject.ContactManager.GivenName);
         }
 
 
 
-        [TestMethod]
+        [Fact]
         public void ShouldUpdateContactAndUpdateCompanyAndContactManager()
         {
             var contactProxy = new ContactProxy();
@@ -151,13 +151,13 @@ namespace Saasu.API.Client.IntegrationTests
             var contactAggregateProxy = new ContactAggregateProxy();
             var contact = GetContact();
             var contactResponse = contactProxy.InsertContact(contact);
-            Assert.IsTrue(contactResponse.IsSuccessfull);
+            Assert.True(contactResponse.IsSuccessfull);
             var contactManager = GetContact();
             var contactManagerResponse = contactProxy.InsertContact(contactManager);
-            Assert.IsTrue(contactManagerResponse.IsSuccessfull);
+            Assert.True(contactManagerResponse.IsSuccessfull);
             var company = GetCompany();
             var companyResponse = companyProxy.InsertCompany(company);
-            Assert.IsTrue(companyResponse.IsSuccessfull);
+            Assert.True(companyResponse.IsSuccessfull);
 
             var contactAggregate = GetNewContactAggregate();
             contactAggregate.Id = contactResponse.DataObject.InsertedContactId;
@@ -168,41 +168,41 @@ namespace Saasu.API.Client.IntegrationTests
 
             var contactAggregateUpdateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate,
                 contactResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(contactAggregateUpdateResponse.IsSuccessfull, "Updating contact and company and contact manager in aggregate failed");
-            Assert.IsNotNull(contactAggregateUpdateResponse.DataObject);
-            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from UpdateContactAggregate when updating company");
-            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from UpdateContactAggregate when updating company");
-            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from UpdateContactAggregate when updating contact manager");
-            Assert.IsTrue(contactAggregateUpdateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from UpdateContactAggregate when updating contact manager");
+            Assert.True(contactAggregateUpdateResponse.IsSuccessfull, "Updating contact and company and contact manager in aggregate failed");
+            Assert.NotNull(contactAggregateUpdateResponse.DataObject);
+            Assert.True(contactAggregateUpdateResponse.DataObject.CompanyId > 0, "Invalid CompanyId returned from UpdateContactAggregate when updating company");
+            Assert.True(contactAggregateUpdateResponse.DataObject.CompanyLastUpdatedId.Length > 0, "Invalid CompanyLastUpdatedId returned from UpdateContactAggregate when updating company");
+            Assert.True(contactAggregateUpdateResponse.DataObject.ContactManagerId > 0, "Invalid ContactManagerId returned from UpdateContactAggregate when updating contact manager");
+            Assert.True(contactAggregateUpdateResponse.DataObject.ContactManagerLastUpdatedId.Length > 0, "Invalid ContactManagerLastUpdatedId returned from UpdateContactAggregate when updating contact manager");
 
             var updatedContactAggregateResponse =
                 contactAggregateProxy.GetContactAggregate(contactResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(updatedContactAggregateResponse.IsSuccessfull, "Updating contact and company and contact manager in aggregate failed");
-            Assert.IsNotNull(updatedContactAggregateResponse.DataObject);
+            Assert.True(updatedContactAggregateResponse.IsSuccessfull, "Updating contact and company and contact manager in aggregate failed");
+            Assert.NotNull(updatedContactAggregateResponse.DataObject);
             var updatedAggregate = updatedContactAggregateResponse.DataObject;
-            Assert.IsNotNull(updatedAggregate.Company, "Company not associated with updated aggregate");
-            Assert.IsNotNull(updatedAggregate.ContactManager, "Contact manager not associated with updated aggregate");
-            Assert.IsNotNull(updatedAggregate.Company.Id);
-            Assert.IsNotNull(updatedAggregate.ContactManager.Id);
+            Assert.True(updatedAggregate.Company != null, "Company not associated with updated aggregate");
+            Assert.True(updatedAggregate.ContactManager != null, "Contact manager not associated with updated aggregate");
+            Assert.NotNull(updatedAggregate.Company.Id);
+            Assert.NotNull(updatedAggregate.ContactManager.Id);
 
             var updatedContact = contactProxy.GetContact(contactResponse.DataObject.InsertedContactId);
             AssertUpdatedContact(contactAggregate, updatedContact);
 
             var updatedCompany = companyProxy.GetCompany(updatedAggregate.Company.Id.Value);
-            Assert.IsTrue(updatedCompany.IsSuccessfull);
-            Assert.IsNotNull(updatedCompany.DataObject);
+            Assert.True(updatedCompany.IsSuccessfull);
+            Assert.NotNull(updatedCompany.DataObject);
 
             AssertCompany(contactAggregate.Company, updatedCompany.DataObject);
 
             var updatedContactManager = contactProxy.GetContact(updatedAggregate.ContactManager.Id.Value);
-            Assert.IsTrue(updatedCompany.IsSuccessfull);
-            Assert.IsNotNull(updatedCompany.DataObject);
+            Assert.True(updatedCompany.IsSuccessfull);
+            Assert.NotNull(updatedCompany.DataObject);
             AssertContactManager(contactAggregate.ContactManager, updatedContactManager.DataObject);
 
 
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldFailAggregateInsertIfCompanyLastUpdatedIdIncorrect()
         {
             var companyProxy = new CompanyProxy();
@@ -215,12 +215,12 @@ namespace Saasu.API.Client.IntegrationTests
             contactAggregate.Company.LastUpdatedId = companyResponse.DataObject.LastUpdatedId.ToLower();
 
             var aggregateResponse = contactAggregateProxy.InsertContactAggregate(contactAggregate);
-            Assert.IsFalse(aggregateResponse.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
-            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
+            Assert.False(aggregateResponse.IsSuccessfull);
+            Assert.Equal(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.Equal("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldFailAggregateInsertIfContactManagerLastUpdatedIdIncorrect()
         {
             var contactProxy = new ContactProxy();
@@ -233,12 +233,12 @@ namespace Saasu.API.Client.IntegrationTests
             contactAggregate.ContactManager.LastUpdatedId = contactResponse.DataObject.LastUpdatedId.ToLower();
 
             var aggregateResponse = contactAggregateProxy.InsertContactAggregate(contactAggregate);
-            Assert.IsFalse(aggregateResponse.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
-            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
+            Assert.False(aggregateResponse.IsSuccessfull);
+            Assert.Equal(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.Equal("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldNotUpdateCompanyWhenContactLastUpdatedIdIncorrect()
         {
             var contactProxy = new ContactProxy();
@@ -257,15 +257,15 @@ namespace Saasu.API.Client.IntegrationTests
             contactAggregate.Company.LastUpdatedId = companyResponse.DataObject.LastUpdatedId;
 
             var aggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
-            Assert.IsFalse(aggregateResponse.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
-            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
+            Assert.False(aggregateResponse.IsSuccessfull);
+            Assert.Equal(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.Equal("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
 
             var updatedCompany = companyProxy.GetCompany(companyResponse.DataObject.InsertedCompanyId);
-            Assert.AreEqual(companyResponse.DataObject.LastUpdatedId, updatedCompany.DataObject.LastUpdatedId);
+            Assert.Equal(companyResponse.DataObject.LastUpdatedId, updatedCompany.DataObject.LastUpdatedId);
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldNotUpdateContactManagerWhenContactLastUpdatedIdIncorrect()
         {
             var contactProxy = new ContactProxy();
@@ -283,15 +283,15 @@ namespace Saasu.API.Client.IntegrationTests
             contactAggregate.Company.LastUpdatedId = contactManagerResponse.DataObject.LastUpdatedId;
 
             var aggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
-            Assert.IsFalse(aggregateResponse.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
-            Assert.AreEqual("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
+            Assert.False(aggregateResponse.IsSuccessfull);
+            Assert.Equal(HttpStatusCode.BadRequest, aggregateResponse.StatusCode);
+            Assert.Equal("\"Record to be updated has changed since last read.\"", aggregateResponse.RawResponse);
 
             var updatedContact = contactProxy.GetContact(contactManagerResponse.DataObject.InsertedContactId);
-            Assert.AreEqual(contactManagerResponse.DataObject.LastUpdatedId, updatedContact.DataObject.LastUpdatedId);
+            Assert.Equal(contactManagerResponse.DataObject.LastUpdatedId, updatedContact.DataObject.LastUpdatedId);
         }
 
-        [TestMethod]
+        [Fact]
         public void ShouldNotModifyExistingContactFieldsNotContainedInAggregateModel()
         {
             var contactProxy = new ContactProxy();
@@ -305,42 +305,42 @@ namespace Saasu.API.Client.IntegrationTests
             contactAggregate.LastUpdatedId = contactResponse.DataObject.LastUpdatedId;
 
             var aggregateResponse = contactAggregateProxy.UpdateContactAggregate(contactAggregate, contactResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(aggregateResponse.IsSuccessfull);
+            Assert.True(aggregateResponse.IsSuccessfull);
 
             var updatedContactResponse = contactProxy.GetContact(contactResponse.DataObject.InsertedContactId);
-            Assert.IsTrue(updatedContactResponse.IsSuccessfull);
-            Assert.IsNotNull(updatedContactResponse.DataObject);
+            Assert.True(updatedContactResponse.IsSuccessfull);
+            Assert.NotNull(updatedContactResponse.DataObject);
             var updatedContact = updatedContactResponse.DataObject;
-            Assert.AreEqual(contact.AutoSendStatement, updatedContact.AutoSendStatement);
-            Assert.AreEqual(contact.BpayDetails.BillerCode, updatedContact.BpayDetails.BillerCode);
-            Assert.AreEqual(contact.BpayDetails.CRN, updatedContact.BpayDetails.CRN);
-            Assert.AreEqual(contact.ChequeDetails.AcceptCheque, updatedContact.ChequeDetails.AcceptCheque);
-            Assert.AreEqual(contact.ChequeDetails.ChequePayableTo, updatedContact.ChequeDetails.ChequePayableTo);
-            Assert.AreEqual(contact.CustomField1, updatedContact.CustomField1);
-            Assert.AreEqual(contact.CustomField2, updatedContact.CustomField2);
-            Assert.AreEqual(contact.DefaultPurchaseDiscount, updatedContact.DefaultPurchaseDiscount);
-            Assert.AreEqual(contact.DefaultSaleDiscount, updatedContact.DefaultSaleDiscount);
-            Assert.AreEqual(contact.DirectDepositDetails.AcceptDirectDeposit, updatedContact.DirectDepositDetails.AcceptDirectDeposit);
-            Assert.AreEqual(contact.DirectDepositDetails.AccountBSB, updatedContact.DirectDepositDetails.AccountBSB);
-            Assert.AreEqual(contact.DirectDepositDetails.AccountName, updatedContact.DirectDepositDetails.AccountName);
-            Assert.AreEqual(contact.DirectDepositDetails.AccountNumber, updatedContact.DirectDepositDetails.AccountNumber);
-            Assert.AreEqual(contact.HomePhone, updatedContact.HomePhone);
-            Assert.AreEqual(contact.LinkedInProfile, updatedContact.LinkedInProfile);
-            Assert.AreEqual(contact.OtherAddress.City, updatedContact.OtherAddress.City);
-            Assert.AreEqual(contact.OtherAddress.Country, updatedContact.OtherAddress.Country);
-            Assert.AreEqual(contact.OtherAddress.Postcode, updatedContact.OtherAddress.Postcode);
-            Assert.AreEqual(contact.OtherAddress.State, updatedContact.OtherAddress.State);
-            Assert.AreEqual(contact.OtherAddress.Street, updatedContact.OtherAddress.Street);
-            Assert.AreEqual(contact.OtherPhone, updatedContact.OtherPhone);
-            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsInterval, updatedContact.PurchaseTradingTerms.TradingTermsInterval);
-            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsIntervalType, updatedContact.PurchaseTradingTerms.TradingTermsIntervalType);
-            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsType, updatedContact.PurchaseTradingTerms.TradingTermsType);
-            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsInterval, updatedContact.SaleTradingTerms.TradingTermsInterval);
-            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsIntervalType, updatedContact.SaleTradingTerms.TradingTermsIntervalType);
-            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsType, updatedContact.SaleTradingTerms.TradingTermsType);
-            Assert.AreEqual(contact.SkypeId, updatedContact.SkypeId);
-            Assert.AreEqual(contact.TwitterId, updatedContact.TwitterId);
-            Assert.AreEqual(contact.WebsiteUrl, updatedContact.WebsiteUrl);
+            Assert.Equal(contact.AutoSendStatement, updatedContact.AutoSendStatement);
+            Assert.Equal(contact.BpayDetails.BillerCode, updatedContact.BpayDetails.BillerCode);
+            Assert.Equal(contact.BpayDetails.CRN, updatedContact.BpayDetails.CRN);
+            Assert.Equal(contact.ChequeDetails.AcceptCheque, updatedContact.ChequeDetails.AcceptCheque);
+            Assert.Equal(contact.ChequeDetails.ChequePayableTo, updatedContact.ChequeDetails.ChequePayableTo);
+            Assert.Equal(contact.CustomField1, updatedContact.CustomField1);
+            Assert.Equal(contact.CustomField2, updatedContact.CustomField2);
+            Assert.Equal(contact.DefaultPurchaseDiscount, updatedContact.DefaultPurchaseDiscount);
+            Assert.Equal(contact.DefaultSaleDiscount, updatedContact.DefaultSaleDiscount);
+            Assert.Equal(contact.DirectDepositDetails.AcceptDirectDeposit, updatedContact.DirectDepositDetails.AcceptDirectDeposit);
+            Assert.Equal(contact.DirectDepositDetails.AccountBSB, updatedContact.DirectDepositDetails.AccountBSB);
+            Assert.Equal(contact.DirectDepositDetails.AccountName, updatedContact.DirectDepositDetails.AccountName);
+            Assert.Equal(contact.DirectDepositDetails.AccountNumber, updatedContact.DirectDepositDetails.AccountNumber);
+            Assert.Equal(contact.HomePhone, updatedContact.HomePhone);
+            Assert.Equal(contact.LinkedInProfile, updatedContact.LinkedInProfile);
+            Assert.Equal(contact.OtherAddress.City, updatedContact.OtherAddress.City);
+            Assert.Equal(contact.OtherAddress.Country, updatedContact.OtherAddress.Country);
+            Assert.Equal(contact.OtherAddress.Postcode, updatedContact.OtherAddress.Postcode);
+            Assert.Equal(contact.OtherAddress.State, updatedContact.OtherAddress.State);
+            Assert.Equal(contact.OtherAddress.Street, updatedContact.OtherAddress.Street);
+            Assert.Equal(contact.OtherPhone, updatedContact.OtherPhone);
+            Assert.Equal(contact.PurchaseTradingTerms.TradingTermsInterval, updatedContact.PurchaseTradingTerms.TradingTermsInterval);
+            Assert.Equal(contact.PurchaseTradingTerms.TradingTermsIntervalType, updatedContact.PurchaseTradingTerms.TradingTermsIntervalType);
+            Assert.Equal(contact.PurchaseTradingTerms.TradingTermsType, updatedContact.PurchaseTradingTerms.TradingTermsType);
+            Assert.Equal(contact.SaleTradingTerms.TradingTermsInterval, updatedContact.SaleTradingTerms.TradingTermsInterval);
+            Assert.Equal(contact.SaleTradingTerms.TradingTermsIntervalType, updatedContact.SaleTradingTerms.TradingTermsIntervalType);
+            Assert.Equal(contact.SaleTradingTerms.TradingTermsType, updatedContact.SaleTradingTerms.TradingTermsType);
+            Assert.Equal(contact.SkypeId, updatedContact.SkypeId);
+            Assert.Equal(contact.TwitterId, updatedContact.TwitterId);
+            Assert.Equal(contact.WebsiteUrl, updatedContact.WebsiteUrl);
         }
 
         private ContactAggregate GetNewContactAggregate()
@@ -475,56 +475,56 @@ namespace Saasu.API.Client.IntegrationTests
             Contact actualContact)
         {
 
-            Assert.AreEqual(expectedContactManager.FamilyName, actualContact.FamilyName,
+            Assert.True(expectedContactManager.FamilyName == actualContact.FamilyName,
                 "FamilyName not updated for contact manager");
-            Assert.AreEqual(expectedContactManager.GivenName, actualContact.GivenName,
+            Assert.True( expectedContactManager.GivenName == actualContact.GivenName,
                 "GivenName not updated for contact manager");
-            Assert.AreEqual(expectedContactManager.MiddleInitials,
+            Assert.True(expectedContactManager.MiddleInitials ==
                 actualContact.MiddleInitials, "MiddleInitials not updated for contact manager");
-            Assert.AreEqual(expectedContactManager.PositionTitle,
+            Assert.True(expectedContactManager.PositionTitle ==
                 actualContact.PositionTitle, "PositionTitle not updated for contact manager");
-            Assert.AreEqual(expectedContactManager.Salutation, actualContact.Salutation,
+            Assert.True(expectedContactManager.Salutation == actualContact.Salutation,
                 "Salutation not updated for contact manager");
         }
 
         private static void AssertCompany(Company aggregateCompany, CompanyDetail company)
         {
 
-            Assert.AreEqual(aggregateCompany.TradingName, company.TradingName,
+            Assert.True(aggregateCompany.TradingName ==company.TradingName,
                 "TradingName not updated for company");
-            Assert.AreEqual(aggregateCompany.Abn, company.Abn,
+            Assert.True(aggregateCompany.Abn == company.Abn,
                 "ABN not updated for contact manager");
-            Assert.AreEqual(aggregateCompany.CompanyEmail, company.CompanyEmail,
+            Assert.True(aggregateCompany.CompanyEmail == company.CompanyEmail,
                 "CompanyEmail not updated for company");
-            Assert.AreEqual(aggregateCompany.LongDescription, company.LongDescription,
+            Assert.True(aggregateCompany.LongDescription == company.LongDescription,
                 "LongDescription not updated for company");
-            Assert.AreEqual(aggregateCompany.Name, company.Name,
+            Assert.True(aggregateCompany.Name == company.Name,
                 "Name not updated for company");
         }
 
         private static void AssertUpdatedContact(ContactAggregate contactAggregate, ProxyResponse<Contact> updatedContact)
         {
-            Assert.AreEqual(contactAggregate.EmailAddress, updatedContact.DataObject.EmailAddress);
-            Assert.AreEqual(contactAggregate.ContactId, updatedContact.DataObject.ContactId);
-            Assert.AreEqual(contactAggregate.FamilyName, updatedContact.DataObject.FamilyName);
-            Assert.AreEqual(contactAggregate.Fax, updatedContact.DataObject.Fax);
-            Assert.AreEqual(contactAggregate.GivenName, updatedContact.DataObject.GivenName);
-            Assert.AreEqual(contactAggregate.IsPartner, updatedContact.DataObject.IsPartner);
-            Assert.AreEqual(contactAggregate.IsContractor, updatedContact.DataObject.IsContractor);
-            Assert.AreEqual(contactAggregate.IsCustomer, updatedContact.DataObject.IsCustomer);
-            Assert.AreEqual(contactAggregate.IsPartner, updatedContact.DataObject.IsPartner);
-            Assert.AreEqual(contactAggregate.IsSupplier, updatedContact.DataObject.IsSupplier);
-            Assert.AreEqual(contactAggregate.MiddleInitials, updatedContact.DataObject.MiddleInitials);
-            Assert.AreEqual(contactAggregate.MobilePhone, updatedContact.DataObject.MobilePhone);
-            Assert.AreEqual(contactAggregate.HomePhone, updatedContact.DataObject.HomePhone);
-            Assert.AreEqual(contactAggregate.PositionTitle, updatedContact.DataObject.PositionTitle);
-            Assert.AreEqual(contactAggregate.PostalAddress.City, updatedContact.DataObject.PostalAddress.City);
-            Assert.AreEqual(contactAggregate.PostalAddress.Country, updatedContact.DataObject.PostalAddress.Country);
-            Assert.AreEqual(contactAggregate.PostalAddress.Postcode, updatedContact.DataObject.PostalAddress.Postcode);
-            Assert.AreEqual(contactAggregate.PostalAddress.State, updatedContact.DataObject.PostalAddress.State);
-            Assert.AreEqual(contactAggregate.PostalAddress.Street, updatedContact.DataObject.PostalAddress.Street);
-            Assert.AreEqual(contactAggregate.PrimaryPhone, updatedContact.DataObject.PrimaryPhone);
-            Assert.AreEqual(contactAggregate.Salutation, updatedContact.DataObject.Salutation);
+            Assert.Equal(contactAggregate.EmailAddress, updatedContact.DataObject.EmailAddress);
+            Assert.Equal(contactAggregate.ContactId, updatedContact.DataObject.ContactId);
+            Assert.Equal(contactAggregate.FamilyName, updatedContact.DataObject.FamilyName);
+            Assert.Equal(contactAggregate.Fax, updatedContact.DataObject.Fax);
+            Assert.Equal(contactAggregate.GivenName, updatedContact.DataObject.GivenName);
+            Assert.Equal(contactAggregate.IsPartner, updatedContact.DataObject.IsPartner);
+            Assert.Equal(contactAggregate.IsContractor, updatedContact.DataObject.IsContractor);
+            Assert.Equal(contactAggregate.IsCustomer, updatedContact.DataObject.IsCustomer);
+            Assert.Equal(contactAggregate.IsPartner, updatedContact.DataObject.IsPartner);
+            Assert.Equal(contactAggregate.IsSupplier, updatedContact.DataObject.IsSupplier);
+            Assert.Equal(contactAggregate.MiddleInitials, updatedContact.DataObject.MiddleInitials);
+            Assert.Equal(contactAggregate.MobilePhone, updatedContact.DataObject.MobilePhone);
+            Assert.Equal(contactAggregate.HomePhone, updatedContact.DataObject.HomePhone);
+            Assert.Equal(contactAggregate.PositionTitle, updatedContact.DataObject.PositionTitle);
+            Assert.Equal(contactAggregate.PostalAddress.City, updatedContact.DataObject.PostalAddress.City);
+            Assert.Equal(contactAggregate.PostalAddress.Country, updatedContact.DataObject.PostalAddress.Country);
+            Assert.Equal(contactAggregate.PostalAddress.Postcode, updatedContact.DataObject.PostalAddress.Postcode);
+            Assert.Equal(contactAggregate.PostalAddress.State, updatedContact.DataObject.PostalAddress.State);
+            Assert.Equal(contactAggregate.PostalAddress.Street, updatedContact.DataObject.PostalAddress.Street);
+            Assert.Equal(contactAggregate.PrimaryPhone, updatedContact.DataObject.PrimaryPhone);
+            Assert.Equal(contactAggregate.Salutation, updatedContact.DataObject.Salutation);
         }
     }
 }

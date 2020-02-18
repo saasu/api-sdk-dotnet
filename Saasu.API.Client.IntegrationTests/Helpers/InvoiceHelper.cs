@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Ola.RestClient.Dto;
 using Ola.RestClient.Proxies;
 using Saasu.API.Client.Proxies;
@@ -7,7 +7,7 @@ using Saasu.API.Core.Models.Invoices;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography.Pkcs;
+//using System.Security.Cryptography.Pkcs;
 using System.Text;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
@@ -444,32 +444,32 @@ namespace Saasu.API.Client.IntegrationTests
         public void CreatetestInvoices()
         {
             var inv1 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.IsNotNull(inv1);
-            Assert.Greater(inv1.TransactionId, 0);
+            Assert.NotNull(inv1);
+            Assert.True(inv1.TransactionId > 0);
             _invoice1Id = Convert.ToInt32(inv1.TransactionId);
             _invoice1IdSummary = inv1.Summary;
 
             var inv2 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.IsNotNull(inv2);
-            Assert.Greater(inv2.TransactionId, 0);
+            Assert.NotNull(inv2);
+            Assert.True(inv2.TransactionId > 0);
             _invoice2Id = Convert.ToInt32(inv2.TransactionId);
             _invoice2IdSummary = inv2.Summary;
 
             var inv3 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.IsNotNull(inv3);
-            Assert.Greater(inv3.TransactionId, 0);
+            Assert.NotNull(inv3);
+            Assert.True(inv3.TransactionId > 0);
             _invoice3Id = Convert.ToInt32(inv3.TransactionId);
             _invoice3IdSummary = inv3.Summary;
 
             var inv4 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, transactionType: "P");
-            Assert.IsNotNull(inv4);
-            Assert.Greater(inv4.TransactionId, 0);
+            Assert.NotNull(inv4);
+            Assert.True(inv4.TransactionId > 0);
             _invoice4Id = Convert.ToInt32(inv4.TransactionId);
             _invoice4IdSummary = inv4.Summary;
 
             var quote1 = GetTestInsertInvoice(InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, invoiceType: "Quote");
-            Assert.IsNotNull(quote1);
-            Assert.Greater(quote1.TransactionId, 0);
+            Assert.NotNull(quote1);
+            Assert.True(quote1.TransactionId > 0);
         }
 
         public InvoiceTransactionDetail CreateASingleInvoice(string tranType = "S", decimal? amount = null)
@@ -531,13 +531,13 @@ namespace Saasu.API.Client.IntegrationTests
             {
                 var response = new InvoiceProxy().InsertInvoice(invDetail);
 
-                Assert.IsNotNull(response, "Inserting an invoice did not return a response");
-                Assert.IsTrue(response.IsSuccessfull, "Inserting an invoice was not successfull. Status code: " + ((int)response.StatusCode).ToString());
-                Assert.IsNotNull(response.RawResponse, "No raw response returned as part of inserting an invoice");
+                Assert.True(response != null, "Inserting an invoice did not return a response");
+                Assert.True(response.IsSuccessfull, "Inserting an invoice was not successfull. Status code: " + ((int)response.StatusCode).ToString());
+                Assert.True(response.RawResponse != null, "No raw response returned as part of inserting an invoice");
 
                 var serialized = response.DataObject;
 
-                Assert.IsTrue(serialized.InsertedEntityId > 0, "Invoice insert did not return an InsertedEntityId > 0");
+                Assert.True(serialized.InsertedEntityId > 0, "Invoice insert did not return an InsertedEntityId > 0");
 
                 invDetail.TransactionId = serialized.InsertedEntityId;
             }

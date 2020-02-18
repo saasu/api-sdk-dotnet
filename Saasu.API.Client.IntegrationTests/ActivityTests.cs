@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using Xunit;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Activities;
 using Saasu.API.Core.Models.Invoices;
@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    [TestFixture]
     public class ActivityTests
     {
         private int _saleInvoiceTranId;
@@ -27,127 +26,127 @@ namespace Saasu.API.Client.IntegrationTests
 
         #region Tests
 
-        [Test]
+        [Fact]
         public void GetActivities()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities();
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivities was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivities returned no data");
-            Assert.Greater(response.DataObject.Activities.Count, 1, "Call to GetActivities returned too few rows");
+            Assert.True(response.IsSuccessfull, "Call to GetActivities was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.True(response.DataObject.Activities.Count > 1, "Call to GetActivities returned too few rows");
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOnType()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(activityType: "Task");
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivities was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivities returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.ActivityType != "Task").FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivities was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => a.ActivityType != "Task"));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOnStatus()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(activityStatus: "done");
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterOnStatus was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterOnStatus returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => !a.Done).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterOnStatus was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => !a.Done));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOwnerEmail()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(ownerEmail: TestConfig.TestUser);
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterOwnerEmail was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterOwnerEmail returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.OwnerEmail != TestConfig.TestUser).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterOwnerEmail was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => a.OwnerEmail != TestConfig.TestUser));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterAttachedToTypeAndAttachedToId()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(attachedToType: "sale", attachedToId: _saleInvoiceTranId2);
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterAttachedToTypeAndAttachedToId was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterAttachedToTypeAndAttachedToId returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.AttachedToType.ToLower() != "sale" && a.AttachedToId != _saleInvoiceTranId2).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterAttachedToTypeAndAttachedToId was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => a.AttachedToType.ToLower() != "sale" && a.AttachedToId != _saleInvoiceTranId2));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterFromAndToDate()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(fromDate: DateTime.Now.AddDays(-1), toDate: DateTime.Now.AddDays(-1));
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterFromAndToDate was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterFromAndToDate returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.Due != DateTime.Now.AddDays(-1)).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterFromAndToDate was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => a.Due != DateTime.Now.AddDays(-1)));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOnTagsRequireAll()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(tags: "red, blue", tagFilterType: "requireAll");
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsRequireAny was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterOnTagsRequireAny returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => !a.Tags.Contains("red") || !a.Tags.Contains("blue")).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsRequireAny was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => !a.Tags.Contains("red") || !a.Tags.Contains("blue")));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOnTagsRequireAny()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(tags: "red, blue", tagFilterType: "requireAny");
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsRequireAny was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterOnTagsRequireAny returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => !a.Tags.Contains("red") && !a.Tags.Contains("blue")).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsRequireAny was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => !a.Tags.Contains("red") && !a.Tags.Contains("blue")));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOnTagsExcludeAll()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(tags: "red, blue", tagFilterType: "excludeAll");
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsExcludeAll was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterOnTagsExcludeAll returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.Tags.Contains("red") && a.Tags.Contains("blue")).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsExcludeAll was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => a.Tags.Contains("red") && a.Tags.Contains("blue")));
         }
 
-        [Test]
+        [Fact]
         public void GetActivitiesFilterOnTagsExcludeAny()
         {
             var proxy = new ActivitiesProxy();
             var response = proxy.GetActivities(tags: "red, blue", tagFilterType: "excludeAny");
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsExcludeAny was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivitiesFilterOnTagsExcludeAny returned no data");
-            Assert.IsNull(response.DataObject.Activities.Where(a => a.Tags.Contains("red") || a.Tags.Contains("blue")).FirstOrDefault());
+            Assert.True(response.IsSuccessfull, "Call to GetActivitiesFilterOnTagsExcludeAny was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Null(response.DataObject.Activities.FirstOrDefault(a => a.Tags.Contains("red") || a.Tags.Contains("blue")));
         }
 
-        [Test]
+        [Fact]
         public void GetActivity()
         {
             var proxy = new ActivityProxy();
             var response = proxy.GetActivity(_testActivityId1);
-            Assert.IsTrue(response.IsSuccessfull, "Call to GetActivity was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to GetActivity returned no data");
-            Assert.AreEqual(response.DataObject.Id, _testActivityId1);
+            Assert.True(response.IsSuccessfull, "Call to GetActivity was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.Equal(_testActivityId1, response.DataObject.Id);
         }
 
-        [Test]
+        [Fact]
         public void InsertActivity()
         {
             var uniqueId = Guid.NewGuid().ToString().Substring(0, 5);
@@ -158,19 +157,19 @@ namespace Saasu.API.Client.IntegrationTests
             var activity = GetActivityDetail(title: title, details: details, tags: tag, ownerEmail: TestConfig.TestUser, done: true, due: DateTime.Now.AddDays(10));
             var proxy = new ActivityProxy();
             var response = proxy.InsertActivity(activity);
-            Assert.IsTrue(response.IsSuccessfull, "Call to InsertActivity was not successful");
-            Assert.IsNotNull(response.DataObject, "Call to InsertActivity returned no data");
-            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Call to InsertActivity returned 0 entity Id");
+            Assert.True(response.IsSuccessfull, "Call to InsertActivity was not successful");
+            Assert.NotNull(response.DataObject);
+            Assert.True(response.DataObject.InsertedEntityId > 0, "Call to InsertActivity returned 0 entity Id");
 
             var activityGet = proxy.GetActivity(response.DataObject.InsertedEntityId);
-            Assert.NotNull(activityGet.DataObject, "No row returned from Get after insert.");
+            Assert.True(activityGet.DataObject != null, "No row returned from Get after insert.");
 
             VerifyDetailsAreSame(activity, activityGet.DataObject);
-            Assert.IsTrue(activityGet.DataObject.CreatedDateUtc > DateTime.UtcNow.AddHours(-1) && activityGet.DataObject.CreatedDateUtc < DateTime.UtcNow.AddHours(1));
-            Assert.IsTrue(activityGet.DataObject.LastModifiedDateUtc > DateTime.UtcNow.AddHours(-1) && activityGet.DataObject.LastModifiedDateUtc < DateTime.UtcNow.AddHours(1));
+            Assert.True(activityGet.DataObject.CreatedDateUtc > DateTime.UtcNow.AddHours(-1) && activityGet.DataObject.CreatedDateUtc < DateTime.UtcNow.AddHours(1));
+            Assert.True(activityGet.DataObject.LastModifiedDateUtc > DateTime.UtcNow.AddHours(-1) && activityGet.DataObject.LastModifiedDateUtc < DateTime.UtcNow.AddHours(1));
         }
 
-        [Test]
+        [Fact]
         public void UpdateActivity()
         {
             var proxy = new ActivityProxy();
@@ -203,37 +202,37 @@ namespace Saasu.API.Client.IntegrationTests
 
             var updateResponse = proxy.UpdateActivity(_testActivityToBeUpdated, updateActivty);
 
-            Assert.IsTrue(updateResponse.IsSuccessfull, "Call to UpdateActivity was not successful");
-            Assert.NotNull(updateResponse.DataObject, "Call to InsertActivity returned no data");
-            Assert.AreEqual(updateResponse.DataObject.UpdatedActivityId, _testActivityToBeUpdated, "Activity was not correctly updated.");
+            Assert.True(updateResponse.IsSuccessfull, "Call to UpdateActivity was not successful");
+            Assert.True(updateResponse.DataObject!= null, "Call to InsertActivity returned no data");
+            Assert.Equal(_testActivityToBeUpdated, updateResponse.DataObject.UpdatedActivityId);
 
             var activityGet = proxy.GetActivity(_testActivityToBeUpdated);
-            Assert.NotNull(activityGet.DataObject, "No row returned from Get after update.");
+            Assert.True(activityGet.DataObject != null, "No row returned from Get after update.");
 
             VerifyDetailsAreSame(updateActivty, activityGet.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void DeleteActivity()
         {
             var proxy = new ActivityProxy();
             var response = proxy.DeleteActivity(_testActivityToBeDeletedId);
 
-            Assert.IsTrue(response.IsSuccessfull, "Call to DeleteActivity was not successful");
-            Assert.NotNull(response.DataObject, "Call to DeleteActivity returned no data");
+            Assert.True(response.IsSuccessfull, "Call to DeleteActivity was not successful");
+            Assert.True(response.DataObject != null, "Call to DeleteActivity returned no data");
 
             var verifyDeleted = proxy.GetActivity(_testActivityToBeDeletedId);
-            Assert.IsFalse(verifyDeleted.IsSuccessfull, "Call to Get deleted activity was successful");
-            Assert.IsNull(verifyDeleted.DataObject, "Call to Get deleted activity returned data");
+            Assert.False(verifyDeleted.IsSuccessfull, "Call to Get deleted activity was successful");
+            Assert.Null(verifyDeleted.DataObject);
         }
 
         private void VerifyDetailsAreSame(ActivityDetail details1, ActivityDetail details2)
         {
-            Assert.AreEqual(details1.Title, details2.Title);
-            Assert.AreEqual(details1.Details, details2.Details);
-            Assert.AreEqual(details1.OwnerEmail, details2.OwnerEmail);
-            Assert.AreEqual(details1.Done, details2.Done);
-            Assert.AreEqual(details1.Due.Date, details2.Due.Date);
+            Assert.Equal(details2.Title, details1.Title);
+            Assert.Equal(details2.Details, details1.Details);
+            Assert.Equal(details2.OwnerEmail, details1.OwnerEmail);
+            Assert.Equal(details2.Done, details1.Done);
+            Assert.Equal(details2.Due.Date, details1.Due.Date);
         }
 
         #endregion

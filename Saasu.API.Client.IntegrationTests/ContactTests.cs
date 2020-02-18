@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using Xunit;
 using Ola.RestClient;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
@@ -12,11 +12,6 @@ using System.Net;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    /// <summary>
-    /// Summary description for UnitTest1
-    /// </summary>
-    //[TestClass]
-    [TestFixture]
     public class ContactTests
     {
         public ContactTests()
@@ -50,7 +45,7 @@ namespace Saasu.API.Client.IntegrationTests
         //
         #endregion
 
-        [Test]
+        [Fact]
         public void GetContactsShouldReturnContactsUsingOAuth()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
@@ -59,24 +54,24 @@ namespace Saasu.API.Client.IntegrationTests
             AssertContactProxy(proxy);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsShouldReturnContactsUsingWsAccessKey()
         {
             var proxy = new ContactsProxy();
             AssertContactProxy(proxy);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterOnPersonNameAndOrganisationName()
         {
             var proxy = new ContactsProxy();
 
             var response = AssertContactProxy(proxy, givenName: "Carl", familyName: "O'Neil", organisationName: "O'Neil Capital");
 
-            Assert.IsTrue(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
+            Assert.True(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
         }
 
-        [Test]
+        [Fact]
         public void GetContactsAll()
         {
             var proxy = new ContactsProxy();
@@ -84,17 +79,17 @@ namespace Saasu.API.Client.IntegrationTests
             var response = AssertContactProxy(proxy);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsOnePageOneRecord()
         {
             var proxy = new ContactsProxy();
 
             var response = AssertContactProxy(proxy, pageNumber: 1, pageSize: 1);
 
-            Assert.AreEqual(1, response.DataObject.Contacts.Count, "Paging of 1 page and 1 record is returning the wrong number of records");
+            Assert.Equal(1, response.DataObject.Contacts.Count);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsSecondPage()
         {
             var proxy = new ContactsProxy();
@@ -105,10 +100,10 @@ namespace Saasu.API.Client.IntegrationTests
 
             response = AssertContactProxy(proxy, pageNumber: 2, pageSize: 2);
 
-            response.DataObject.Contacts.ForEach(c => Assert.IsFalse(idsFromPage1.Contains(c.Id), "Record(s) from page 1 were returned"));
+            response.DataObject.Contacts.ForEach(c => Assert.False(idsFromPage1.Contains(c.Id), "Record(s) from page 1 were returned"));
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterOnModifiedDates()
         {
             var proxy = new ContactsProxy();
@@ -117,7 +112,7 @@ namespace Saasu.API.Client.IntegrationTests
             AssertContactProxy(proxy, lastModifiedFromDate: DateTime.Now.AddYears(-1), lastModifiedToDate: DateTime.Now.AddDays(1));
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterActiveCustomer()
         {
             var proxy = new ContactsProxy();
@@ -125,7 +120,7 @@ namespace Saasu.API.Client.IntegrationTests
             AssertContactProxy(proxy, isActive: true, isCustomer: true);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterActiveSupplier()
         {
             var proxy = new ContactsProxy();
@@ -133,7 +128,7 @@ namespace Saasu.API.Client.IntegrationTests
             AssertContactProxy(proxy, isActive: true, isSupplier: true);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterActivePartner()
         {
             var proxy = new ContactsProxy();
@@ -141,7 +136,7 @@ namespace Saasu.API.Client.IntegrationTests
             AssertContactProxy(proxy, isActive: true, isPartner: true);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterActiveContractor()
         {
             var proxy = new ContactsProxy();
@@ -149,27 +144,27 @@ namespace Saasu.API.Client.IntegrationTests
             AssertContactProxy(proxy, isActive: true, isContractor: true);
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterOnEmail()
         {
             var proxy = new ContactsProxy();
 
             var response = AssertContactProxy(proxy, email: "carl@oneilcapital.com");
 
-            Assert.IsTrue(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
+            Assert.True(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
         }
 
-        [Test]
+        [Fact]
         public void GetContactsFilterOnContactId()
         {
             var proxy = new ContactsProxy();
 
             var response = AssertContactProxy(proxy, contactId: "GLD879");
 
-            Assert.IsTrue(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
+            Assert.True(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
         }
 
-        [Test]
+        [Fact]
         public void GetSingleContactWithContactId()
         {
             var contactsProxy = new ContactsProxy();
@@ -177,23 +172,23 @@ namespace Saasu.API.Client.IntegrationTests
             //Find Test contact to obtain their Id.
             var contactsResponse = AssertContactProxy(contactsProxy, givenName: "carl", familyName: "o'neil", contactId: "GLD879");
 
-            Assert.IsTrue(contactsResponse.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
+            Assert.True(contactsResponse.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
 
             var proxy = new ContactProxy();
 
             var id = contactsResponse.DataObject.Contacts[0].Id;
-            Assert.IsNotNull(id);
+            Assert.NotNull(id);
             var response = proxy.GetContact(id.Value);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject._links);
-            Assert.IsTrue(response.DataObject._links.Count > 0);
-            Assert.IsTrue(response.DataObject.Id == id);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0);
+            Assert.True(response.DataObject.Id == id);
         }
 
-        [Test]
+        [Fact]
         public void ModifyingContactsIsBooleanFieldsShouldNotAffectOtherIsBooleanFields()
         {
             var contactsProxy = new ContactsProxy();
@@ -201,15 +196,15 @@ namespace Saasu.API.Client.IntegrationTests
             //Find Test contact to obtain their Id.
             var contactsResponse = AssertContactProxy(contactsProxy, givenName: "carl", familyName: "o'neil", contactId: "GLD879");
 
-            Assert.IsTrue(contactsResponse.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
+            Assert.True(contactsResponse.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
 
             var proxy = new ContactProxy();
 
             var testId = contactsResponse.DataObject.Contacts[0].Id;
             var response = proxy.GetContact(testId.Value);
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
 
             // Now Modify the IsCustomer, IsContractor, IsSupplier, Is... fields and ensure setting one does not clear the other
             var testContact = response.DataObject;
@@ -218,29 +213,29 @@ namespace Saasu.API.Client.IntegrationTests
             testContact.IsPartner = true;
             testContact.IsSupplier = true;
             var updateResponse = proxy.UpdateContact(testContact, testContact.Id.Value);
-            Assert.IsNotNull(updateResponse);
-            Assert.IsTrue(updateResponse.IsSuccessfull);
+            Assert.NotNull(updateResponse);
+            Assert.True(updateResponse.IsSuccessfull);
 
             var updatedResponse1 = proxy.GetContact(testContact.Id.Value);
-            Assert.IsTrue(updatedResponse1.IsSuccessfull);
-            Assert.AreEqual(testContact.IsContractor, updatedResponse1.DataObject.IsContractor);
-            Assert.AreEqual(testContact.IsCustomer, updatedResponse1.DataObject.IsCustomer);
-            Assert.AreEqual(testContact.IsPartner, updatedResponse1.DataObject.IsPartner);
-            Assert.AreEqual(testContact.IsSupplier, updatedResponse1.DataObject.IsSupplier);
+            Assert.True(updatedResponse1.IsSuccessfull);
+            Assert.Equal(testContact.IsContractor, updatedResponse1.DataObject.IsContractor);
+            Assert.Equal(testContact.IsCustomer, updatedResponse1.DataObject.IsCustomer);
+            Assert.Equal(testContact.IsPartner, updatedResponse1.DataObject.IsPartner);
+            Assert.Equal(testContact.IsSupplier, updatedResponse1.DataObject.IsSupplier);
 
             testContact.LastUpdatedId = updateResponse.DataObject.LastUpdatedId;
             testContact.IsSupplier = false;
             testContact.IsPartner = false;
             var updateResponse2 = proxy.UpdateContact(testContact, testContact.Id.Value);
-            Assert.IsNotNull(updateResponse2);
-            Assert.IsTrue(updateResponse2.IsSuccessfull);
+            Assert.NotNull(updateResponse2);
+            Assert.True(updateResponse2.IsSuccessfull);
 
             var updatedResponse2 = proxy.GetContact(testContact.Id.Value);
-            Assert.IsTrue(updatedResponse2.IsSuccessfull);
-            Assert.AreEqual(testContact.IsContractor, updatedResponse2.DataObject.IsContractor);
-            Assert.AreEqual(testContact.IsCustomer, updatedResponse2.DataObject.IsCustomer);
-            Assert.AreEqual(testContact.IsPartner, updatedResponse2.DataObject.IsPartner);
-            Assert.AreEqual(testContact.IsSupplier, updatedResponse2.DataObject.IsSupplier);
+            Assert.True(updatedResponse2.IsSuccessfull);
+            Assert.Equal(testContact.IsContractor, updatedResponse2.DataObject.IsContractor);
+            Assert.Equal(testContact.IsCustomer, updatedResponse2.DataObject.IsCustomer);
+            Assert.Equal(testContact.IsPartner, updatedResponse2.DataObject.IsPartner);
+            Assert.Equal(testContact.IsSupplier, updatedResponse2.DataObject.IsSupplier);
         }
 
         public static ProxyResponse<ContactResponse> AssertContactProxy(ContactsProxy proxy, int? pageNumber = null, int? pageSize = null, DateTime? lastModifiedFromDate = null, DateTime? lastModifiedToDate = null,
@@ -253,18 +248,18 @@ namespace Saasu.API.Client.IntegrationTests
                 isActive, isCustomer, isSupplier, isContractor, isPartner,
                 tags, tagSelection, email, contactId, companyName, companyId);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject.Contacts);
-            Assert.IsNotNull(response.DataObject._links);
-            Assert.IsTrue(response.DataObject._links.Count > 0);
-            Assert.IsTrue(response.DataObject.Contacts.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Contacts);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0);
+            Assert.True(response.DataObject.Contacts.Count > 0);
 
             return response;
         }
 
-        [Test]
+        [Fact]
         public void InsertCompleteContact()
         {
             var contact = GetCompleteContact();
@@ -272,70 +267,70 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var response = proxy.InsertContact(contact);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.True(response.DataObject.InsertedContactId > 0);
 
             System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
             var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
-            Assert.IsNotNull(insertedContact.DataObject);
+            Assert.NotNull(insertedContact.DataObject);
 
-            Assert.AreEqual(contact.DirectDepositDetails.AcceptDirectDeposit, insertedContact.DataObject.DirectDepositDetails.AcceptDirectDeposit);
-            Assert.AreEqual(contact.ChequeDetails.AcceptCheque, insertedContact.DataObject.ChequeDetails.AcceptCheque);
-            Assert.AreEqual(contact.AutoSendStatement.HasValue, insertedContact.DataObject.AutoSendStatement.HasValue);
-            Assert.AreEqual(contact.BpayDetails.BillerCode, insertedContact.DataObject.BpayDetails.BillerCode);
-            Assert.AreEqual(contact.BpayDetails.CRN, insertedContact.DataObject.BpayDetails.CRN);
-            Assert.AreEqual(contact.ChequeDetails.ChequePayableTo, insertedContact.DataObject.ChequeDetails.ChequePayableTo);
-            Assert.AreEqual(contact.ContactId, insertedContact.DataObject.ContactId);
-            Assert.AreEqual(contact.ContactManagerId, insertedContact.DataObject.ContactManagerId);
-            Assert.AreEqual(contact.CustomField1, insertedContact.DataObject.CustomField1);
-            Assert.AreEqual(contact.CustomField2, insertedContact.DataObject.CustomField2);
-            Assert.AreEqual(contact.DefaultPurchaseDiscount, insertedContact.DataObject.DefaultPurchaseDiscount);
-            Assert.AreEqual(contact.DefaultSaleDiscount, insertedContact.DataObject.DefaultSaleDiscount);
-            Assert.AreEqual(contact.DirectDepositDetails.AccountBSB, insertedContact.DataObject.DirectDepositDetails.AccountBSB);
-            Assert.AreEqual(contact.DirectDepositDetails.AccountName, insertedContact.DataObject.DirectDepositDetails.AccountName);
-            Assert.AreEqual(contact.DirectDepositDetails.AccountNumber, insertedContact.DataObject.DirectDepositDetails.AccountNumber);
-            Assert.AreEqual(contact.EmailAddress, insertedContact.DataObject.EmailAddress);
-            Assert.AreEqual(contact.FamilyName, insertedContact.DataObject.FamilyName);
-            Assert.AreEqual(contact.Fax, insertedContact.DataObject.Fax);
-            Assert.AreEqual(contact.GivenName, insertedContact.DataObject.GivenName);
-            Assert.AreEqual(contact.HomePhone, insertedContact.DataObject.HomePhone);
-            Assert.AreEqual(contact.IsActive, insertedContact.DataObject.IsActive);
-            Assert.AreEqual(contact.IsContractor, insertedContact.DataObject.IsContractor);
-            Assert.AreEqual(contact.IsCustomer, insertedContact.DataObject.IsCustomer);
-            Assert.AreEqual(contact.IsPartner, insertedContact.DataObject.IsPartner);
-            Assert.AreEqual(contact.IsSupplier, insertedContact.DataObject.IsSupplier);
-            Assert.AreEqual(contact.LinkedInProfile, insertedContact.DataObject.LinkedInProfile);
-            Assert.AreEqual(contact.MiddleInitials, insertedContact.DataObject.MiddleInitials);
-            Assert.AreEqual(contact.MobilePhone, insertedContact.DataObject.MobilePhone);
-            Assert.AreEqual(contact.CompanyId, insertedContact.DataObject.CompanyId);
-            Assert.AreEqual(contact.PositionTitle, insertedContact.DataObject.PositionTitle);
-            Assert.IsNotNull(contact.OtherAddress);
-            Assert.AreEqual(contact.OtherAddress.City, insertedContact.DataObject.OtherAddress.City);
-            Assert.AreEqual(contact.OtherAddress.Country, insertedContact.DataObject.OtherAddress.Country);
-            Assert.AreEqual(contact.OtherAddress.Postcode, insertedContact.DataObject.OtherAddress.Postcode);
-            Assert.AreEqual(contact.OtherAddress.State, insertedContact.DataObject.OtherAddress.State);
-            Assert.AreEqual(contact.OtherAddress.Street, insertedContact.DataObject.OtherAddress.Street);
-            Assert.AreEqual(contact.PostalAddress.City, insertedContact.DataObject.PostalAddress.City);
-            Assert.AreEqual(contact.PostalAddress.Country, insertedContact.DataObject.PostalAddress.Country);
-            Assert.AreEqual(contact.PostalAddress.Postcode, insertedContact.DataObject.PostalAddress.Postcode);
-            Assert.AreEqual(contact.PostalAddress.State, insertedContact.DataObject.PostalAddress.State);
-            Assert.AreEqual(contact.PostalAddress.Street, insertedContact.DataObject.PostalAddress.Street);
-            Assert.AreEqual(contact.PrimaryPhone, insertedContact.DataObject.PrimaryPhone);
-            Assert.IsNotNull(insertedContact.DataObject.PurchaseTradingTerms);
-            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsInterval, insertedContact.DataObject.PurchaseTradingTerms.TradingTermsInterval);
-            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsIntervalType, insertedContact.DataObject.PurchaseTradingTerms.TradingTermsIntervalType);
-            Assert.AreEqual(contact.PurchaseTradingTerms.TradingTermsType, insertedContact.DataObject.PurchaseTradingTerms.TradingTermsType);
-            Assert.IsNotNull(insertedContact.DataObject.SaleTradingTerms);
-            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsInterval, insertedContact.DataObject.SaleTradingTerms.TradingTermsInterval);
-            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsIntervalType, insertedContact.DataObject.SaleTradingTerms.TradingTermsIntervalType);
-            Assert.AreEqual(contact.SaleTradingTerms.TradingTermsType, insertedContact.DataObject.SaleTradingTerms.TradingTermsType);
-            Assert.AreEqual(contact.Salutation, insertedContact.DataObject.Salutation);
-            Assert.AreEqual(contact.SkypeId, insertedContact.DataObject.SkypeId);
-            Assert.AreEqual(contact.TwitterId, insertedContact.DataObject.TwitterId);
-            Assert.AreEqual(contact.WebsiteUrl, insertedContact.DataObject.WebsiteUrl);
+            Assert.Equal(contact.DirectDepositDetails.AcceptDirectDeposit, insertedContact.DataObject.DirectDepositDetails.AcceptDirectDeposit);
+            Assert.Equal(contact.ChequeDetails.AcceptCheque, insertedContact.DataObject.ChequeDetails.AcceptCheque);
+            Assert.Equal(contact.AutoSendStatement.HasValue, insertedContact.DataObject.AutoSendStatement.HasValue);
+            Assert.Equal(contact.BpayDetails.BillerCode, insertedContact.DataObject.BpayDetails.BillerCode);
+            Assert.Equal(contact.BpayDetails.CRN, insertedContact.DataObject.BpayDetails.CRN);
+            Assert.Equal(contact.ChequeDetails.ChequePayableTo, insertedContact.DataObject.ChequeDetails.ChequePayableTo);
+            Assert.Equal(contact.ContactId, insertedContact.DataObject.ContactId);
+            Assert.Equal(contact.ContactManagerId, insertedContact.DataObject.ContactManagerId);
+            Assert.Equal(contact.CustomField1, insertedContact.DataObject.CustomField1);
+            Assert.Equal(contact.CustomField2, insertedContact.DataObject.CustomField2);
+            Assert.Equal(contact.DefaultPurchaseDiscount, insertedContact.DataObject.DefaultPurchaseDiscount);
+            Assert.Equal(contact.DefaultSaleDiscount, insertedContact.DataObject.DefaultSaleDiscount);
+            Assert.Equal(contact.DirectDepositDetails.AccountBSB, insertedContact.DataObject.DirectDepositDetails.AccountBSB);
+            Assert.Equal(contact.DirectDepositDetails.AccountName, insertedContact.DataObject.DirectDepositDetails.AccountName);
+            Assert.Equal(contact.DirectDepositDetails.AccountNumber, insertedContact.DataObject.DirectDepositDetails.AccountNumber);
+            Assert.Equal(contact.EmailAddress, insertedContact.DataObject.EmailAddress);
+            Assert.Equal(contact.FamilyName, insertedContact.DataObject.FamilyName);
+            Assert.Equal(contact.Fax, insertedContact.DataObject.Fax);
+            Assert.Equal(contact.GivenName, insertedContact.DataObject.GivenName);
+            Assert.Equal(contact.HomePhone, insertedContact.DataObject.HomePhone);
+            Assert.Equal(contact.IsActive, insertedContact.DataObject.IsActive);
+            Assert.Equal(contact.IsContractor, insertedContact.DataObject.IsContractor);
+            Assert.Equal(contact.IsCustomer, insertedContact.DataObject.IsCustomer);
+            Assert.Equal(contact.IsPartner, insertedContact.DataObject.IsPartner);
+            Assert.Equal(contact.IsSupplier, insertedContact.DataObject.IsSupplier);
+            Assert.Equal(contact.LinkedInProfile, insertedContact.DataObject.LinkedInProfile);
+            Assert.Equal(contact.MiddleInitials, insertedContact.DataObject.MiddleInitials);
+            Assert.Equal(contact.MobilePhone, insertedContact.DataObject.MobilePhone);
+            Assert.Equal(contact.CompanyId, insertedContact.DataObject.CompanyId);
+            Assert.Equal(contact.PositionTitle, insertedContact.DataObject.PositionTitle);
+            Assert.NotNull(contact.OtherAddress);
+            Assert.Equal(contact.OtherAddress.City, insertedContact.DataObject.OtherAddress.City);
+            Assert.Equal(contact.OtherAddress.Country, insertedContact.DataObject.OtherAddress.Country);
+            Assert.Equal(contact.OtherAddress.Postcode, insertedContact.DataObject.OtherAddress.Postcode);
+            Assert.Equal(contact.OtherAddress.State, insertedContact.DataObject.OtherAddress.State);
+            Assert.Equal(contact.OtherAddress.Street, insertedContact.DataObject.OtherAddress.Street);
+            Assert.Equal(contact.PostalAddress.City, insertedContact.DataObject.PostalAddress.City);
+            Assert.Equal(contact.PostalAddress.Country, insertedContact.DataObject.PostalAddress.Country);
+            Assert.Equal(contact.PostalAddress.Postcode, insertedContact.DataObject.PostalAddress.Postcode);
+            Assert.Equal(contact.PostalAddress.State, insertedContact.DataObject.PostalAddress.State);
+            Assert.Equal(contact.PostalAddress.Street, insertedContact.DataObject.PostalAddress.Street);
+            Assert.Equal(contact.PrimaryPhone, insertedContact.DataObject.PrimaryPhone);
+            Assert.NotNull(insertedContact.DataObject.PurchaseTradingTerms);
+            Assert.Equal(contact.PurchaseTradingTerms.TradingTermsInterval, insertedContact.DataObject.PurchaseTradingTerms.TradingTermsInterval);
+            Assert.Equal(contact.PurchaseTradingTerms.TradingTermsIntervalType, insertedContact.DataObject.PurchaseTradingTerms.TradingTermsIntervalType);
+            Assert.Equal(contact.PurchaseTradingTerms.TradingTermsType, insertedContact.DataObject.PurchaseTradingTerms.TradingTermsType);
+            Assert.NotNull(insertedContact.DataObject.SaleTradingTerms);
+            Assert.Equal(contact.SaleTradingTerms.TradingTermsInterval, insertedContact.DataObject.SaleTradingTerms.TradingTermsInterval);
+            Assert.Equal(contact.SaleTradingTerms.TradingTermsIntervalType, insertedContact.DataObject.SaleTradingTerms.TradingTermsIntervalType);
+            Assert.Equal(contact.SaleTradingTerms.TradingTermsType, insertedContact.DataObject.SaleTradingTerms.TradingTermsType);
+            Assert.Equal(contact.Salutation, insertedContact.DataObject.Salutation);
+            Assert.Equal(contact.SkypeId, insertedContact.DataObject.SkypeId);
+            Assert.Equal(contact.TwitterId, insertedContact.DataObject.TwitterId);
+            Assert.Equal(contact.WebsiteUrl, insertedContact.DataObject.WebsiteUrl);
         }
 
-        [Test]
+        [Fact]
         public void InsertContactWithoutAddressDoesNotFail()
         {
             var contact = new Contact()
@@ -349,16 +344,16 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var response = proxy.InsertContact(contact);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.True(response.DataObject.InsertedContactId > 0);
 
             System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
             var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
-            Assert.IsNotNull(insertedContact.DataObject);
-            Assert.AreEqual(contact.EmailAddress, insertedContact.DataObject.EmailAddress);
+            Assert.NotNull(insertedContact.DataObject);
+            Assert.Equal(contact.EmailAddress, insertedContact.DataObject.EmailAddress);
         }
 
-        [Test]
+        [Fact]
         public void InsertingContactWithoutSpecifyingIsActiveShouldReturnActiveContact()
         {
             var contact = GetCompleteContact();
@@ -367,17 +362,17 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var response = proxy.InsertContact(contact);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.True(response.DataObject.InsertedContactId > 0);
 
             System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
             var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
-            Assert.IsNotNull(insertedContact.DataObject);
-            Assert.IsNotNull(insertedContact.DataObject.IsActive);
-            Assert.IsTrue(insertedContact.DataObject.IsActive.Value);
+            Assert.NotNull(insertedContact.DataObject);
+            Assert.NotNull(insertedContact.DataObject.IsActive);
+            Assert.True(insertedContact.DataObject.IsActive.Value);
         }
 
-        [Test]
+        [Fact]
         public void InsertingContactWithIsActiveFalseShouldReturnInActiveContact()
         {
             var contact = GetCompleteContact();
@@ -386,17 +381,17 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var response = proxy.InsertContact(contact);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.True(response.DataObject.InsertedContactId > 0);
 
             System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
             var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
-            Assert.IsNotNull(insertedContact.DataObject);
-            Assert.IsNotNull(insertedContact.DataObject.IsActive);
-            Assert.IsFalse(insertedContact.DataObject.IsActive.Value);
+            Assert.NotNull(insertedContact.DataObject);
+            Assert.NotNull(insertedContact.DataObject.IsActive);
+            Assert.False(insertedContact.DataObject.IsActive.Value);
         }
 
-        [Test]
+        [Fact]
         public void InsertingContactWithIsActiveTrueShouldReturnActiveContact()
         {
             var contact = GetCompleteContact();
@@ -405,17 +400,17 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var response = proxy.InsertContact(contact);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsTrue(response.DataObject.InsertedContactId > 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.True(response.DataObject.InsertedContactId > 0);
 
             System.Threading.Thread.Sleep(1000); // Tags are saved through messagequeue, give time to be processed
             var insertedContact = proxy.GetContact(response.DataObject.InsertedContactId);
-            Assert.IsNotNull(insertedContact.DataObject);
-            Assert.IsNotNull(insertedContact.DataObject.IsActive);
-            Assert.IsTrue(insertedContact.DataObject.IsActive.Value);
+            Assert.NotNull(insertedContact.DataObject);
+            Assert.NotNull(insertedContact.DataObject.IsActive);
+            Assert.True(insertedContact.DataObject.IsActive.Value);
         }
 
-        [Test]
+        [Fact]
         public void UpdateCompleteContact()
         {
             var contact = GetMinimalContact();
@@ -423,8 +418,8 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var insertResponse = proxy.InsertContact(contact);
 
-            Assert.IsTrue(insertResponse.IsSuccessfull);
-            Assert.IsTrue(insertResponse.DataObject.InsertedContactId > 0);
+            Assert.True(insertResponse.IsSuccessfull);
+            Assert.True(insertResponse.DataObject.InsertedContactId > 0);
 
             var insertedContact = proxy.GetContact(insertResponse.DataObject.InsertedContactId);
             insertedContact.DataObject.GivenName = "Jack";
@@ -437,16 +432,16 @@ namespace Saasu.API.Client.IntegrationTests
 
             var updateResponse = proxy.UpdateContact(insertedContact.DataObject, insertResponse.DataObject.InsertedContactId);
 
-            Assert.IsTrue(updateResponse.IsSuccessfull);
+            Assert.True(updateResponse.IsSuccessfull);
             //System.Threading.Thread.Sleep(1000);
             var updatedContact = proxy.GetContact(updateResponse.DataObject.UpdatedContactId);
 
-            Assert.AreEqual(insertedContact.DataObject.GivenName, updatedContact.DataObject.GivenName);
-            Assert.IsNotNull(updatedContact.DataObject.PostalAddress);
-            Assert.AreEqual(insertedContact.DataObject.PostalAddress.City, updatedContact.DataObject.PostalAddress.City);
+            Assert.Equal(insertedContact.DataObject.GivenName, updatedContact.DataObject.GivenName);
+            Assert.NotNull(updatedContact.DataObject.PostalAddress);
+            Assert.Equal(insertedContact.DataObject.PostalAddress.City, updatedContact.DataObject.PostalAddress.City);
         }
 
-        [Test]
+        [Fact]
         public void DeleteContact()
         {
             var contact = GetMinimalContact();
@@ -454,15 +449,15 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ContactProxy();
             var result = proxy.InsertContact(contact);
 
-            Assert.IsTrue(result.IsSuccessfull);
-            Assert.Greater(result.DataObject.InsertedContactId, 0);
+            Assert.True(result.IsSuccessfull);
+            Assert.True(result.DataObject.InsertedContactId > 0);
 
             var deleteResult = proxy.DeleteContact(result.DataObject.InsertedContactId);
-            Assert.IsTrue(deleteResult.IsSuccessfull);
+            Assert.True(deleteResult.IsSuccessfull);
 
             var deletedContact = proxy.GetContact(result.DataObject.InsertedContactId);
-            Assert.IsNull(deletedContact.DataObject);
-            Assert.AreEqual(HttpStatusCode.NotFound, deletedContact.StatusCode);
+            Assert.Null(deletedContact.DataObject);
+            Assert.Equal(HttpStatusCode.NotFound, deletedContact.StatusCode);
 
         }
 
@@ -519,11 +514,11 @@ namespace Saasu.API.Client.IntegrationTests
 
             if (response != null)
             {
-                Assert.IsTrue(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
+                Assert.True(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
             }
             else
             {
-                Assert.Fail("No contact type specified to be created.");
+                Assert.True(false, "No contact type specified to be created.");
             }
 
             return response;
@@ -585,7 +580,7 @@ namespace Saasu.API.Client.IntegrationTests
                 Email = "carl@oneilcapital.com"
             };
             proxy.Insert(dto);
-            Assert.IsTrue(dto.Uid > 0, "Incorrect uid post save.");
+            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
         }
 
         /// <summary>
@@ -606,7 +601,7 @@ namespace Saasu.API.Client.IntegrationTests
                 ContactType = (int)ContactType.Supplier
             };
             proxy.Insert(dto);
-            Assert.IsTrue(dto.Uid > 0, "Incorrect uid post save.");
+            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
         }
 
         /// <summary>
@@ -627,7 +622,7 @@ namespace Saasu.API.Client.IntegrationTests
                 ContactType = (int)ContactType.Partner
             };
             proxy.Insert(dto);
-            Assert.IsTrue(dto.Uid > 0, "Incorrect uid post save.");
+            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
         }
 
         /// <summary>
@@ -647,7 +642,7 @@ namespace Saasu.API.Client.IntegrationTests
                 ContactType = (int)Ola.RestClient.ContactType.Contractor
             };
             proxy.Insert(dto);
-            Assert.IsTrue(dto.Uid > 0, "Incorrect uid post save.");
+            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
         }
 
         #endregion

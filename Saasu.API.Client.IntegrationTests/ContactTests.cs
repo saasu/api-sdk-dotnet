@@ -1,5 +1,5 @@
 using Xunit;
-using Ola.RestClient;
+
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models;
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Net;
+using Saasu.API.Core.Models.Company;
 
 namespace Saasu.API.Client.IntegrationTests
 {
@@ -16,12 +17,12 @@ namespace Saasu.API.Client.IntegrationTests
     {
         public ContactTests()
         {
-            //Create test data needed for unit tests.
-            VerifyTestContactExistsOrCreate(ContactType.Customer);
-            VerifyTestContactExistsOrCreate(ContactType.Supplier);
-            VerifyTestContactExistsOrCreate(ContactType.Partner);
-            VerifyTestContactExistsOrCreate(ContactType.Contractor);
+            GetOrCreateContactCustomer();
+            GetOrCreateContractorContact();
+            GetOrCreatePartnerContact();
+            GetOrCreateSupplierContact();
         }
+
 
         #region Additional test attributes
         //
@@ -463,186 +464,194 @@ namespace Saasu.API.Client.IntegrationTests
 
         #region Test data
 
-        internal static ProxyResponse<ContactResponse> VerifyTestContactExistsOrCreate(ContactType contactType)
-        {
-            var proxy = new ContactsProxy();
-            ProxyResponse<ContactResponse> response = null;
 
-            switch (contactType)
+        public static int GetOrCreateContactCustomer(string firstName, string lastName, string organisationName, string email)
+        {
+            var proxy = new ContactProxy();
+            var searchProxy = new ContactsProxy();
+            var companyProxy = new CompanyProxy();
+
+            var response = searchProxy.GetContacts(givenName: firstName, familyName: lastName, isCustomer: true, organisationName: organisationName);
+            if (response.IsSuccessfull && response.DataObject.Contacts.Any())
             {
-                case Ola.RestClient.ContactType.Customer:
-                    {
-                        response = SearchCarl(proxy);
-                        if (response.DataObject.Contacts.Count == 0)
-                        {
-                            AddCarlCustomer(proxy.WsAccessKey, proxy.FileId);
-                            response = SearchCarl(proxy);
-                        }
-                        break;
-                    }
-                case Ola.RestClient.ContactType.Supplier:
-                    {
-                        response = SearchJenny(proxy);
-                        if (response.DataObject.Contacts.Count == 0)
-                        {
-                            AddJennySupplier(proxy.WsAccessKey, proxy.FileId);
-                            response = SearchJenny(proxy);
-                        }
-                        break;
-                    }
-                case Ola.RestClient.ContactType.Partner:
-                    {
-                        response = SearchBrad(proxy);
-                        if (response.DataObject.Contacts.Count == 0)
-                        {
-                            AddBradPartner(proxy.WsAccessKey, proxy.FileId);
-                            response = SearchBrad(proxy);
-                        }
-                        break;
-                    }
-                case Ola.RestClient.ContactType.Contractor:
-                    {
-                        response = SearchKathy(proxy);
-                        if (response.DataObject.Contacts.Count == 0)
-                        {
-                            AddKathyContractor(proxy.WsAccessKey, proxy.FileId);
-                            response = SearchKathy(proxy);
-                        }
-                        break;
-                    }
+                return response.DataObject.Contacts[0].Id.GetValueOrDefault();
             }
 
-            if (response != null)
+            var cResult = companyProxy.InsertCompany(new CompanyDetail()
             {
-                Assert.True(response.DataObject.Contacts.Count >= 1, "Incorrect number of contacts found.");
-            }
-            else
+                Name = organisationName
+            });
+
+            Assert.True(cResult.IsSuccessfull, "Failed to create organization for customer contact test data.");
+
+            var contact = new Contact()
             {
-                Assert.True(false, "No contact type specified to be created.");
-            }
+                GivenName = firstName,
+                FamilyName = lastName,
+                //ContactId = "GLD879",
+                IsCustomer = true,
+                Tags = new List<string>() { $"{firstName}Tag1", $"{lastName}Tag2" },
+                EmailAddress = email,
+                CompanyId = cResult.DataObject.InsertedCompanyId
+            };
 
-            return response;
+            var result = proxy.InsertContact(contact);
+            Assert.True(result.IsSuccessfull, "Failed to add customer contact test data.");
+            return result.DataObject.InsertedContactId;
+
         }
 
-        /// <summary>
-        /// Search for fictious customer contact.
-        /// </summary>
-        private static ProxyResponse<ContactResponse> SearchCarl(ContactsProxy proxy)
-        {
-            var response = proxy.GetContacts(givenName: "carl", familyName: "o'neil", organisationName: "o'neil capital");
-            return response;
-        }
-
-        /// <summary>
-        /// Search for fictious supplier contact.
-        /// </summary>
-        private static ProxyResponse<ContactResponse> SearchJenny(ContactsProxy proxy)
-        {
-            var response = proxy.GetContacts(givenName: "jenny", familyName: "o'neil", organisationName: "o'neil supplier");
-            return response;
-        }
-
-        /// <summary>
-        /// Search for fictious partner contact.
-        /// </summary>
-        private static ProxyResponse<ContactResponse> SearchBrad(ContactsProxy proxy)
-        {
-            var response = proxy.GetContacts(givenName: "brad", familyName: "o'neil", organisationName: "o'neil partner");
-            return response;
-        }
-
-        /// <summary>
-        /// Search for fictious contractor contact.
-        /// </summary>
-        private static ProxyResponse<ContactResponse> SearchKathy(ContactsProxy proxy)
-        {
-            var response = proxy.GetContacts(givenName: "kathy", familyName: "o'neil", organisationName: "o'neil contractor", isContractor: true);
-            return response;
-        }
 
         /// <summary>
         /// Add fictious customer contact. Currently have to use old Rest client API to insert record as this functionality not available in Web API yet.
         /// </summary>
-        public static void AddCarlCustomer(string wsAccessKey, int fileuid)
+        public static int GetOrCreateContactCustomer()
         {
-            var proxy = new Ola.RestClient.Proxies.ContactProxy();
-            var dto = new Ola.RestClient.Dto.ContactDto()
+            var proxy = new ContactProxy();
+            var searchProxy = new ContactsProxy();
+            var companyProxy = new CompanyProxy();
+
+            var response = searchProxy.GetContacts(givenName: "carl", familyName: "o'neil", isCustomer: true, organisationName: "o'neil capital");
+            if (response.IsSuccessfull && response.DataObject.Contacts.Any())
+            {
+                return response.DataObject.Contacts[0].Id.GetValueOrDefault();
+            }
+
+            var cResult = companyProxy.InsertCompany(new CompanyDetail()
+            {
+                Name = "O'Neil Capital"
+            });
+
+            Assert.True(cResult.IsSuccessfull, "Failed to create organization for customer contact test data.");
+
+            var contact = new Contact()
             {
                 Salutation = "Mr.",
                 GivenName = "Carl",
                 FamilyName = "O'Neil",
-                OrganisationName = "O'Neil Capital",
-                ContactID = "GLD879",
+                ContactId = "GLD879",
                 CustomField1 = "O'NeilC",
                 IsCustomer = true,
-                ContactType = (int)ContactType.Customer,
-                Tags = "carlTag1,carlTag2",
-                Email = "carl@oneilcapital.com"
+                Tags = new List<string>(){"carlTag1","carlTag2"},
+                EmailAddress = "carl@oneilcapital.com",
+                CompanyId = cResult.DataObject.InsertedCompanyId
             };
-            proxy.Insert(dto);
-            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
+
+            var result = proxy.InsertContact(contact);
+            Assert.True(result.IsSuccessfull, "Failed to add customer contact test data.");
+            return result.DataObject.InsertedContactId;
+
         }
 
         /// <summary>
         /// Add fictious supplier contact. Currently have to use old Rest client API to insert record as this functionality not available in Web API yet.
         /// </summary>
-        public static void AddJennySupplier(string wsAccessKey, int fileuid)
+        public static int GetOrCreateSupplierContact()
         {
-            var proxy = new Ola.RestClient.Proxies.ContactProxy();
-            var dto = new Ola.RestClient.Dto.ContactDto()
+            var proxy = new ContactProxy();
+            var searchProxy = new ContactsProxy();
+            var companyProxy = new CompanyProxy();
+
+            var response = searchProxy.GetContacts(givenName: "jenny", familyName: "o'neil", isCustomer: true, organisationName: "O'Neil Supplier");
+            if (response.IsSuccessfull && response.DataObject.Contacts.Any())
+            {
+                return response.DataObject.Contacts[0].Id.GetValueOrDefault();
+            }
+
+            var cResult = companyProxy.InsertCompany(new CompanyDetail()
+            {
+                Name = "O'Neil Supplier"
+            });
+
+            Assert.True(cResult.IsSuccessfull, "Failed to create organization for supplier contact test data.");
+
+            var contact = new Contact()
             {
                 Salutation = "Ms.",
                 GivenName = "Jenny",
                 FamilyName = "O'Neil",
-                OrganisationName = "O'Neil Supplier",
-                ContactID = "GLD880",
+                ContactId = "GLD880",
                 CustomField1 = "O'NeilJ",
                 IsSupplier = true,
-                ContactType = (int)ContactType.Supplier
+                CompanyId = cResult.DataObject.InsertedCompanyId
             };
-            proxy.Insert(dto);
-            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
+            var result = proxy.InsertContact(contact);
+            Assert.True(result.IsSuccessfull, "Failed to add supplier contact test data.");
+            return result.DataObject.InsertedContactId;
         }
 
         /// <summary>
         /// Add fictious partner contact. Currently have to use old Rest client API to insert record as this functionality not available in Web API yet.
         /// </summary>
-        public static void AddBradPartner(string wsAccessKey, int fileuid)
+        public static int GetOrCreatePartnerContact()
         {
-            var proxy = new Ola.RestClient.Proxies.ContactProxy();
-            var dto = new Ola.RestClient.Dto.ContactDto()
+            var proxy = new ContactProxy();
+            var searchProxy = new ContactsProxy();
+            var companyProxy = new CompanyProxy();
+
+            var response = searchProxy.GetContacts(givenName: "brad", familyName: "o'neil", isCustomer: true, organisationName: "O'Neil Partner");
+            if (response.IsSuccessfull && response.DataObject.Contacts.Any())
+            {
+                return response.DataObject.Contacts[0].Id.GetValueOrDefault();
+            }
+
+            var cResult = companyProxy.InsertCompany(new CompanyDetail()
+            {
+                Name = "O'Neil Partner"
+            });
+
+            Assert.True(cResult.IsSuccessfull, "Failed to create organization for partner contact test data.");
+
+            var contact = new Contact()
             {
                 Salutation = "Mr.",
                 GivenName = "Brad",
                 FamilyName = "O'Neil",
-                OrganisationName = "O'Neil Partner",
-                ContactID = "GLD881",
+                ContactId = "GLD881",
                 CustomField1 = "O'NeilB",
                 IsPartner = true,
-                ContactType = (int)ContactType.Partner
+                CompanyId = cResult.DataObject.InsertedCompanyId
             };
-            proxy.Insert(dto);
-            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
+            var result = proxy.InsertContact(contact);
+            Assert.True(result.IsSuccessfull, "Failed to add partner contact test data.");
+            return result.DataObject.InsertedContactId;
         }
 
         /// <summary>
         /// Add fictious contractor contact. Currently have to use old Rest client API to insert record as this functionality not available in Web API yet.
         /// </summary>
-        public static void AddKathyContractor(string wsAccessKey, int fileuid)
+        public static int GetOrCreateContractorContact()
         {
-            var proxy = new Ola.RestClient.Proxies.ContactProxy();
-            var dto = new Ola.RestClient.Dto.ContactDto()
+            var proxy = new ContactProxy();
+            var searchProxy = new ContactsProxy();
+            var companyProxy = new CompanyProxy();
+
+            var response = searchProxy.GetContacts(givenName: "kathy", familyName: "o'neil", isCustomer: true, organisationName: "O'Neil Contractor");
+            if (response.IsSuccessfull && response.DataObject.Contacts.Any())
+            {
+                return response.DataObject.Contacts[0].Id.GetValueOrDefault();
+            }
+
+            var cResult = companyProxy.InsertCompany(new CompanyDetail()
+            {
+                Name = "O'Neil Contractor"
+            });
+
+            Assert.True(cResult.IsSuccessfull, "Failed to create organization for supplier contact test data.");
+
+            var contact = new Contact()
             {
                 Salutation = "Ms.",
                 GivenName = "Kathy",
                 FamilyName = "O'Neil",
-                OrganisationName = "O'Neil Contractor",
-                ContactID = "GLD882",
+                ContactId = "GLD882",
                 CustomField1 = "O'NeilK",
-                ContactType = (int)Ola.RestClient.ContactType.Contractor
+                CompanyId = cResult.DataObject.InsertedCompanyId,
+                IsContractor = true
             };
-            proxy.Insert(dto);
-            Assert.True(dto.Uid > 0, "Incorrect uid post save.");
+            var result = proxy.InsertContact(contact);
+            Assert.True(result.IsSuccessfull, "Failed to add contractor contact test data.");
+            return result.DataObject.InsertedContactId;
         }
 
         #endregion

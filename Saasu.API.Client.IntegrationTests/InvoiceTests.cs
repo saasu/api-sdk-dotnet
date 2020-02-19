@@ -1,7 +1,5 @@
 using Xunit;
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ola.RestClient.Dto;
-using Ola.RestClient.Proxies;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models.Attachments;
@@ -11,12 +9,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Saasu.API.Core.Globals;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
 {
     public class InvoiceTests
     {
+        private readonly InvoiceHelper _invHelper;
+
         private static int? _testInvoiceId;
 
         private static int? TestInvoiceId
@@ -34,22 +35,6 @@ namespace Saasu.API.Client.IntegrationTests
             }
         }
 
-        private static int _BillingContactId;
-        private static int _ShippingContactId;
-        private static int _IncomeAccountId;
-        private static int _IncomeAccountId2;
-        private static int _ExpenseAccountId;
-        private static int _ExpenseAccountId2;
-        private static int _BankAccountId;
-        private static int _AssetAccountId;
-        private static int _InventorySaleItemId;
-        private static int _InventorySaleItemId2;
-        private static int _InventoryPurchaseItemId;
-        private static int _InventoryPurchaseItemId2;
-
-        private static int _invoice1Id;
-        private static int _invoice2Id;
-        private static int _invoice3Id;
 
         private const string AutoNumber = "<auto number>";
         private const string ItemLayoutForbiddenMessage = " Check the response returned as this may be because your current subscription does not allow item layouts.";
@@ -57,11 +42,7 @@ namespace Saasu.API.Client.IntegrationTests
 
         public InvoiceTests()
         {
-            //note - don't change the order of these calls, they are dependent.
-            CreateTestContacts();
-            CreateTestAccounts();
-            CreateTestInventoryItems();
-            CreatetestInvoices();
+            _invHelper = new InvoiceHelper();
         }
 
         [Fact]
@@ -101,7 +82,7 @@ namespace Saasu.API.Client.IntegrationTests
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
             var proxy = new InvoiceProxy(accessToken);
-            var response = proxy.GetInvoice(Convert.ToInt32(_invoice1Id));
+            var response = proxy.GetInvoice(Convert.ToInt32(_invHelper.InvoiceId1));
 
             Assert.NotNull(response);
             Assert.True(response.IsSuccessfull);
@@ -174,14 +155,14 @@ namespace Saasu.API.Client.IntegrationTests
             var attachment = CreateTestAttachment();
 
             //Attach invoice Id to attachment and insert attachment.
-            attachment.ItemIdAttachedTo = Convert.ToInt32(_invoice1Id);
+            attachment.ItemIdAttachedTo = Convert.ToInt32(_invHelper.InvoiceId1);
             var insertResponse = proxy.AddAttachment(attachment);
 
             var attachmentId = insertResponse.DataObject.Id;
 
             Assert.True(attachmentId > 0);
 
-            var getResponse = proxy.GetAllAttachmentsInfo(_invoice1Id);
+            var getResponse = proxy.GetAllAttachmentsInfo(_invHelper.InvoiceId1.GetValueOrDefault());
 
             Assert.NotNull(getResponse);
             Assert.True(getResponse.IsSuccessfull);
@@ -257,7 +238,7 @@ namespace Saasu.API.Client.IntegrationTests
             var invNumber = string.Format("Inv{0}", Guid.NewGuid());
 
             //Create and insert test invoice.
-            GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: invNumber, actuallyInsertAndVerifyResponse: true);
+            GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: invNumber, actuallyInsertAndVerifyResponse: true);
 
             var response = AssertInvoiceProxy(invoiceNumber: invNumber);
 
@@ -270,7 +251,7 @@ namespace Saasu.API.Client.IntegrationTests
             var purchaseOrderNumber = string.Format("Inv{0}", Guid.NewGuid());
 
             //Create and insert test invoice.
-            GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: purchaseOrderNumber, actuallyInsertAndVerifyResponse: true);
+            GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: purchaseOrderNumber, actuallyInsertAndVerifyResponse: true);
 
             var response = AssertInvoiceProxy(purchaseOrderNumber: purchaseOrderNumber);
 
@@ -287,25 +268,27 @@ namespace Saasu.API.Client.IntegrationTests
         public void GetInvoicesFilterOnBillingContactId()
         {
             //Get Id of test contact associated with the invoice.
-            var contactResponse = ContactTests.VerifyTestContactExistsOrCreate(contactType: Ola.RestClient.ContactType.Customer);
+            var contactId = ContactTests.GetOrCreateContactCustomer();
+            var contactProxy = new Proxies.ContactProxy();
+            var contactResponse = contactProxy.GetContact(contactId);
 
-            var billingContactId = contactResponse.DataObject.Contacts[0].Id;
+            var billingContactId = contactResponse.DataObject.Id;
 
             //Create and insert test invoices for billing contact.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
-            var invoice2 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
+            var invoice2 = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
 
             var proxy = new InvoiceProxy();
             proxy.InsertInvoice(invoice);
             proxy.InsertInvoice(invoice2);
 
-            AssertInvoiceProxy(billingContactId: contactResponse.DataObject.Contacts[0].Id);
+            AssertInvoiceProxy(billingContactId: contactResponse.DataObject.Id);
         }
 
         [Fact]
         public void GetInvoicesFilterOnInvoiceStatus()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceType: InvoiceType.SaleOrder, invoiceStatus: InvoiceStatusType.Order.ToQueryParameter());
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceType: Constants.InvoiceType.SaleOrder, invoiceStatus: InvoiceStatusType.Order.ToQueryParameter());
             new InvoiceProxy().InsertInvoice(invoice);
 
             AssertInvoiceProxy(invoiceStatus: InvoiceStatusType.Order.ToQueryParameter());
@@ -314,7 +297,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void GetSingleInvoiceWithInvoiceId()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var insertResponse = new InvoiceProxy().InsertInvoice(invoice);
 
@@ -375,7 +358,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertSaleWithServiceItemsNoEmailToContact()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var response = new InvoiceProxy().InsertInvoice(invoice);
 
@@ -401,7 +384,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertSaleAndCanUpdateUsingReturnedLastUpdateId()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -445,7 +428,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertSaleWithItemLayoutEmailToContactAndAutoNumberAndAutoPopulateFxRate()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true, autoPopulateFxRate: true);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true, autoPopulateFxRate: true);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -473,7 +456,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertSaleWithAutoPopulateFxRateShouldNotUsePassedInFxRate()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", autoPopulateFxRate: true, fxRate: 99);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", autoPopulateFxRate: true, fxRate: 99);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -505,7 +488,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertPurchaseWithServiceItemsNoEmailToContact()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var response = new InvoiceProxy().InsertInvoice(invoice);
 
@@ -538,7 +521,7 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertPurchaseWithItemLayoutEmailToContactAndAutoNumber()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "P", emailContact: true);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "P", emailContact: true);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -567,7 +550,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void InsertDifferentCurrencyForMultiCurrencyFile()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", currency: "USD", fxRate: new decimal(1.50));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", currency: "USD", fxRate: new decimal(1.50));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -593,13 +576,13 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertSaleWithQuickPayment()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             invoice.QuickPayment = new InvoiceQuickPaymentDetail
             {
                 DatePaid = DateTime.Now.AddDays(-4),
                 DateCleared = DateTime.Now.AddDays(-3),
-                BankedToAccountId = _BankAccountId,
+                BankedToAccountId = _invHelper.BankAccountId,
                 Amount = new decimal(10.00),
                 Reference = "Test quick payment reference",
                 Summary = "Test quick payment summary"
@@ -623,13 +606,13 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void InsertPurchaseWithQuickPayment()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             invoice.QuickPayment = new InvoiceQuickPaymentDetail
             {
                 DatePaid = DateTime.Now.AddDays(-4),
                 DateCleared = DateTime.Now.AddDays(-3),
-                BankedToAccountId = _BankAccountId,
+                BankedToAccountId = _invHelper.BankAccountId,
                 Amount = new decimal(10.00),
                 Reference = "Test quick payment reference",
                 Summary = "Test quick payment summary"
@@ -663,7 +646,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void UpdateSaleWithServiceLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
             Assert.True(response.IsSuccessfull);
 
@@ -685,8 +668,8 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                 {
                     Description = "updated line item",
-                    AccountId = _IncomeAccountId2,
-                    TaxCode = TaxCode.SaleInputTaxed,
+                    AccountId = _invHelper.IncomeAccountId2,
+                    TaxCode = Constants.TaxCode.SaleInputTaxed,
                     TotalAmount = new decimal(100.00),
                     Tags = new List<string> { "update item tag 1", "update item tag 2" }
                 }
@@ -718,7 +701,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void UpdateSaleWithItemLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
             Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
@@ -740,11 +723,11 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                         {
                             Description = "updated line item 1",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 20,
                             UnitPrice = new decimal(200.00),
                             PercentageDiscount = new decimal(15.00),
-                            InventoryId =  _InventorySaleItemId2,
+                            InventoryId =  _invHelper.InventorySaleItemId2,
                             Tags = new List<string> {"updated item tag 1", "updated item tag 2"}
 							//Attributes = GetItemAttributes()
 						},
@@ -776,7 +759,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void UpdatePurchaseWithServiceLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
             Assert.True(response.IsSuccessfull);
 
@@ -798,8 +781,8 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                 {
                     Description = "updated line item",
-                    AccountId = _IncomeAccountId2,
-                    TaxCode = TaxCode.SaleInputTaxed,
+                    AccountId = _invHelper.IncomeAccountId2,
+                    TaxCode = Constants.TaxCode.SaleInputTaxed,
                     TotalAmount = new decimal(100.00),
                     Tags = new List<string> { "update item tag 1", "update item tag 2" }
                 }
@@ -831,7 +814,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void UpdatePurchaseithItemLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
             Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
@@ -852,11 +835,11 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                         {
                             Description = "upadated line item 1",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 20,
                             UnitPrice = new decimal(200.00),
                             PercentageDiscount = new decimal(15.00),
-                            InventoryId =  _InventoryPurchaseItemId2,
+                            InventoryId =  _invHelper.InventoryPurchaseItemId2,
                             Tags = new List<string> {"upadated item tag 1", "updated item tag 2"}
                         }
             };
@@ -885,7 +868,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void UpdateDifferentCurrencyForMultiCurrencyFile()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S");
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S");
             var response = new InvoiceProxy().InsertInvoice(invoice);
             Assert.True(response.IsSuccessfull);
 
@@ -926,7 +909,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void DeleteSaleInvoiceWithServiceLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -954,7 +937,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void DeleteSaleInvoiceWithItemLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -985,7 +968,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void DeletePurchaseInvoiceWithServiceLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -1016,7 +999,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void DeletePurchaseInvoiceWithItemLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -1048,7 +1031,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void InvalidCurrencyInsert()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", currency: "TEST");
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", currency: "TEST");
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
@@ -1063,11 +1046,10 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void EmailInvoiceToBillingContact()
         {
-            var contactResponse = ContactTests.VerifyTestContactExistsOrCreate(contactType: Ola.RestClient.ContactType.Customer);
+            
+            var billingContactId = ContactTests.GetOrCreateContactCustomer();
 
-            var billingContactId = contactResponse.DataObject.Contacts[0].Id;
-
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", billingContactId: billingContactId, emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", billingContactId: billingContactId, emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var insertResponse = new InvoiceProxy().InsertInvoice(invoice);
 
             Assert.True(insertResponse.IsSuccessfull);
@@ -1328,8 +1310,8 @@ namespace Saasu.API.Client.IntegrationTests
                 IsTaxInc = true,
                 RequiresFollowUp = requiresFollowUp,
                 TransactionDate = transactionDate ?? DateTime.Now.AddDays(-10),
-                BillingContactId = billingContactId ?? _BillingContactId,
-                ShippingContactId = shippingContactId ?? _ShippingContactId,
+                BillingContactId = billingContactId ?? _invHelper.BillingContactId,
+                ShippingContactId = shippingContactId ?? _invHelper.ShippingContactId,
                 FxRate = fxRate,
                 AutoPopulateFxRate = autoPopulateFxRate,
                 InvoiceStatus = invoiceStatus,
@@ -1399,8 +1381,8 @@ namespace Saasu.API.Client.IntegrationTests
                 PurchaseOrderNumber = string.Format("PO{0}", Guid.NewGuid()),
                 Summary = "Summary Update",
                 RequiresFollowUp = true,
-                BillingContactId = _ShippingContactId, //swap the contacts
-                ShippingContactId = _BillingContactId,
+                BillingContactId = _invHelper.ShippingContactId, //swap the contacts
+                ShippingContactId = _invHelper.BillingContactId,
                 Tags = new List<string> { "updated header tag 1", "updated header tag 2" },
                 SendEmailToContact = emailToContact
             };
@@ -1416,16 +1398,16 @@ namespace Saasu.API.Client.IntegrationTests
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 1",
-                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-                            TaxCode = TaxCode.SaleInclGst,
+                            AccountId = tranType == "S" ? _invHelper.IncomeAccountId : _invHelper.ExpenseAccountId,
+                            TaxCode = Constants.TaxCode.SaleInclGst,
                             TotalAmount = new decimal(10.00),
                             Tags = new List<string> {"item tag 1", "item tag 2"}
                         },
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 2",
-                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            AccountId = tranType == "S" ? _invHelper.IncomeAccountId : _invHelper.ExpenseAccountId,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             TotalAmount = new decimal(20.00),
                             Tags = new List<string> {"item tag 3", "item tag 4"}
                         }
@@ -1437,21 +1419,21 @@ namespace Saasu.API.Client.IntegrationTests
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 1",
-                            TaxCode = TaxCode.SaleInclGst,
+                            TaxCode = Constants.TaxCode.SaleInclGst,
                             Quantity = 2,
                             UnitPrice = new decimal(15.00),
                             PercentageDiscount = new decimal(3.00),
-                            InventoryId =  tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            InventoryId =  tranType == "S" ? _invHelper.InventorySaleItemId : _invHelper.InventoryPurchaseItemId,
                             Tags = new List<string> {"item tag 1", "item tag 2"}
                         },
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 2",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 3,
                             UnitPrice = new decimal(25.00),
                             PercentageDiscount = new decimal(0.00),
-                            InventoryId = tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            InventoryId = tranType == "S" ? _invHelper.InventorySaleItemId : _invHelper.InventoryPurchaseItemId,
                             Tags = new List<string> {"item tag 3", "item tag 4"}
                         }
 
@@ -1483,238 +1465,13 @@ namespace Saasu.API.Client.IntegrationTests
             return null;
         }
 
-        private void CreateTestContacts()
-        {
-            //Billing contact.
-            var response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "BillingContact");
 
-            if (response.DataObject.Contacts.Count == 0)
-            {
-                var dto = new Ola.RestClient.Dto.ContactDto
-                {
-                    GivenName = "TestAPIInvoice",
-                    FamilyName = "BillingContact"
-                };
 
-                Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
-                proxy.Insert(dto);
-            }
-            else
-            {
-                _BillingContactId = response.DataObject.Contacts[0].Id.Value;
-            }
 
-            //Shipping contact.
-            response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "ShippingContact");
 
-            if (response.DataObject.Contacts.Count == 0)
-            {
-                var dto = new Ola.RestClient.Dto.ContactDto
-                {
-                    GivenName = "TestAPIInvoice",
-                    FamilyName = "ShippingContact"
-                };
 
-                Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
-                proxy.Insert(dto);
-            }
-            else
-            {
-                _ShippingContactId = response.DataObject.Contacts[0].Id.Value;
-            }
-        }
 
-        private void CreateTestAccounts()
-        {
-            if (_IncomeAccountId == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Income,
-                    Name = "Income Account " + " " + System.Guid.NewGuid()
-                };
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _IncomeAccountId = dto.Uid;
-            }
-
-            if (_IncomeAccountId2 == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Income,
-                    Name = "Income Account " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _IncomeAccountId2 = dto.Uid;
-            }
-
-            if (_ExpenseAccountId == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Expense,
-                    Name = "Expense Account " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _ExpenseAccountId = dto.Uid;
-            }
-
-            if (_ExpenseAccountId2 == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Expense,
-                    Name = "Expense Account2 " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _ExpenseAccountId2 = dto.Uid;
-            }
-
-            if (_AssetAccountId == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Asset,
-                    Name = "Asset Account " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _AssetAccountId = dto.Uid;
-            }
-
-            if (_BankAccountId == 0)
-            {
-                var acctname = "Bank Account " + " " + System.Guid.NewGuid();
-
-                var dto = new BankAccountDto
-                {
-                    BSB = "111111",
-                    AccountNumber = "22222222",
-                    Type = AccountType.Asset,
-                    Name = acctname,
-                    DisplayName = acctname
-                };
-
-                new Ola.RestClient.Proxies.BankAccountProxy().Insert(dto);
-                _BankAccountId = dto.Uid;
-            }
-        }
-
-        private void CreateTestInventoryItems()
-        {
-            var proxy = new InventoryItemProxy();
-
-            //sale items.
-            if (_InventorySaleItemId == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(5.00),
-                    BuyingPrice = new decimal(4.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(6.00),
-                    DefaultReOrderQuantity = 2,
-                    Description = "Test inventory sale item",
-                    IsActive = true,
-                    IsBought = false,
-                    IsBuyingPriceIncTax = false,
-                    IsSold = true,
-                    SaleIncomeAccountUid = _IncomeAccountId
-                };
-
-                proxy.Insert(dto);
-                _InventorySaleItemId = dto.Uid;
-            }
-
-            if (_InventorySaleItemId2 == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(25.00),
-                    BuyingPrice = new decimal(40.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(16.00),
-                    DefaultReOrderQuantity = 20,
-                    Description = "updated Test inventory sale item",
-                    IsActive = true,
-                    IsBought = false,
-                    IsBuyingPriceIncTax = false,
-                    IsSold = true,
-                    SaleIncomeAccountUid = _IncomeAccountId2
-                };
-
-                proxy.Insert(dto);
-                _InventorySaleItemId2 = dto.Uid;
-            }
-
-            //purchase items.
-            if (_InventoryPurchaseItemId == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(5.00),
-                    BuyingPrice = new decimal(4.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(6.00),
-                    DefaultReOrderQuantity = 2,
-                    Description = "Test inventory purchase item",
-                    IsActive = true,
-                    IsBought = true,
-                    IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountUid = _ExpenseAccountId
-                };
-
-                proxy.Insert(dto);
-                _InventoryPurchaseItemId = dto.Uid;
-            }
-
-            if (_InventoryPurchaseItemId2 == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(50.00),
-                    BuyingPrice = new decimal(40.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(60.00),
-                    DefaultReOrderQuantity = 20,
-                    Description = "Updated test inventory purchase item",
-                    IsActive = true,
-                    IsBought = true,
-                    IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountUid = _ExpenseAccountId2
-                };
-
-                proxy.Insert(dto);
-                _InventoryPurchaseItemId2 = dto.Uid;
-            }
-        }
-
-        //For test cases where we need at least a few invoices to exist.
-        private void CreatetestInvoices()
-        {
-            var inv1 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.NotNull(inv1);
-            Assert.True(inv1.TransactionId > 0);
-            _invoice1Id = Convert.ToInt32(inv1.TransactionId);
-
-            var inv2 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.NotNull(inv2);
-            Assert.True(inv2.TransactionId > 0);
-            _invoice2Id = Convert.ToInt32(inv2.TransactionId);
-
-            var inv3 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.NotNull(inv3);
-            Assert.True(inv3.TransactionId > 0);
-            _invoice3Id = Convert.ToInt32(inv3.TransactionId);
-        }
 
         private static int? GetTestInvoiceId()
         {

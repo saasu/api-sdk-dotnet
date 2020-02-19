@@ -1,6 +1,4 @@
 ﻿using Xunit;
-using Ola.RestClient.Dto;
-using Ola.RestClient.Proxies;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Attachments;
 using Saasu.API.Core.Models.Invoices;
@@ -9,6 +7,10 @@ using System.Collections.Generic;
 using System.IO;
 //using System.Security.Cryptography.Pkcs;
 using System.Text;
+
+using Saasu.API.Core.Globals;
+using Saasu.API.Core.Models.Accounts;
+using Saasu.API.Core.Models.Items;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
@@ -119,7 +121,26 @@ namespace Saasu.API.Client.IntegrationTests
         {
             get { return _quote1IdSummary; }
         }
-        
+
+        public int BankAccountId => _BankAccountId;
+
+        public int IncomeAccountId => _IncomeAccountId;
+
+        public int IncomeAccountId2 => _IncomeAccountId2;
+
+        public int AssetAccountId => _AssetAccountId;
+
+        public int InventorySaleItemId => _InventorySaleItemId;
+        public int InventorySaleItemId2 => _InventorySaleItemId2;
+
+        public int InventoryPurchaseItemId => _InventoryPurchaseItemId;
+        public int InventoryPurchaseItemId2 => _InventoryPurchaseItemId2;
+
+        public int BillingContactId => _BillingContactId;
+        public int ShippingContactId => _ShippingContactId;
+        public int ExpenseAccountId => _ExpenseAccountId;
+        public int ExpenseAccountId2 => ExpenseAccountId2;
+
 
         private int _BillingContactId;
         private int _ShippingContactId;
@@ -158,7 +179,7 @@ namespace Saasu.API.Client.IntegrationTests
                         {
                             Description = "line item 1",
                             AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-                            TaxCode = TaxCode.SaleInclGst,
+                            TaxCode = Constants.TaxCode.SaleInclGst,
                             TotalAmount = new decimal(10.00),
                             Tags = new List<string> {"item tag 1", "item tag 2"}
                         },
@@ -166,7 +187,7 @@ namespace Saasu.API.Client.IntegrationTests
                         {
                             Description = "line item 2",
                             AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             TotalAmount = new decimal(20.00),
                             Tags = new List<string> {"item tag 3", "item tag 4"}
                         }
@@ -178,7 +199,7 @@ namespace Saasu.API.Client.IntegrationTests
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 1",
-                            TaxCode = TaxCode.SaleInclGst,
+                            TaxCode = Constants.TaxCode.SaleInclGst,
                             Quantity = 2,
                             UnitPrice = new decimal(15.00),
                             PercentageDiscount = new decimal(3.00),
@@ -188,7 +209,7 @@ namespace Saasu.API.Client.IntegrationTests
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 2",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 3,
                             UnitPrice = new decimal(25.00),
                             PercentageDiscount = new decimal(0.00),
@@ -227,137 +248,99 @@ namespace Saasu.API.Client.IntegrationTests
 
         private void CreateTestContacts()
         {
-            //Billing contact.
-            var response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "BillingContact");
 
-            if (response.DataObject.Contacts.Count == 0)
-            {
-                var dto = new Ola.RestClient.Dto.ContactDto
-                {
-                    GivenName = "TestAPIInvoice",
-                    FamilyName = "BillingContact",
-                    Email = "test@test.com"
-                };
-
-                Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
-                proxy.Insert(dto);
-            }
-            response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "BillingContact");
-
-            _BillingContactId = response.DataObject.Contacts[0].Id.Value;
-
-
-            //Shipping contact.
-            response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "ShippingContact");
-
-            if (response.DataObject.Contacts.Count == 0)
-            {
-                var dto = new Ola.RestClient.Dto.ContactDto
-                {
-                    GivenName = "TestAPIInvoice",
-                    FamilyName = "ShippingContact"
-                };
-
-                Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
-                proxy.Insert(dto);
-            }
-
-            response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "ShippingContact");
-            _ShippingContactId = response.DataObject.Contacts[0].Id.Value;
+            _BillingContactId = ContactHelper.GetOrCreateContact("TestAPIInvoice", "BillingContact", "bill@test.com");
+            _ShippingContactId = ContactHelper.GetOrCreateContact("TestAPIInvoice", "ShippingContact", "ship@test.com");
 
         }
 
         private void CreateTestAccounts()
         {
+            var accountProxy = new AccountProxy();
             if (_IncomeAccountId == 0)
             {
-                var dto = new TransactionCategoryDto
+                var result1 = accountProxy.InsertAccount(new AccountDetail()
                 {
-                    Type = AccountType.Income,
+                    AccountType = Constants.AccountType.Income,
                     Name = "Income Account " + " " + System.Guid.NewGuid()
-                };
+                });
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _IncomeAccountId = dto.Uid;
+                _IncomeAccountId = result1.DataObject.InsertedEntityId;
             }
 
             if (_IncomeAccountId2 == 0)
             {
-                var dto = new TransactionCategoryDto
+                var result2 = accountProxy.InsertAccount(new AccountDetail()
                 {
-                    Type = AccountType.Income,
+                    AccountType = Constants.AccountType.Income,
                     Name = "Income Account " + " " + System.Guid.NewGuid()
-                };
+                });
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _IncomeAccountId2 = dto.Uid;
+                _IncomeAccountId2 = result2.DataObject.InsertedEntityId;
             }
 
             if (_ExpenseAccountId == 0)
             {
-                var dto = new TransactionCategoryDto
+                var result3 = accountProxy.InsertAccount(new AccountDetail()
                 {
-                    Type = AccountType.Expense,
+                    AccountType = Constants.AccountType.Expense,
                     Name = "Expense Account " + " " + System.Guid.NewGuid()
-                };
+                });
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _ExpenseAccountId = dto.Uid;
+                _ExpenseAccountId = result3.DataObject.InsertedEntityId;
             }
 
             if (_ExpenseAccountId2 == 0)
             {
-                var dto = new TransactionCategoryDto
+                var result4 = accountProxy.InsertAccount(new AccountDetail()
                 {
-                    Type = AccountType.Expense,
-                    Name = "Expense Account2 " + " " + System.Guid.NewGuid()
-                };
+                    AccountType = Constants.AccountType.Expense,
+                    Name = "Expense Account " + " " + System.Guid.NewGuid()
+                });
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _ExpenseAccountId2 = dto.Uid;
+                _ExpenseAccountId2 = result4.DataObject.InsertedEntityId;
             }
 
             if (_AssetAccountId == 0)
             {
-                var dto = new TransactionCategoryDto
+                var result5 = accountProxy.InsertAccount(new AccountDetail()
                 {
-                    Type = AccountType.Asset,
+                    AccountType = Constants.AccountType.Asset,
                     Name = "Asset Account " + " " + System.Guid.NewGuid()
-                };
+                });
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _AssetAccountId = dto.Uid;
+                _AssetAccountId = result5.DataObject.InsertedEntityId;
             }
 
             if (_BankAccountId == 0)
             {
                 var acctname = "Bank Account " + " " + System.Guid.NewGuid();
 
-                var dto = new BankAccountDto
+                var result6 = accountProxy.InsertAccount(new AccountDetail()
                 {
+                    AccountType = Constants.AccountType.Asset,
                     BSB = "111111",
-                    AccountNumber = "22222222",
-                    Type = AccountType.Asset,
+                    Number = "22222222",
                     Name = acctname,
-                    DisplayName = acctname
-                };
+                    BankAccountName = acctname,
+                    IsBankAccount = true
 
-                new Ola.RestClient.Proxies.BankAccountProxy().Insert(dto);
-                _BankAccountId = dto.Uid;
+                });
+
+                _BankAccountId = result6.DataObject.InsertedEntityId;
             }
         }
 
         private void CreateTestInventoryItems()
         {
-            var proxy = new InventoryItemProxy();
+            var proxy = new ItemProxy();
 
             //sale items.
             if (_InventorySaleItemId == 0)
             {
-                var dto = new InventoryItemDto
+                var result = proxy.InsertItem(new ItemDetail()
                 {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(5.00),
+                    AssetAccountId = _AssetAccountId,
                     BuyingPrice = new decimal(4.00),
                     Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
                     CurrentValue = new decimal(6.00),
@@ -367,19 +350,17 @@ namespace Saasu.API.Client.IntegrationTests
                     IsBought = false,
                     IsBuyingPriceIncTax = false,
                     IsSold = true,
-                    SaleIncomeAccountUid = _IncomeAccountId
-                };
+                    SaleIncomeAccountId = _IncomeAccountId
+                });
 
-                proxy.Insert(dto);
-                _InventorySaleItemId = dto.Uid;
+                _InventorySaleItemId = result.DataObject.InsertedItemId;
             }
 
             if (_InventorySaleItemId2 == 0)
             {
-                var dto = new InventoryItemDto
+                var result = proxy.InsertItem(new ItemDetail()
                 {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(25.00),
+                    AssetAccountId = _AssetAccountId,
                     BuyingPrice = new decimal(40.00),
                     Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
                     CurrentValue = new decimal(16.00),
@@ -389,20 +370,18 @@ namespace Saasu.API.Client.IntegrationTests
                     IsBought = false,
                     IsBuyingPriceIncTax = false,
                     IsSold = true,
-                    SaleIncomeAccountUid = _IncomeAccountId2
-                };
+                    SaleIncomeAccountId = _IncomeAccountId2
+                });
 
-                proxy.Insert(dto);
-                _InventorySaleItemId2 = dto.Uid;
+                _InventorySaleItemId2 = result.DataObject.InsertedItemId;
             }
 
             //purchase items.
             if (_InventoryPurchaseItemId == 0)
             {
-                var dto = new InventoryItemDto
+                var result = proxy.InsertItem(new ItemDetail()
                 {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(5.00),
+                    AssetAccountId = _AssetAccountId,
                     BuyingPrice = new decimal(4.00),
                     Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
                     CurrentValue = new decimal(6.00),
@@ -411,19 +390,17 @@ namespace Saasu.API.Client.IntegrationTests
                     IsActive = true,
                     IsBought = true,
                     IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountUid = _ExpenseAccountId
-                };
+                    PurchaseExpenseAccountId = _ExpenseAccountId
+                });
 
-                proxy.Insert(dto);
-                _InventoryPurchaseItemId = dto.Uid;
+                _InventoryPurchaseItemId = result.DataObject.InsertedItemId;
             }
 
             if (_InventoryPurchaseItemId2 == 0)
             {
-                var dto = new InventoryItemDto
+                var result = proxy.InsertItem(new ItemDetail()
                 {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(50.00),
+                    AssetAccountId = _AssetAccountId,
                     BuyingPrice = new decimal(40.00),
                     Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
                     CurrentValue = new decimal(60.00),
@@ -432,42 +409,41 @@ namespace Saasu.API.Client.IntegrationTests
                     IsActive = true,
                     IsBought = true,
                     IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountUid = _ExpenseAccountId2
-                };
+                    PurchaseExpenseAccountId = _ExpenseAccountId2
+                });
 
-                proxy.Insert(dto);
-                _InventoryPurchaseItemId2 = dto.Uid;
+                _InventoryPurchaseItemId2 = result.DataObject.InsertedItemId;
             }
         }
 
         //For test cases where we need at least a few invoices to exist.
         public void CreatetestInvoices()
         {
-            var inv1 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
+            var inv1 = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
             Assert.NotNull(inv1);
             Assert.True(inv1.TransactionId > 0);
             _invoice1Id = Convert.ToInt32(inv1.TransactionId);
             _invoice1IdSummary = inv1.Summary;
 
-            var inv2 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
+            var inv2 = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
             Assert.NotNull(inv2);
             Assert.True(inv2.TransactionId > 0);
             _invoice2Id = Convert.ToInt32(inv2.TransactionId);
             _invoice2IdSummary = inv2.Summary;
 
-            var inv3 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
+            var inv3 = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
             Assert.NotNull(inv3);
             Assert.True(inv3.TransactionId > 0);
             _invoice3Id = Convert.ToInt32(inv3.TransactionId);
             _invoice3IdSummary = inv3.Summary;
 
-            var inv4 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, transactionType: "P");
+            var inv4 = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, transactionType: "P");
             Assert.NotNull(inv4);
             Assert.True(inv4.TransactionId > 0);
             _invoice4Id = Convert.ToInt32(inv4.TransactionId);
             _invoice4IdSummary = inv4.Summary;
 
-            var quote1 = GetTestInsertInvoice(InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, invoiceType: "Quote");
+            var quote1 = GetTestInsertInvoice(Constants.InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true, invoiceType: "Quote");
             Assert.NotNull(quote1);
             Assert.True(quote1.TransactionId > 0);
         }
@@ -480,7 +456,7 @@ namespace Saasu.API.Client.IntegrationTests
                 CreateTestData();
             }
 
-            return GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: tranType, actuallyInsertAndVerifyResponse: true);
+            return GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: tranType, actuallyInsertAndVerifyResponse: true);
         }
 
         private static int? GetTestInvoiceId()

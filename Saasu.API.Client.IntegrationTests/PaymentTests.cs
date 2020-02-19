@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Ola.RestClient.Dto;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Globals;
 using Saasu.API.Core.Models.Invoices;
 using Saasu.API.Core.Framework;
-using Ola.RestClient.Proxies;
 using System.Collections.Specialized;
 using System.Configuration;
+using Saasu.API.Core.Models.Accounts;
 using Xunit;
 using Saasu.API.Core.Models.Payments;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
@@ -736,64 +735,74 @@ namespace Saasu.API.Client.IntegrationTests
         }		
 		
 		private static void SetupBankAccounts()
-		{			
-			CrudProxy bankAccount = new BankAccountProxy();
+        {
+            var accountProxy = new AccountProxy();
+            var acctname = "Bank Account " + " " + System.Guid.NewGuid();
 
-			var bankAccountDto = new Ola.RestClient.Dto.BankAccountDto()
-			{
-				Type = AccountType.Asset,
-				Name = "TestBank " + System.Guid.NewGuid().ToString(),
-				DisplayName = "TestBank " + System.Guid.NewGuid().ToString(),
-				BSB = "111-111",
-				AccountNumber = "12345-6789"				
-			};
-			bankAccount.Insert(bankAccountDto);
-		    _bankAccount01Id = bankAccountDto.Uid;
-
-            bankAccountDto = new Ola.RestClient.Dto.BankAccountDto()
+            var result1 = accountProxy.InsertAccount(new AccountDetail()
             {
-                Type = AccountType.Asset,
+                AccountType = Constants.AccountType.Asset,
+                BSB = "111-111",
+                Number = "12345-6789",
                 Name = "TestBank " + System.Guid.NewGuid().ToString(),
-                DisplayName = "TestBank " + System.Guid.NewGuid().ToString(),
+                BankAccountName = "TestBank " + System.Guid.NewGuid().ToString(),
+                IsBankAccount = true
+
+            });
+
+            _bankAccount01Id = result1.DataObject.InsertedEntityId;
+
+
+            var result2 = accountProxy.InsertAccount(new AccountDetail()
+            {
+                AccountType = Constants.AccountType.Asset,
                 BSB = "222-222",
-                AccountNumber = "2345-6789"
-            };
-			bankAccount.Insert(bankAccountDto);
-		    _bankAccount02Id = bankAccountDto.Uid;
+                Number = "2345-6789",
+                Name = "TestBank " + System.Guid.NewGuid().ToString(),
+                BankAccountName = "TestBank " + System.Guid.NewGuid().ToString(),
+                IsBankAccount = true
+
+            });
+
+            _bankAccount02Id = result1.DataObject.InsertedEntityId;
+
 		}
 		
 		private static int CreateTransactionCategory(string accountType, string accountName)
-		{
-		    var dto = new Ola.RestClient.Dto.TransactionCategoryDto()
-		              {
-		                  Type = accountType,
-		                  Name = accountName + " " + System.Guid.NewGuid().ToString()
-		              };
+        {
 
-			new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
+            var accountProxy = new AccountProxy();
+
+            var result = accountProxy.InsertAccount(new AccountDetail()
+            {
+                AccountType = accountType,
+                Name = accountName + " " + System.Guid.NewGuid().ToString(),
+                
+            });
+           
 
 			var combinedName = string.Concat(accountType.Replace(" ", string.Empty), "|", accountName.Replace(" ", string.Empty));
 
 			switch (combinedName)
 			{
 				case "Asset|Inventory":
-					_assetInventory = dto.Uid;
+					_assetInventory = result.DataObject.InsertedEntityId;
 					break;
 				case "Income|HardwareSales":
-					_incomeHardwareSales = dto.Uid;
+					_incomeHardwareSales = result.DataObject.InsertedEntityId;
 					break;
 				case "CostOfSales|Hardware":
-					_coSHardware = dto.Uid;
+					_coSHardware = result.DataObject.InsertedEntityId;
 					break;
 				case "Expense|Misc":
-					_expenseMisc = dto.Uid;
+					_expenseMisc = result.DataObject.InsertedEntityId;
 					break;
 				case "Income|Shipping":
-					_incomeShipping = dto.Uid;
+					_incomeShipping = result.DataObject.InsertedEntityId;
 					break;
 			}
 
-			return dto.Uid;
+            return result.DataObject.InsertedEntityId;
 		}
 
 		#endregion

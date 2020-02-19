@@ -210,12 +210,11 @@ namespace Saasu.API.Client.IntegrationTests
 
         public  CompanyTests()
         {
-            var proxy = new CompaniesProxy();
-            ContactTests.AddBradPartner(proxy.WsAccessKey, proxy.FileId);
-            ContactTests.AddCarlCustomer(proxy.WsAccessKey, proxy.FileId);
-            ContactTests.AddJennySupplier(proxy.WsAccessKey, proxy.FileId);
-            ContactTests.AddKathyContractor(proxy.WsAccessKey, proxy.FileId);
-            ContactTests.AddBradPartner(proxy.WsAccessKey, proxy.FileId);
+            ContactTests.GetOrCreateContactCustomer();
+            ContactTests.GetOrCreateContractorContact();
+            ContactTests.GetOrCreatePartnerContact();
+            ContactTests.GetOrCreateSupplierContact();
+            ContactTests.GetOrCreateContactCustomer("Bob", "Bends", "Bender Inc.", "bob@bender.com");
         }
 
         private CompanyDetail GetTestCompany()

@@ -43,6 +43,7 @@ namespace Saasu.API.Client.IntegrationTests
         public InvoiceTests()
         {
             _invHelper = new InvoiceHelper();
+            _invHelper.CreateTestData();
         }
 
         [Fact]

@@ -262,7 +262,9 @@ namespace Saasu.API.Client.IntegrationTests
                 var result1 = accountProxy.InsertAccount(new AccountDetail()
                 {
                     AccountType = Constants.AccountType.Income,
-                    Name = "Income Account " + " " + System.Guid.NewGuid()
+                    Name = "Income Account " + " " + System.Guid.NewGuid(),
+                    IsBankAccount = false,
+                    Currency = "AUD",
                 });
 
                 _IncomeAccountId = result1.DataObject.InsertedEntityId;
@@ -273,7 +275,9 @@ namespace Saasu.API.Client.IntegrationTests
                 var result2 = accountProxy.InsertAccount(new AccountDetail()
                 {
                     AccountType = Constants.AccountType.Income,
-                    Name = "Income Account " + " " + System.Guid.NewGuid()
+                    Name = "Income Account " + " " + System.Guid.NewGuid(),
+                    IsBankAccount = false,
+                    Currency = "AUD",
                 });
 
                 _IncomeAccountId2 = result2.DataObject.InsertedEntityId;
@@ -284,7 +288,9 @@ namespace Saasu.API.Client.IntegrationTests
                 var result3 = accountProxy.InsertAccount(new AccountDetail()
                 {
                     AccountType = Constants.AccountType.Expense,
-                    Name = "Expense Account " + " " + System.Guid.NewGuid()
+                    Name = "Expense Account " + " " + System.Guid.NewGuid(),
+                    IsBankAccount = false,
+                    Currency = "AUD",
                 });
 
                 _ExpenseAccountId = result3.DataObject.InsertedEntityId;
@@ -295,7 +301,9 @@ namespace Saasu.API.Client.IntegrationTests
                 var result4 = accountProxy.InsertAccount(new AccountDetail()
                 {
                     AccountType = Constants.AccountType.Expense,
-                    Name = "Expense Account " + " " + System.Guid.NewGuid()
+                    Name = "Expense Account " + " " + System.Guid.NewGuid(),
+                    IsBankAccount = false,
+                    Currency = "AUD",
                 });
 
                 _ExpenseAccountId2 = result4.DataObject.InsertedEntityId;
@@ -306,7 +314,9 @@ namespace Saasu.API.Client.IntegrationTests
                 var result5 = accountProxy.InsertAccount(new AccountDetail()
                 {
                     AccountType = Constants.AccountType.Asset,
-                    Name = "Asset Account " + " " + System.Guid.NewGuid()
+                    Name = "Asset Account " + " " + System.Guid.NewGuid(),
+                    IsBankAccount = false,
+                    Currency = "AUD",
                 });
 
                 _AssetAccountId = result5.DataObject.InsertedEntityId;
@@ -323,8 +333,8 @@ namespace Saasu.API.Client.IntegrationTests
                     Number = "22222222",
                     Name = acctname,
                     BankAccountName = acctname,
-                    IsBankAccount = true
-
+                    IsBankAccount = true,
+                    Currency = "AUD",
                 });
 
                 _BankAccountId = result6.DataObject.InsertedEntityId;
@@ -350,7 +360,8 @@ namespace Saasu.API.Client.IntegrationTests
                     IsBought = false,
                     IsBuyingPriceIncTax = false,
                     IsSold = true,
-                    SaleIncomeAccountId = _IncomeAccountId
+                    SaleIncomeAccountId = _IncomeAccountId,
+                    Type = "I",
                 });
 
                 _InventorySaleItemId = result.DataObject.InsertedItemId;
@@ -370,7 +381,8 @@ namespace Saasu.API.Client.IntegrationTests
                     IsBought = false,
                     IsBuyingPriceIncTax = false,
                     IsSold = true,
-                    SaleIncomeAccountId = _IncomeAccountId2
+                    SaleIncomeAccountId = _IncomeAccountId2,
+                    Type = "I",
                 });
 
                 _InventorySaleItemId2 = result.DataObject.InsertedItemId;
@@ -390,7 +402,8 @@ namespace Saasu.API.Client.IntegrationTests
                     IsActive = true,
                     IsBought = true,
                     IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountId = _ExpenseAccountId
+                    PurchaseExpenseAccountId = _ExpenseAccountId,
+                    Type = "I",
                 });
 
                 _InventoryPurchaseItemId = result.DataObject.InsertedItemId;
@@ -409,7 +422,8 @@ namespace Saasu.API.Client.IntegrationTests
                     IsActive = true,
                     IsBought = true,
                     IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountId = _ExpenseAccountId2
+                    PurchaseExpenseAccountId = _ExpenseAccountId2,
+                    Type = "I",
                 });
 
                 _InventoryPurchaseItemId2 = result.DataObject.InsertedItemId;

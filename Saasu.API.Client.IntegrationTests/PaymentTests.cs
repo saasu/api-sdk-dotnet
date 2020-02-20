@@ -737,7 +737,6 @@ namespace Saasu.API.Client.IntegrationTests
 		private static void SetupBankAccounts()
         {
             var accountProxy = new AccountProxy();
-            var acctname = "Bank Account " + " " + System.Guid.NewGuid();
 
             var result1 = accountProxy.InsertAccount(new AccountDetail()
             {
@@ -746,7 +745,8 @@ namespace Saasu.API.Client.IntegrationTests
                 Number = "12345-6789",
                 Name = "TestBank " + System.Guid.NewGuid().ToString(),
                 BankAccountName = "TestBank " + System.Guid.NewGuid().ToString(),
-                IsBankAccount = true
+                IsBankAccount = true,
+                Currency = "AUD",
 
             });
 
@@ -760,7 +760,8 @@ namespace Saasu.API.Client.IntegrationTests
                 Number = "2345-6789",
                 Name = "TestBank " + System.Guid.NewGuid().ToString(),
                 BankAccountName = "TestBank " + System.Guid.NewGuid().ToString(),
-                IsBankAccount = true
+                IsBankAccount = true,
+                Currency = "AUD",
 
             });
 
@@ -777,7 +778,8 @@ namespace Saasu.API.Client.IntegrationTests
             {
                 AccountType = accountType,
                 Name = accountName + " " + System.Guid.NewGuid().ToString(),
-                
+                IsBankAccount = false,
+                Currency = "AUD",
             });
            
 

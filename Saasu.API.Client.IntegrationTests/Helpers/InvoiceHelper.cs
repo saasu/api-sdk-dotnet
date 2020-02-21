@@ -19,10 +19,11 @@ namespace Saasu.API.Client.IntegrationTests
     {
         public InvoiceHelper()
         {
-
+            CreateTestData();
         }
+        
 
-        public void CreateTestData()
+        private void CreateTestData()
         {
             //note - don't change the order of these calls, they are dependent.
             CreateTestContacts();
@@ -48,13 +49,7 @@ namespace Saasu.API.Client.IntegrationTests
             }
         }
 
-        public int? InvoiceId1
-        {
-            get
-            {
-                return _invoice1Id;
-            }
-        }
+        public int? InvoiceId1 => _invoice1Id;
 
         public string InvoiceId1Summary
         {

@@ -14,7 +14,7 @@ using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    public class InvoiceTests
+    public class InvoiceTests : IClassFixture<InvoiceHelper>
     {
         private readonly InvoiceHelper _invHelper;
 
@@ -40,10 +40,9 @@ namespace Saasu.API.Client.IntegrationTests
         private const string ItemLayoutForbiddenMessage = " Check the response returned as this may be because your current subscription does not allow item layouts.";
         private const string MultiCurrencyForbiddenMessage = " Check the response returned as this may be because your current subscription does not allow multi currency or because it is turned off.";
 
-        public InvoiceTests()
+        public InvoiceTests(InvoiceHelper invHelper)
         {
-            _invHelper = new InvoiceHelper();
-            _invHelper.CreateTestData();
+            _invHelper = invHelper;
         }
 
         [Fact]

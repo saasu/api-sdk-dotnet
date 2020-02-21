@@ -205,8 +205,6 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoiceProxy();
             var helper = new InvoiceHelper();
 
-            helper.CreateTestData();
-
             //Create sales.
             _DeletedSaleTranId = (int)helper.CreateASingleInvoice(amount: 20.00M).TransactionId;
             _NotDeletedSaleTranId = (int)helper.CreateASingleInvoice(amount: 20.00M).TransactionId;

@@ -14,13 +14,13 @@ using Saasu.API.Core.Models.Items;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    public class ItemTests
+    public class ItemTests : IClassFixture<ItemHelper>
     {
-        
+        private readonly ItemHelper _itemHelper;
 
-        public ItemTests()
+        public ItemTests(ItemHelper itemHelper)
         {
-            _itemHelper = new ItemHelper();
+            _itemHelper = itemHelper;
         }
 
         [Fact]
@@ -430,6 +430,6 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
 
-        private readonly ItemHelper _itemHelper;
+
     }
 }

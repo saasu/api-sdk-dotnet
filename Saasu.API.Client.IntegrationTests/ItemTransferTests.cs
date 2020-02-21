@@ -13,7 +13,6 @@ namespace Saasu.API.Client.IntegrationTests
     public class ItemTransferTests
     {
         private readonly ItemHelper _itemHelper;
-        private readonly ItemAdjustmentHelper _adjustmentHelper;
         private readonly ItemTransferHelper _transferHelper;
 
         private ItemDetail _item;
@@ -25,7 +24,6 @@ namespace Saasu.API.Client.IntegrationTests
         public ItemTransferTests()
         {
             _itemHelper = new ItemHelper();
-            _adjustmentHelper = new ItemAdjustmentHelper();
             _transferHelper = new ItemTransferHelper();
 
             GetTestAccounts();

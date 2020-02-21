@@ -15,7 +15,6 @@ namespace Saasu.API.Client.IntegrationTests
         public SearchTests()
         {
             _invoiceHelper = new InvoiceHelper();
-            _invoiceHelper.CreateTestData();
             Thread.Sleep(3000); // Need to wait for entities to be indexed
             _itemHelper = new ItemHelper();
         }

@@ -1,17 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461'">
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.VisualStudio.SlowCheetah" Version="3.2.26">
@@ -30,5 +25,10 @@
     <ProjectReference Include="..\Saasu.API.Client\Saasu.API.Client.csproj" />
     <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj" />
   </ItemGroup>
-
+  <Target Condition=" '$(TargetFramework)' == 'netcoreapp2.1'" Name="CopyAppConfig" AfterTargets="Build" DependsOnTargets="Build">
+    <CreateItem Include="$(OutputPath)$(AssemblyName).dll.config">
+      <Output TaskParameter="Include" ItemName="FilesToCopy"/>
+    </CreateItem>
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFiles="$(OutputPath)testhost.dll.config" />
+  </Target>
 </Project>

@@ -301,19 +301,6 @@ namespace Saasu.API.Client.Framework
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
             }
 
-            MediaTypeFormatter mediaFormatter;
-
-            if (ContentType == RequestContentType.ApplicationXml)
-            {
-                mediaFormatter = new System.Net.Http.Formatting.XmlMediaTypeFormatter();
-
-            }
-            else
-            {
-                mediaFormatter = new System.Net.Http.Formatting.JsonMediaTypeFormatter();
-            }
-
-
             HttpResponseMessage responseMsg = null;
             if (OperationMethod == HttpMethod.Get)
             {
@@ -333,11 +320,40 @@ namespace Saasu.API.Client.Framework
                 //Note: Need to explicitly specify the content type here otherwise this call fails.
                 if (OperationMethod == HttpMethod.Put)
                 {
-                    responseMsg = client.PutAsync<T>(requestUri, postData, mediaFormatter).Result;
+                    if (ContentType == RequestContentType.ApplicationXml)
+                    {
+                        responseMsg = client.PutAsXmlAsync(requestUri, postData).Result;
+                    }
+                    else
+                    {
+#if NETSTANDARD2_0
+                        StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json");
+                        responseMsg = client.PutAsync(requestUri, content).Result;
+#else
+                        responseMsg = client.PutAsJsonAsync(requestUri, postData).Result;
+#endif
+                    }
                 }
                 else
                 {
-                    responseMsg = client.PostAsync<T>(requestUri, postData, mediaFormatter).Result;
+                    if (ContentType == RequestContentType.ApplicationXml)
+                    {
+                        responseMsg = client.PostAsXmlAsync(requestUri, postData).Result;
+                    }
+                    else
+                    {
+#if NETSTANDARD2_0
+                        StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json");
+                        responseMsg = client.PostAsync(requestUri, content).Result;
+#else
+                        responseMsg = client.PostAsJsonAsync(requestUri, postData).Result;
+#endif
+                    }
+                    
+                    
+
+                    
+
                 }
             }
 

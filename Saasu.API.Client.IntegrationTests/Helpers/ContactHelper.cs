@@ -6,11 +6,38 @@ using System.Threading.Tasks;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models;
 using Saasu.API.Core.Models.Contacts;
+using Xunit;
 
 namespace Saasu.API.Client.IntegrationTests
 {
     public class ContactHelper
     {
+
+        public static int GetOrCreateContact(string firstName, string lastName, string email)
+        {
+            var proxy = new ContactProxy();
+            var searchProxy = new ContactsProxy();
+            var companyProxy = new CompanyProxy();
+
+            var response = searchProxy.GetContacts(givenName: firstName, familyName: lastName);
+            if (response.IsSuccessfull && response.DataObject.Contacts.Any())
+            {
+                return response.DataObject.Contacts[0].Id.GetValueOrDefault();
+            }
+
+
+            var contact = new Contact()
+            {
+                GivenName = firstName,
+                FamilyName = lastName,
+                EmailAddress = email,
+            };
+
+            var result = proxy.InsertContact(contact);
+            Assert.True(result.IsSuccessfull, "Failed to add customer contact test data.");
+            return result.DataObject.InsertedContactId;
+
+        }
 
         public InsertContactResult AddContact()
         {

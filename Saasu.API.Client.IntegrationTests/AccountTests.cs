@@ -1,322 +1,321 @@
-﻿using System;
+using System;
 using System.Linq;
-using NUnit.Framework;
+using Saasu.API.Client.IntegrationTests.Helpers;
+using Xunit;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Accounts;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-	[TestFixture]
-	public class AccountTests
+	public class AccountTests : IClassFixture<AccountHelper>
 	{
-		private int _nonBankAcctId;
-		private int _bankAcctId;
-		private int _accountToBeUpdated;
-		private int _bankAccountToBeUpdated;
-		private int _inactiveAccountId;
-        private int _headerAccountId;
-        private int _accountToAssignToHeaderAccount;
 
+		private readonly AccountHelper _accountHelper;
 
-		public AccountTests()
+		public AccountTests(AccountHelper accountHelper)
 		{
-			CreateTestData();
+			_accountHelper = accountHelper;
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsNoFilter()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts();
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 		}
 
-		[Test]
+		[Fact]
 		public void GetNonBankAccount()
 		{
 			var accountsProxy = new AccountProxy();
-			var response = accountsProxy.GetAccount(_nonBankAcctId);
+			var response = accountsProxy.GetAccount(_accountHelper.NonBankAcctId);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.IsFalse(Convert.ToBoolean(response.DataObject.IsBankAccount), "Account returned is a bank account");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.False(Convert.ToBoolean(response.DataObject.IsBankAccount), "Account returned is a bank account");
 		}
 
-		[Test]
+		[Fact]
 		public void GetBankAccount()
 		{
 			var accountsProxy = new AccountProxy();
-			var response = accountsProxy.GetAccount(_bankAcctId);
+			var response = accountsProxy.GetAccount(_accountHelper.BankAcctId);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.IsTrue(Convert.ToBoolean(response.DataObject.IsBankAccount), "Account returned is not a bank account");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(Convert.ToBoolean(response.DataObject.IsBankAccount), "Account returned is not a bank account");
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnIsBankAccount()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(isBankAccount: true);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
-			response.DataObject.Accounts.ForEach(a => Assert.IsTrue(Convert.ToBoolean(a.IsBankAccount), "Non bank accounts have been returned"));
+			response.DataObject.Accounts.ForEach(a =>
+				Assert.True(Convert.ToBoolean(a.IsBankAccount), "Non bank accounts have been returned"));
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnIsNotBankAccount()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(isBankAccount: false);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
-			response.DataObject.Accounts.ForEach(a => Assert.IsFalse(Convert.ToBoolean(a.IsBankAccount), "Bank accounts have been returned"));
+			response.DataObject.Accounts.ForEach(a =>
+				Assert.False(Convert.ToBoolean(a.IsBankAccount), "Bank accounts have been returned"));
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnActive()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(isActive: true);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
-			response.DataObject.Accounts.ForEach(a => Assert.IsTrue(Convert.ToBoolean(a.IsActive), "inactive accounts have been returned"));
+			response.DataObject.Accounts.ForEach(a =>
+				Assert.True(Convert.ToBoolean(a.IsActive), "inactive accounts have been returned"));
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnInactive()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(isActive: false);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
-			response.DataObject.Accounts.ForEach(a => Assert.IsFalse(Convert.ToBoolean(a.IsActive)));
+			response.DataObject.Accounts.ForEach(a => Assert.False(Convert.ToBoolean(a.IsActive)));
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnIncludeBuiltIn()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(includeBuiltIn: true);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
 			var builtInAccounts = response.DataObject.Accounts.Where(a => Convert.ToBoolean(a.IsBuiltIn));
-			Assert.Greater(builtInAccounts.Count(), 0);
+			Assert.True(builtInAccounts.Any());
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnNotIncludeBuiltIn()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(includeBuiltIn: false);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
 			var builtInAccounts = response.DataObject.Accounts.Where(a => Convert.ToBoolean(a.IsBuiltIn));
-			Assert.AreEqual(builtInAccounts.Count(), 0);
+			Assert.Empty(builtInAccounts);
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsFilterOnAccountType()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(accountType: "Income");
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
-			response.DataObject.Accounts.ForEach(a => Assert.AreEqual(a.AccountType, "Income"));
+			response.DataObject.Accounts.ForEach(a => Assert.Equal("Income", a.AccountType));
 		}
 
-        [Test]
-        public void GetAccountsFilterOnHeaderAccountId()
-        {
-            var accountsProxy = new AccountsProxy();
-            var response = accountsProxy.GetAccounts(headerAccountId: _headerAccountId);
+		[Fact]
+		public void GetAccountsFilterOnHeaderAccountId()
+		{
+			var accountsProxy = new AccountsProxy();
+			var response = accountsProxy.GetAccounts(headerAccountId: _accountHelper.HeaderAccountId);
 
-            Assert.IsNotNull(response, "Reponse is null");
-            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-            Assert.AreEqual(response.DataObject.Accounts.Count, 1, "Incorrect number of accounts returned");
-            Assert.AreEqual(response.DataObject.Accounts[0].Id, _accountToAssignToHeaderAccount, "Incorrect account assigned to header account.");
-        }
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.Equal(1, response.DataObject.Accounts.Count);
+			Assert.Equal(_accountHelper.AccountToAssignToHeaderAccount, response.DataObject.Accounts[0].Id);
+		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsPageSize()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(pageSize: 10);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.AreEqual(response.DataObject.Accounts.Count, 10, "10 records should have been returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.Equal(10, response.DataObject.Accounts.Count);
 		}
 
-		[Test]
+		[Fact]
 		public void GetAccountsSecondPage()
 		{
 			var accountsProxy = new AccountsProxy();
 			var response = accountsProxy.GetAccounts(pageNumber: 1, pageSize: 10);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.AreEqual(response.DataObject.Accounts.Count, 10, "10 records should have been returned");
+			Assert.NotNull(response);
+			Assert.Equal(10, response.DataObject.Accounts.Count);
 
 			var acctIdsFirstPage = response.DataObject.Accounts.Select(a => a.Id).ToList();
 
 			response = accountsProxy.GetAccounts(pageNumber: 2, pageSize: 10);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.Greater(response.DataObject.Accounts.Count, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.DataObject.Accounts.Count > 0, "Zero accounts returned");
 
-			response.DataObject.Accounts.ForEach(a => Assert.IsFalse(acctIdsFirstPage.Contains(a.Id), "Record from page 1 returned"));
+			response.DataObject.Accounts.ForEach(a =>
+				Assert.False(acctIdsFirstPage.Contains(a.Id), "Record from page 1 returned"));
 		}
 
-		[Test]
+		[Fact]
 		public void InsertNonBankAccount()
 		{
 			//Create and Insert
-			var account = GetTestAccount();
+			var account = _accountHelper.GetTestAccount();
 
 			var accountProxy = new AccountProxy();
 			var response = accountProxy.InsertAccount(account);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.InsertedEntityId > 0, "Zero accounts returned");
 
 			//Get account again and verify inserted fields.
 			var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
 
-			Assert.AreEqual(acct.DataObject.Name, account.Name, "Names not equal");
-			Assert.AreEqual(acct.DataObject.AccountType, account.AccountType, "Account types not equal");
-			Assert.AreEqual(acct.DataObject.DefaultTaxCode, account.DefaultTaxCode, "Tax codes not equal");
-			Assert.AreEqual(acct.DataObject.LedgerCode, account.LedgerCode, "Leadge codes not equal");
-			Assert.AreEqual(acct.DataObject.Currency, account.Currency, "Currencies not equal");
-			Assert.AreEqual(acct.DataObject.IsBankAccount, account.IsBankAccount, "IsBankAccount not equal");
-			Assert.AreEqual(acct.DataObject.IncludeInForecaster, false, "IncludeInForecaster should be false for non bank accounts");
-            Assert.Null(acct.DataObject.HeaderAccountId, "Account should not have a header account");
+			Assert.Equal(account.Name, acct.DataObject.Name);
+			Assert.Equal(account.AccountType, acct.DataObject.AccountType);
+			Assert.Equal(account.DefaultTaxCode, acct.DataObject.DefaultTaxCode);
+			Assert.Equal(account.LedgerCode, acct.DataObject.LedgerCode);
+			Assert.Equal(account.Currency, acct.DataObject.Currency);
+			Assert.Equal(account.IsBankAccount, acct.DataObject.IsBankAccount);
+			Assert.Equal(false, acct.DataObject.IncludeInForecaster);
+			Assert.Null(acct.DataObject.HeaderAccountId);
 		}
 
-		[Test]
+		[Fact]
 		public void InsertBankAccount()
 		{
 			//Create and Insert
-			var account = GetTestBankAccount();
+			var account = _accountHelper.GetTestBankAccount();
 
 			var accountProxy = new AccountProxy();
 			var response = accountProxy.InsertAccount(account);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-			Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.InsertedEntityId > 0, "Zero accounts returned");
 
 			//Get account again and verify inserted fields.
 			var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
 
-			Assert.AreEqual(acct.DataObject.Name, account.Name, "Names not equal");
-			Assert.AreEqual(acct.DataObject.AccountType, account.AccountType, "Account types not equal");
-			Assert.AreEqual(acct.DataObject.DefaultTaxCode, account.DefaultTaxCode, "Tax codes not equal");
-			Assert.AreEqual(acct.DataObject.LedgerCode, account.LedgerCode, "Ledger codes not equal");
-			Assert.AreEqual(acct.DataObject.Currency, account.Currency, "Currencis not equal");
-			Assert.AreEqual(acct.DataObject.IsBankAccount, account.IsBankAccount, "IsBankAccount not equal");
-			Assert.AreEqual(acct.DataObject.IncludeInForecaster, account.IncludeInForecaster, "Include in Forecaster not equal");
-			Assert.AreEqual(acct.DataObject.BSB, account.BSB, "BSBs not equal");
-			Assert.AreEqual(acct.DataObject.Number, account.Number, "Account numbers not equal");
-			Assert.AreEqual(acct.DataObject.BankAccountName, account.BankAccountName, "Bank account names not equal");
-			Assert.AreEqual(acct.DataObject.BankFileCreationEnabled, account.BankFileCreationEnabled, "BankFileCreationEnabled not equal");
-			Assert.AreEqual(acct.DataObject.BankCode, account.BankCode, "Bank codes not equal");
-			Assert.AreEqual(acct.DataObject.UserNumber, account.UserNumber, "User numbers not equal");
-			Assert.AreEqual(acct.DataObject.MerchantFeeAccountId, account.MerchantFeeAccountId, "Merchant accounts not equal");
-			Assert.AreEqual(acct.DataObject.IncludePendingTransactions, account.IncludePendingTransactions, "IncludePendingTransactions not equal");
+			Assert.Equal(account.Name, acct.DataObject.Name);
+			Assert.Equal(account.AccountType, acct.DataObject.AccountType);
+			Assert.Equal(account.DefaultTaxCode, acct.DataObject.DefaultTaxCode);
+			Assert.Equal(account.LedgerCode, acct.DataObject.LedgerCode);
+			Assert.Equal(account.Currency, acct.DataObject.Currency);
+			Assert.Equal(account.IsBankAccount, acct.DataObject.IsBankAccount);
+			Assert.Equal(account.IncludeInForecaster, acct.DataObject.IncludeInForecaster);
+			Assert.Equal(account.BSB, acct.DataObject.BSB);
+			Assert.Equal(account.Number, acct.DataObject.Number);
+			Assert.Equal(account.BankAccountName, acct.DataObject.BankAccountName);
+			Assert.Equal(account.BankFileCreationEnabled, acct.DataObject.BankFileCreationEnabled);
+			Assert.Equal(account.BankCode, acct.DataObject.BankCode);
+			Assert.Equal(account.UserNumber, acct.DataObject.UserNumber);
+			Assert.Equal(account.MerchantFeeAccountId, acct.DataObject.MerchantFeeAccountId);
+			Assert.Equal(account.IncludePendingTransactions, acct.DataObject.IncludePendingTransactions);
 		}
 
-        [Test]
-        public void InsertAccountWithHeader()
-        {
-            //Create and Insert
-            var headerAccount = GetTestHeaderAccount();
-            var accountProxy = new AccountProxy();
-            var headerInsertResponse = accountProxy.InsertAccount(headerAccount);
-            Assert.IsNotNull(headerInsertResponse, "Reponse is null");
-            Assert.IsTrue(headerInsertResponse.IsSuccessfull, "Reponse has not been successful");
-            Assert.Greater(headerInsertResponse.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+		[Fact]
+		public void InsertAccountWithHeader()
+		{
+			//Create and Insert
+			var headerAccount = _accountHelper.GetTestHeaderAccount();
+			var accountProxy = new AccountProxy();
+			var headerInsertResponse = accountProxy.InsertAccount(headerAccount);
+			Assert.NotNull(headerInsertResponse);
+			Assert.True(headerInsertResponse.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(headerInsertResponse.DataObject.InsertedEntityId > 0, "Zero accounts returned");
 
-            var headerAccountId = headerInsertResponse.DataObject.InsertedEntityId;
+			var headerAccountId = headerInsertResponse.DataObject.InsertedEntityId;
 
-            var account = GetTestAccount();
-            account.HeaderAccountId = headerAccountId;
+			var account = _accountHelper.GetTestAccount();
+			account.HeaderAccountId = headerAccountId;
 
-            var response = accountProxy.InsertAccount(account);
+			var response = accountProxy.InsertAccount(account);
 
-            Assert.IsNotNull(response, "Reponse is null");
-            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.InsertedEntityId > 0, "Zero accounts returned");
 
-            //Get account again and verify inserted fields.
-            var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
+			//Get account again and verify inserted fields.
+			var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
 
-            Assert.AreEqual(acct.DataObject.Name, account.Name, "Names not equal");
-            Assert.AreEqual(acct.DataObject.AccountType, account.AccountType, "Account types not equal");
-            Assert.AreEqual(acct.DataObject.DefaultTaxCode, account.DefaultTaxCode, "Tax codes not equal");
-            Assert.AreEqual(acct.DataObject.LedgerCode, account.LedgerCode, "Leadge codes not equal");
-            Assert.AreEqual(acct.DataObject.Currency, account.Currency, "Currencies not equal");
-            Assert.AreEqual(acct.DataObject.IsBankAccount, account.IsBankAccount, "IsBankAccount not equal");
-            Assert.AreEqual(acct.DataObject.IncludeInForecaster, false, "IncludeInForecaster should be false for non bank accounts");
-            Assert.AreEqual(acct.DataObject.HeaderAccountId, headerAccountId);
-        }
+			Assert.Equal(account.Name, acct.DataObject.Name);
+			Assert.Equal(account.AccountType, acct.DataObject.AccountType);
+			Assert.Equal(account.DefaultTaxCode, acct.DataObject.DefaultTaxCode);
+			Assert.Equal(account.LedgerCode, acct.DataObject.LedgerCode);
+			Assert.Equal(account.Currency, acct.DataObject.Currency);
+			Assert.Equal(account.IsBankAccount, acct.DataObject.IsBankAccount);
+			Assert.Equal(false, acct.DataObject.IncludeInForecaster);
+			Assert.Equal(headerAccountId, acct.DataObject.HeaderAccountId);
+		}
 
-        [Test]
-        public void InsertHeaderAccount()
-        {
-            //Create and Insert
-            var account = GetTestHeaderAccount();
+		[Fact]
+		public void InsertHeaderAccount()
+		{
+			//Create and Insert
+			var account = _accountHelper.GetTestHeaderAccount();
 
-            var accountProxy = new AccountProxy();
-            var response = accountProxy.InsertAccount(account);
+			var accountProxy = new AccountProxy();
+			var response = accountProxy.InsertAccount(account);
 
-            Assert.IsNotNull(response, "Reponse is null");
-            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.InsertedEntityId > 0, "Zero accounts returned");
 
-            //Get account again and verify inserted fields.
-            var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
+			//Get account again and verify inserted fields.
+			var acct = accountProxy.GetAccount(response.DataObject.InsertedEntityId);
 
-            Assert.AreEqual(acct.DataObject.Name, account.Name, "Names not equal");
-            Assert.AreEqual(acct.DataObject.AccountLevel.ToLower(), "header");
-            Assert.AreEqual(acct.DataObject.AccountType, account.AccountType, "Account types not equal");
-            Assert.IsNull(acct.DataObject.DefaultTaxCode, "Tax code should be null");
-            Assert.AreEqual(acct.DataObject.LedgerCode, account.LedgerCode, "Ledger codes not equal");
-            Assert.IsFalse(Convert.ToBoolean(acct.DataObject.IsBankAccount), "Header accounts cannot be bank accounts");
-            Assert.IsFalse(Convert.ToBoolean(acct.DataObject.IncludeInForecaster), "Header accounts cannot be included in forecaster");
-        }
+			Assert.Equal(account.Name, acct.DataObject.Name);
+			Assert.Equal("header", acct.DataObject.AccountLevel.ToLower());
+			Assert.Equal(account.AccountType, acct.DataObject.AccountType);
+			Assert.Null(acct.DataObject.DefaultTaxCode);
+			Assert.Equal(account.LedgerCode, acct.DataObject.LedgerCode);
+			Assert.False(Convert.ToBoolean(acct.DataObject.IsBankAccount), "Header accounts cannot be bank accounts");
+			Assert.False(Convert.ToBoolean(acct.DataObject.IncludeInForecaster),
+				"Header accounts cannot be included in forecaster");
+		}
 
-		[Test]
+		[Fact]
 		public void UpdateAccount()
 		{
 			var accountProxy = new AccountProxy();
 
 			//Get account, change name then update.
-			var acct = accountProxy.GetAccount(_accountToBeUpdated);
+			var acct = accountProxy.GetAccount(_accountHelper.AccountToBeUpdated);
 
 			var newName = string.Format("UpdatedAccount_{0}", Guid.NewGuid());
 
@@ -334,29 +333,29 @@ namespace Saasu.API.Client.IntegrationTests
 
 			var response = accountProxy.UpdateAccount(Convert.ToInt32(acct.DataObject.Id), updatedAccount);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
 
 			//Get account again and verify change.
-			acct = accountProxy.GetAccount(_accountToBeUpdated);
+			acct = accountProxy.GetAccount(_accountHelper.AccountToBeUpdated);
 
-			Assert.IsNotNull(acct, "Account is null");
-			Assert.AreEqual(acct.DataObject.Name, newName, "Names not equal");
-			Assert.AreEqual(acct.DataObject.AccountType, "Equity", "Account types not equal");
-			Assert.AreEqual(acct.DataObject.IsActive, false, "IsActive not equal");
-			Assert.AreEqual(acct.DataObject.DefaultTaxCode, "G1,G4", "Default tax codes not equal");
-			Assert.AreEqual(acct.DataObject.Currency, "AUD", "Currencies not equal");
-			Assert.AreEqual(acct.DataObject.LedgerCode, "BB", "Ledger codes not equal");
-			Assert.AreEqual(acct.DataObject.IncludeInForecaster, false, "Include in Forecaster should be false for non bank accounts");
+			Assert.NotNull(acct);
+			Assert.Equal(newName, acct.DataObject.Name);
+			Assert.Equal("Equity", acct.DataObject.AccountType);
+			Assert.Equal(false, acct.DataObject.IsActive);
+			Assert.Equal("G1,G4", acct.DataObject.DefaultTaxCode);
+			Assert.Equal("AUD", acct.DataObject.Currency);
+			Assert.Equal("BB", acct.DataObject.LedgerCode);
+			Assert.Equal(false, acct.DataObject.IncludeInForecaster);
 		}
 
-		[Test]
+		[Fact]
 		public void UpdateBankAccount()
 		{
 			var accountProxy = new AccountProxy();
 
 			//Get account, change name then update.
-			var acct = accountProxy.GetAccount(_bankAccountToBeUpdated);
+			var acct = accountProxy.GetAccount(_accountHelper.BankAccountToBeUpdated);
 
 			var newName = string.Format("UpdatedAccount_{0}", Guid.NewGuid());
 			var newBankAccountName = string.Format("Update Bank Account_{0}", Guid.NewGuid());
@@ -378,43 +377,43 @@ namespace Saasu.API.Client.IntegrationTests
 				BankFileCreationEnabled = true,
 				BankCode = "B",
 				UserNumber = "333",
-				MerchantFeeAccountId = _bankAcctId,
+				MerchantFeeAccountId = _accountHelper.BankAcctId,
 				IncludePendingTransactions = false
 			};
 
 			var response = accountProxy.UpdateAccount(Convert.ToInt32(acct.DataObject.Id), updatedAccount);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
 
 			//Get account again and verify change.
-			acct = accountProxy.GetAccount(_bankAccountToBeUpdated);
+			acct = accountProxy.GetAccount(_accountHelper.BankAccountToBeUpdated);
 
-			Assert.IsNotNull(acct, "Account in null");
-			Assert.AreEqual(acct.DataObject.Name, newName, "Names not equal");
-			Assert.AreEqual(acct.DataObject.AccountType, "Equity", "Account types not equal");
-			Assert.AreEqual(acct.DataObject.IsActive, false, "IsAcive not equal");
-			Assert.IsNull(acct.DataObject.DefaultTaxCode, "Default should be null");
-			Assert.AreEqual(acct.DataObject.Currency, "AUD", "Currencies not equal");
-			Assert.AreEqual(acct.DataObject.LedgerCode, "BB", "Ledger codes not equal");
-			Assert.AreEqual(acct.DataObject.IncludeInForecaster, false, "Include in Forecaster not equal");
-			Assert.AreEqual(acct.DataObject.BSB, "020202", "BSBs not equal");
-			Assert.AreEqual(acct.DataObject.Number, "22222222", "Account Numbers not equal");
-			Assert.AreEqual(acct.DataObject.BankAccountName, newBankAccountName, "Bank account names not equal");
-			Assert.AreEqual(acct.DataObject.BankFileCreationEnabled, true, "BankFileCreationEnabled not equal");
-			Assert.AreEqual(acct.DataObject.BankCode, "B", "Bank codes not equal");
-			Assert.AreEqual(acct.DataObject.UserNumber, "333", "User numbers not equal");
-			Assert.AreEqual(acct.DataObject.MerchantFeeAccountId, _bankAcctId, "Merchant accounts not equal");
-			Assert.AreEqual(acct.DataObject.IncludePendingTransactions, false, "IncludePendingTransactions not equal");
+			Assert.NotNull(acct);
+			Assert.Equal(newName, acct.DataObject.Name);
+			Assert.Equal("Equity", acct.DataObject.AccountType);
+			Assert.Equal(false, acct.DataObject.IsActive);
+			Assert.Null(acct.DataObject.DefaultTaxCode);
+			Assert.Equal("AUD", acct.DataObject.Currency);
+			Assert.Equal("BB", acct.DataObject.LedgerCode);
+			Assert.Equal(false, acct.DataObject.IncludeInForecaster);
+			Assert.Equal("020202", acct.DataObject.BSB);
+			Assert.Equal("22222222", acct.DataObject.Number);
+			Assert.Equal(newBankAccountName, acct.DataObject.BankAccountName);
+			Assert.Equal(true, acct.DataObject.BankFileCreationEnabled);
+			Assert.Equal("B", acct.DataObject.BankCode);
+			Assert.Equal("333", acct.DataObject.UserNumber);
+			Assert.Equal(_accountHelper.BankAcctId, acct.DataObject.MerchantFeeAccountId);
+			Assert.Equal(false, acct.DataObject.IncludePendingTransactions);
 		}
 
-		[Test]
+		[Fact]
 		public void UpdateBankAccountBankFileCreationEnabled()
 		{
 			var accountProxy = new AccountProxy();
 
 			//Get account, change name then update.
-			var acct = accountProxy.GetAccount(_bankAcctId);
+			var acct = accountProxy.GetAccount(_accountHelper.BankAcctId);
 
 			var newBankName = string.Format("UpdatedBankName_{0}", Guid.NewGuid());
 
@@ -425,17 +424,17 @@ namespace Saasu.API.Client.IntegrationTests
 
 			var response = accountProxy.UpdateAccount(Convert.ToInt32(acct.DataObject.Id), acct.DataObject);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
 
 			//Get account again and verify change.
-			acct = accountProxy.GetAccount(_bankAcctId);
+			acct = accountProxy.GetAccount(_accountHelper.BankAcctId);
 
-			Assert.IsNotNull(acct, "Account in null");
-			Assert.AreEqual(acct.DataObject.BankAccountName, newBankName, "Bank account names not equal");
-			Assert.AreEqual(acct.DataObject.BankFileCreationEnabled, true, "BankFileCreationEnabled not equal");
-			Assert.AreEqual(acct.DataObject.BankCode, "AAA", "Bank codes not equal");
-			Assert.AreEqual(acct.DataObject.UserNumber, "222", "User numbers not equal");
+			Assert.NotNull(acct);
+			Assert.Equal(newBankName, acct.DataObject.BankAccountName);
+			Assert.Equal(true, acct.DataObject.BankFileCreationEnabled);
+			Assert.Equal("AAA", acct.DataObject.BankCode);
+			Assert.Equal("222", acct.DataObject.UserNumber);
 
 			//Reset Bank Code and Customer Number for other tests.
 			acct.DataObject.BankFileCreationEnabled = true;
@@ -445,13 +444,13 @@ namespace Saasu.API.Client.IntegrationTests
 			accountProxy.UpdateAccount(Convert.ToInt32(acct.DataObject.Id), acct.DataObject);
 		}
 
-		[Test]
+		[Fact]
 		public void UpdateBankAccountBankFileCreationNotEnabled()
 		{
 			var accountProxy = new AccountProxy();
 
 			//Get account, change fields then update.
-			var acct = accountProxy.GetAccount(_bankAcctId);
+			var acct = accountProxy.GetAccount(_accountHelper.BankAcctId);
 
 			var newBankName = string.Format("UpdatedBankName_{0}", Guid.NewGuid());
 
@@ -462,168 +461,55 @@ namespace Saasu.API.Client.IntegrationTests
 
 			var response = accountProxy.UpdateAccount(Convert.ToInt32(acct.DataObject.Id), acct.DataObject);
 
-			Assert.IsNotNull(response, "Reponse is null");
-			Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
 
 			//Get account again and verify change.
-			acct = accountProxy.GetAccount(_bankAcctId);
+			acct = accountProxy.GetAccount(_accountHelper.BankAcctId);
 
-			Assert.IsNotNull(acct, "Account in null");
-			Assert.AreEqual(acct.DataObject.BankAccountName, newBankName, "Bank account names not equal");
-			Assert.AreEqual(acct.DataObject.BankFileCreationEnabled, false, "BankFileCreationEnabled not equal");
+			Assert.NotNull(acct);
+			Assert.Equal(newBankName, acct.DataObject.BankAccountName);
+			Assert.Equal(false, acct.DataObject.BankFileCreationEnabled);
 
 			//Bank code and user number should not have changed because BankFileCreationEnabled was false.
-			Assert.IsNull(acct.DataObject.BankCode, "Bank code not null");
-			Assert.IsNull(acct.DataObject.UserNumber, "User number not null");
+			Assert.Null(acct.DataObject.BankCode);
+			Assert.Null(acct.DataObject.UserNumber);
 		}
 
-        [Test]
-        public void UpdateHeaderAccount()
-        {
-            //Create and Insert
-            var account = GetTestHeaderAccount();
-
-            var accountProxy = new AccountProxy();
-            var response = accountProxy.InsertAccount(account);
-
-            Assert.IsNotNull(response, "Reponse is null");
-            Assert.IsTrue(response.IsSuccessfull, "Reponse has not been successful");
-            Assert.Greater(response.DataObject.InsertedEntityId, 0, "Zero accounts returned");
-
-            var accountId = response.DataObject.InsertedEntityId;
-
-            //Get account again and verify inserted fields.
-            var insertedAcctFromDb = accountProxy.GetAccount(accountId);
-
-            var newName = string.Format("TestAccount_{0}", Guid.NewGuid());
-            account.Name = newName;
-            account.LastUpdatedId = insertedAcctFromDb.DataObject.LastUpdatedId;
-
-            var updateResponse = accountProxy.UpdateAccount(response.DataObject.InsertedEntityId, account);
-            Assert.IsNotNull(updateResponse, "Reponse is null");
-            Assert.IsTrue(updateResponse.IsSuccessfull, "Reponse has not been successful");
-
-            //Get account again and verify inserted fields.
-            var updatedAcctFromDb = accountProxy.GetAccount(accountId);
-            Assert.IsNotNull(updatedAcctFromDb, "Reponse is null");
-            Assert.IsTrue(updatedAcctFromDb.IsSuccessfull, "Reponse has not been successful");
-
-            Assert.AreEqual(updatedAcctFromDb.DataObject.Name, newName);
-        }
-
-		#region Test Data
-		private void CreateTestData()
+		[Fact]
+		public void UpdateHeaderAccount()
 		{
+			//Create and Insert
+			var account = _accountHelper.GetTestHeaderAccount();
+
 			var accountProxy = new AccountProxy();
+			var response = accountProxy.InsertAccount(account);
 
-			if (_nonBankAcctId == 0)
-			{
-				var account = GetTestAccount();
-				var insertResult = accountProxy.InsertAccount(account);
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull, "Reponse has not been successful");
+			Assert.True(response.DataObject.InsertedEntityId > 0, "Zero accounts returned");
 
-				_nonBankAcctId = insertResult.DataObject.InsertedEntityId;
-			}
+			var accountId = response.DataObject.InsertedEntityId;
 
-			if (_bankAcctId == 0)
-			{
-				var account = GetTestBankAccount();
-				var insertResult = accountProxy.InsertAccount(account);
+			//Get account again and verify inserted fields.
+			var insertedAcctFromDb = accountProxy.GetAccount(accountId);
 
-				_bankAcctId = insertResult.DataObject.InsertedEntityId;
-			}
+			var newName = string.Format("TestAccount_{0}", Guid.NewGuid());
+			account.Name = newName;
+			account.LastUpdatedId = insertedAcctFromDb.DataObject.LastUpdatedId;
 
-			if (_inactiveAccountId == 0)
-			{
-				var account = GetTestAccount();
-				account.IsActive = false;
-				var insertResult = accountProxy.InsertAccount(account);
+			var updateResponse = accountProxy.UpdateAccount(response.DataObject.InsertedEntityId, account);
+			Assert.NotNull(updateResponse);
+			Assert.True(updateResponse.IsSuccessfull, "Reponse has not been successful");
 
-				_inactiveAccountId = insertResult.DataObject.InsertedEntityId;
-			}
+			//Get account again and verify inserted fields.
+			var updatedAcctFromDb = accountProxy.GetAccount(accountId);
+			Assert.NotNull(updatedAcctFromDb);
+			Assert.True(updatedAcctFromDb.IsSuccessfull, "Reponse has not been successful");
 
-			if (_accountToBeUpdated == 0)
-			{
-				var account = GetTestAccount();
-				var insertResult = accountProxy.InsertAccount(account);
-
-				_accountToBeUpdated = insertResult.DataObject.InsertedEntityId;
-			}
-
-			if (_bankAccountToBeUpdated == 0)
-			{
-				var account = GetTestBankAccount();
-				var insertResult = accountProxy.InsertAccount(account);
-
-				_bankAccountToBeUpdated = insertResult.DataObject.InsertedEntityId;
-			}
-
-            if (_headerAccountId == 0)
-            {
-                var account = GetTestHeaderAccount();
-                
-                var insertResult = accountProxy.InsertAccount(account);
-
-                _headerAccountId = insertResult.DataObject.InsertedEntityId;
-            }
-
-		    if (_accountToAssignToHeaderAccount == 0)
-		    {
-		        var account = GetTestAccount();
-		        account.HeaderAccountId = _headerAccountId;
-		        var insertResult = accountProxy.InsertAccount(account);
-		        _accountToAssignToHeaderAccount = insertResult.DataObject.InsertedEntityId;
-		    }
+			Assert.Equal(newName, updatedAcctFromDb.DataObject.Name);
 		}
-
-		private AccountDetail GetTestAccount()
-		{
-			return new AccountDetail
-			{
-				Name = string.Format("TestAccount_{0}", Guid.NewGuid()),
-				AccountType = "Income",
-				IsActive = true,
-				DefaultTaxCode = "G1",
-				LedgerCode = "AA",
-				Currency = "AUD",
-				IsBankAccount = false
-			};
-		}
-
-		private AccountDetail GetTestBankAccount()
-		{
-			return new AccountDetail
-			{
-				Name = string.Format("TestAccount_{0}", Guid.NewGuid()),
-				AccountType = "Asset",
-				IsActive = true,
-				DefaultTaxCode = null,
-				LedgerCode = "BB",
-				Currency = "AUD",
-				IsBankAccount = true,
-				IncludeInForecaster = true,
-				BSB = "010101",
-				Number = "11111111",
-				BankAccountName = string.Format("Test Bank Account_{0}", Guid.NewGuid()),
-				BankFileCreationEnabled = true,
-				BankCode = "TBA",
-				UserNumber = "111",
-				MerchantFeeAccountId = null,
-				IncludePendingTransactions = true
-			};
-		}
-
-        private AccountDetail GetTestHeaderAccount()
-        {
-            return new AccountDetail
-            {
-                Name = string.Format("TestAccount_{0}", Guid.NewGuid()),
-                AccountLevel = "Header",
-                AccountType = "Income",
-                LedgerCode = "AA"
-            };
-        }
 	}
-		#endregion
 }
 
 

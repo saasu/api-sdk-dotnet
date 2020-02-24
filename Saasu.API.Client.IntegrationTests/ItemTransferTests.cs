@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using Xunit;
 using Saasu.API.Client.IntegrationTests.Helpers;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Items;
@@ -10,11 +10,9 @@ using System.Net;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    [TestFixture]
     public class ItemTransferTests
     {
         private readonly ItemHelper _itemHelper;
-        private readonly ItemAdjustmentHelper _adjustmentHelper;
         private readonly ItemTransferHelper _transferHelper;
 
         private ItemDetail _item;
@@ -26,7 +24,6 @@ namespace Saasu.API.Client.IntegrationTests
         public ItemTransferTests()
         {
             _itemHelper = new ItemHelper();
-            _adjustmentHelper = new ItemAdjustmentHelper();
             _transferHelper = new ItemTransferHelper();
 
             GetTestAccounts();
@@ -34,7 +31,7 @@ namespace Saasu.API.Client.IntegrationTests
             CreateTestTransfers();
         }
 
-        [Test]
+        [Fact]
         public void ShouldInsertItemTransfer()
         {
             var transferItem = _transferHelper.GetTransferItem((int)_item.Id, 2, _assetAccountId, (decimal)_item.BuyingPrice, (decimal)(2 * _item.BuyingPrice));
@@ -45,13 +42,13 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new ItemTransferProxy();
             var response = proxy.InsertItemTransfer(detail);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsTrue(response.DataObject.InsertedEntityId > 0);
-            Assert.GreaterOrEqual(response.DataObject.UtcLastModified, DateTime.Today.AddMinutes(-10).ToUniversalTime());
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.True(response.DataObject.InsertedEntityId > 0);
+            Assert.True(response.DataObject.UtcLastModified >= DateTime.Today.AddMinutes(-10).ToUniversalTime());
         }
 
-        [Test]
+        [Fact]
         public void ShouldFailOnInsertWithNoItems()
         {
             var proxy = new ItemTransferProxy();
@@ -59,45 +56,45 @@ namespace Saasu.API.Client.IntegrationTests
             var detail = _transferHelper.GetTransferDetail(new List<TransferItem>());
             var response = proxy.InsertItemTransfer(detail);
 
-            Assert.IsFalse(response.IsSuccessfull);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.IsNull(response.DataObject);
-            Assert.IsTrue(response.RawResponse.Contains("Please specify TransferItems for this transaction."));
+            Assert.False(response.IsSuccessfull);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Null(response.DataObject);
+            Assert.True(response.RawResponse.Contains("Please specify TransferItems for this transaction."));
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetExistingItemTransfer()
         {
             var proxy = new ItemTransferProxy();
 
             var response = proxy.GetItemTransfer((int)_testTransfer.Id);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsTrue(response.DataObject.Id == (int)_testTransfer.Id);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.True(response.DataObject.Id == (int)_testTransfer.Id);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFailGetItemTransferWithBadId()
         {
             var proxy = new ItemTransferProxy();
             var response = proxy.GetItemTransfer((int)_testTransfer.Id - 1);
 
-            Assert.IsFalse(response.IsSuccessfull);
-            Assert.IsNull(response.DataObject);
+            Assert.False(response.IsSuccessfull);
+            Assert.Null(response.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void ShouldFailGetItemTransferWrongId()
         {
             var proxy = new ItemTransferProxy();
             var response = proxy.GetItemTransfer(9999999);
 
-            Assert.IsFalse(response.IsSuccessfull);
-            Assert.IsNull(response.DataObject);
-            Assert.IsTrue(response.RawResponse.Contains("The requested transaction is not found."));
+            Assert.False(response.IsSuccessfull);
+            Assert.Null(response.DataObject);
+            Assert.True(response.RawResponse.Contains("The requested transaction is not found."));
         }
 
-        [Test]
+        [Fact]
         public void ShouldUpdateExistingTransfer()
         {
             var proxy = new ItemTransferProxy();
@@ -112,40 +109,40 @@ namespace Saasu.API.Client.IntegrationTests
 
             var response = proxy.UpdateItemTransfer(_testTransfer, (int)_testTransfer.Id);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var updatedTransfer = proxy.GetItemTransfer((int)_testTransfer.Id);
 
-            Assert.IsTrue(updatedTransfer.DataObject.Items[0].Quantity == 5);
-            Assert.IsTrue(updatedTransfer.DataObject.Items[1].Quantity == -5);
-            Assert.IsTrue(updatedTransfer.DataObject.Summary.Equals("Updated the summary."));
-            Assert.IsTrue(updatedTransfer.DataObject.Notes.Equals("Updated the notes."));
-            Assert.IsTrue(updatedTransfer.DataObject.Date == _testTransfer.Date);
-            Assert.IsTrue(updatedTransfer.DataObject.RequiresFollowUp.Value);
+            Assert.True(updatedTransfer.DataObject.Items[0].Quantity == 5);
+            Assert.True(updatedTransfer.DataObject.Items[1].Quantity == -5);
+            Assert.True(updatedTransfer.DataObject.Summary.Equals("Updated the summary."));
+            Assert.True(updatedTransfer.DataObject.Notes.Equals("Updated the notes."));
+            Assert.True(updatedTransfer.DataObject.Date == _testTransfer.Date);
+            Assert.True(updatedTransfer.DataObject.RequiresFollowUp.Value);
         }
 
-        [Test]
+        [Fact]
         public void ShouldDeleteItemTransfer()
         {
             var proxy = new ItemTransferProxy();
             var response = proxy.DeleteItemTransfer(_testTransferToDeleteId);
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetItemTransfers()
         {
             var proxy = new ItemTransfersProxy();
             var response = proxy.GetItemTransfers();
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject.Transfers);
-            Assert.IsTrue(response.DataObject.Transfers.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Transfers);
+            Assert.True(response.DataObject.Transfers.Count > 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetItemTransfersFilterOnDate()
         {
             var proxy = new ItemTransferProxy();
@@ -162,13 +159,13 @@ namespace Saasu.API.Client.IntegrationTests
 
             var response = proxyGet.GetItemTransfers(fromDate: testDate, toDate: testDate);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject.Transfers);
-            Assert.IsTrue(response.DataObject.Transfers.Count > 0);
-            Assert.IsNull(response.DataObject.Transfers.Where(t => t.Date < testDate).SingleOrDefault());
-            Assert.IsNull(response.DataObject.Transfers.Where(t => t.Date > testDate).SingleOrDefault());
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Transfers);
+            Assert.True(response.DataObject.Transfers.Count > 0);
+            Assert.Null(response.DataObject.Transfers.Where(t => t.Date < testDate).SingleOrDefault());
+            Assert.Null(response.DataObject.Transfers.Where(t => t.Date > testDate).SingleOrDefault());
             Assert.NotNull(response.DataObject.Transfers.Where(t => t.Id == insertTransfer.DataObject.InsertedEntityId));
         }
 

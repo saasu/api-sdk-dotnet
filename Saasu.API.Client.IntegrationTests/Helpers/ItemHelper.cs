@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Ola.RestClient.Dto;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Accounts;
 using Saasu.API.Core.Models.Contacts;
+using Saasu.API.Core.Models.ItemAdjustments;
 using Saasu.API.Core.Models.Items;
 
 namespace Saasu.API.Client.IntegrationTests
@@ -96,30 +96,28 @@ namespace Saasu.API.Client.IntegrationTests
 
         public void InventoryAdjustments(List<Tuple<BuildItem, decimal>> itemQuantityList)
         {
-            var itemList = new ArrayList();
+            var proxy = new ItemAdjustmentProxy();
+
+            var items = new List<AdjustmentItem>();
 
             itemQuantityList.ForEach(iq =>
             {
-                var dtoItem = new InventoryAdjustmentItemDto()
+                items.Add(new AdjustmentItem()
                 {
-                    AccountUid = _inventoryAccountId,
-                    InventoryItemUid = iq.Item1.Id,
+                    AccountId = _inventoryAccountId,
+                    ItemId = iq.Item1.Id,
                     Quantity = iq.Item2,
-                    TotalPriceExclTax = 1,
-                    UnitPriceExclTax = 10
-                };
-                itemList.Add(dtoItem);
+                    TotalPrice = 1,
+                    UnitPrice = 10
+                });
             });
 
-            var legacyProxy = new Ola.RestClient.Proxies.InventoryAdjustmentProxy();
-
-            var dtoAdjustment = new InventoryAdjustmentDto()
+            proxy.InsertItemAdjustment(new AdjustmentDetail()
             {
-                Date = DateTime.Now,
-                Items = itemList
-            };
-
-            legacyProxy.Insert(dtoAdjustment);
+                AdjustmentItems = items,
+                Date = DateTime.Now
+            });
+            
         }
 
         private void GetTestAccounts()

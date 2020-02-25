@@ -190,7 +190,7 @@ namespace Saasu.API.Client.IntegrationTests
 
         private void CreateContacts()
         {
-            var helper = new ContactHelper();
+            var helper = new ContactHelper(false);
 
             //Create contacts.
             _DeletedContactId = helper.AddContact().InsertedContactId;

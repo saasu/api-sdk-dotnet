@@ -4,14 +4,22 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Saasu.API.Client.IntegrationTests.Helpers;
 using Xunit;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.Company;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    public class CompanyTests
+    public class CompanyTests : IClassFixture<ContactFixture>
     {
+        private readonly ContactFixture _contactFixture;
+        public CompanyTests(ContactFixture contactFixture)
+        {
+            _contactFixture = contactFixture;
+            _contactFixture.ContactHelper.GetOrCreateContactCustomer("Bob", "Bends", "Bender Inc.", "bob@bender.com");
+        }
+
         [Fact]
         public void ShouldRetrieveTaxCodeListForFile()
         {
@@ -208,14 +216,6 @@ namespace Saasu.API.Client.IntegrationTests
 
         }
 
-        public  CompanyTests()
-        {
-            ContactTests.GetOrCreateContactCustomer();
-            ContactTests.GetOrCreateContractorContact();
-            ContactTests.GetOrCreatePartnerContact();
-            ContactTests.GetOrCreateSupplierContact();
-            ContactTests.GetOrCreateContactCustomer("Bob", "Bends", "Bender Inc.", "bob@bender.com");
-        }
 
         private CompanyDetail GetTestCompany()
         {

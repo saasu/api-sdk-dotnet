@@ -243,9 +243,9 @@ namespace Saasu.API.Client.IntegrationTests
 
         private void CreateTestContacts()
         {
-
-            _BillingContactId = ContactHelper.GetOrCreateContact("TestAPIInvoice", "BillingContact", "bill@test.com");
-            _ShippingContactId = ContactHelper.GetOrCreateContact("TestAPIInvoice", "ShippingContact", "ship@test.com");
+            var contactHelper = new ContactHelper(false);
+            _BillingContactId = contactHelper.GetOrCreateContact("TestAPIInvoice", "BillingContact", "bill@test.com");
+            _ShippingContactId = contactHelper.GetOrCreateContact("TestAPIInvoice", "ShippingContact", "ship@test.com");
 
         }
 

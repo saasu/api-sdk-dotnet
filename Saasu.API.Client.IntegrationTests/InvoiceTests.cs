@@ -267,8 +267,9 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void GetInvoicesFilterOnBillingContactId()
         {
+            var contactHelper = new ContactHelper(false);
             //Get Id of test contact associated with the invoice.
-            var contactId = ContactTests.GetOrCreateContactCustomer();
+            var contactId = contactHelper.GetOrCreateContactCustomer();
             var contactProxy = new Proxies.ContactProxy();
             var contactResponse = contactProxy.GetContact(contactId);
 
@@ -1046,8 +1047,8 @@ namespace Saasu.API.Client.IntegrationTests
         [Fact]
         public void EmailInvoiceToBillingContact()
         {
-            
-            var billingContactId = ContactTests.GetOrCreateContactCustomer();
+            var contactHelper = new ContactHelper(false);
+            var billingContactId = contactHelper.GetOrCreateContactCustomer();
 
             var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", billingContactId: billingContactId, emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var insertResponse = new InvoiceProxy().InsertInvoice(invoice);

@@ -114,7 +114,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void IndexedContactShouldMatchEntityData()
         {
             var searchProxy = new SearchProxy();
-            var contactHelper = new ContactHelper();
+            var contactHelper = new ContactHelper(false);
 
             var contactResponse = contactHelper.AddContact();
             Thread.Sleep(5000);

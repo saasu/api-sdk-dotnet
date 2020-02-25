@@ -12,13 +12,12 @@ using Xunit;
 namespace Saasu.API.Client.IntegrationTests
 {
 
-    public class ContactAggregateTests
+    public class ContactAggregateTests : IClassFixture<ContactFixture>
     {
-        private ContactHelper _contactHelper;
-
-        public ContactAggregateTests()
+        private ContactFixture _contactFixture;
+        public ContactAggregateTests(ContactFixture contactFixture)
         {
-            _contactHelper = new ContactHelper();
+            _contactFixture = contactFixture;
         }
 
         [Fact]

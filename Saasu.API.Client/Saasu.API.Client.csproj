@@ -2,9 +2,18 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <Configurations>Debug;Release;CI</Configurations>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>Saasu.API.Dotnet.Sdk</PackageId>
+    <Authors>Saasu</Authors>
+    <Title>API SDK for the Saasu API</Title>
+    <Description>A client SDK for working with the Saasu API.</Description>
+    <PackageProjectUrl>https://github.com/saasu/api-sdk-dotnet</PackageProjectUrl>
+    <PackageTags>Saasu API SDK</PackageTags>
+    <Version>1.2</Version>
+    <Copyright>Saasu Pty. Ltd.</Copyright>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461'">
     <Reference Include="System.Web.Extensions" />
@@ -19,7 +28,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj" />
+    <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Config.Designer.cs">
@@ -35,4 +44,9 @@
     </None>
   </ItemGroup>
 
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))" />
+    </ItemGroup>
+  </Target>
 </Project>

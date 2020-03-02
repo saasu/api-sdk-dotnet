@@ -1,7 +1,5 @@
-﻿using NUnit.Framework;
+using Xunit;
 //using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ola.RestClient.Dto;
-using Ola.RestClient.Proxies;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models.Attachments;
@@ -11,13 +9,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Saasu.API.Core.Globals;
 using InvoiceProxy = Saasu.API.Client.Proxies.InvoiceProxy;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    [TestFixture]
-    public class InvoiceTests
+    public class InvoiceTests : IClassFixture<InvoiceHelper>
     {
+        private readonly InvoiceHelper _invHelper;
+
         private static int? _testInvoiceId;
 
         private static int? TestInvoiceId
@@ -35,37 +35,17 @@ namespace Saasu.API.Client.IntegrationTests
             }
         }
 
-        private static int _BillingContactId;
-        private static int _ShippingContactId;
-        private static int _IncomeAccountId;
-        private static int _IncomeAccountId2;
-        private static int _ExpenseAccountId;
-        private static int _ExpenseAccountId2;
-        private static int _BankAccountId;
-        private static int _AssetAccountId;
-        private static int _InventorySaleItemId;
-        private static int _InventorySaleItemId2;
-        private static int _InventoryPurchaseItemId;
-        private static int _InventoryPurchaseItemId2;
-
-        private static int _invoice1Id;
-        private static int _invoice2Id;
-        private static int _invoice3Id;
 
         private const string AutoNumber = "<auto number>";
         private const string ItemLayoutForbiddenMessage = " Check the response returned as this may be because your current subscription does not allow item layouts.";
         private const string MultiCurrencyForbiddenMessage = " Check the response returned as this may be because your current subscription does not allow multi currency or because it is turned off.";
 
-        public InvoiceTests()
+        public InvoiceTests(InvoiceHelper invHelper)
         {
-            //note - don't change the order of these calls, they are dependent.
-            CreateTestContacts();
-            CreateTestAccounts();
-            CreateTestInventoryItems();
-            CreatetestInvoices();
+            _invHelper = invHelper;
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetInvoicesForKnownFile()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
@@ -73,16 +53,16 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoicesProxy(accessToken);
             var response = proxy.GetInvoices();
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject.Invoices);
-            Assert.IsNotNull(response.DataObject._links);
-            Assert.IsTrue(response.DataObject.Invoices.Count > 0);
-            Assert.IsTrue(response.DataObject._links.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Invoices);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject.Invoices.Count > 0);
+            Assert.True(response.DataObject._links.Count > 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetOnlyFirstInvoiceForKnownFile()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
@@ -90,26 +70,26 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoicesProxy(accessToken);
             var response = proxy.GetInvoices();
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject.Invoices);
-            Assert.IsTrue(response.DataObject.Invoices.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Invoices);
+            Assert.True(response.DataObject.Invoices.Count > 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldGetOneInvoiceForKnownFile()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
             var proxy = new InvoiceProxy(accessToken);
-            var response = proxy.GetInvoice(Convert.ToInt32(_invoice1Id));
+            var response = proxy.GetInvoice(Convert.ToInt32(_invHelper.InvoiceId1));
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void ShouldNotBeAbleToAddAttachmentWithInvalidInvoiceId()
         {
             var attachment = CreateTestAttachment();
@@ -117,11 +97,11 @@ namespace Saasu.API.Client.IntegrationTests
 
             var addResponse = new InvoiceProxy().AddAttachment(attachment);
 
-            Assert.IsNotNull(addResponse, "No response when adding an attachment");
-            Assert.IsFalse(addResponse.IsSuccessfull, "Adding an attachment succeeded BUT it should have failed as it had an invalid invoice id of 0");
+            Assert.NotNull(addResponse);
+            Assert.False(addResponse.IsSuccessfull, "Adding an attachment succeeded BUT it should have failed as it had an invalid invoice id of 0");
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToAddSmallAttachmentUsingWsAccessKey()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
@@ -129,9 +109,9 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoicesProxy(accessToken);
             var response = proxy.GetInvoices();
 
-            Assert.IsNotNull(response, "No response when getting invoices");
-            Assert.IsTrue(response.IsSuccessfull, "Getting invoices failed. STatus code: " + ((int)response.StatusCode).ToString());
-            Assert.IsTrue(response.DataObject.Invoices.Count > 0, "Number of invoices returned was not greater than 0");
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull, "Getting invoices failed. STatus code: " + ((int)response.StatusCode).ToString());
+            Assert.True(response.DataObject.Invoices.Count > 0, "Number of invoices returned was not greater than 0");
 
             _testInvoiceId = response.DataObject.Invoices[0].TransactionId;
 
@@ -140,11 +120,11 @@ namespace Saasu.API.Client.IntegrationTests
 
             var addResponse = new InvoiceProxy().AddAttachment(attachment);
 
-            Assert.IsNotNull(addResponse, "No response when adding an attachment");
-            Assert.IsTrue(addResponse.IsSuccessfull, "Adding an attachment failed. STatus code: " + ((int)addResponse.StatusCode).ToString());
+            Assert.NotNull(addResponse);
+            Assert.True(addResponse.IsSuccessfull, "Adding an attachment failed. STatus code: " + ((int)addResponse.StatusCode).ToString());
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToAddLargeAttachmentUsingWsAccessKey()
         {
             var accessToken = TestHelper.SignInAndGetAccessToken();
@@ -152,9 +132,9 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoicesProxy(accessToken);
             var response = proxy.GetInvoices();
 
-            Assert.IsNotNull(response, "No response when getting invoices");
-            Assert.IsTrue(response.IsSuccessfull, "Getting invoices failed. STatus code: " + ((int)response.StatusCode).ToString());
-            Assert.IsTrue(response.DataObject.Invoices.Count > 0, "Number of invoices returned was not greater than 0");
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull, "Getting invoices failed. STatus code: " + ((int)response.StatusCode).ToString());
+            Assert.True(response.DataObject.Invoices.Count > 0, "Number of invoices returned was not greater than 0");
 
             _testInvoiceId = response.DataObject.Invoices[0].TransactionId;
 
@@ -163,11 +143,11 @@ namespace Saasu.API.Client.IntegrationTests
 
             var addResponse = new InvoiceProxy().AddAttachment(attachment);
 
-            Assert.IsNotNull(addResponse, "No response when adding an attachment");
-            Assert.IsTrue(addResponse.IsSuccessfull, "Adding an attachment failed. STatus code: " + ((int)addResponse.StatusCode).ToString());
+            Assert.NotNull(addResponse);
+            Assert.True(addResponse.IsSuccessfull, "Adding an attachment failed. STatus code: " + ((int)addResponse.StatusCode).ToString());
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToGetInfoOnAllAttachmentsUsingWsAccessKey()
         {
             var proxy = new InvoiceProxy();
@@ -175,23 +155,23 @@ namespace Saasu.API.Client.IntegrationTests
             var attachment = CreateTestAttachment();
 
             //Attach invoice Id to attachment and insert attachment.
-            attachment.ItemIdAttachedTo = Convert.ToInt32(_invoice1Id);
+            attachment.ItemIdAttachedTo = Convert.ToInt32(_invHelper.InvoiceId1);
             var insertResponse = proxy.AddAttachment(attachment);
 
             var attachmentId = insertResponse.DataObject.Id;
 
-            Assert.IsTrue(attachmentId > 0);
+            Assert.True(attachmentId > 0);
 
-            var getResponse = proxy.GetAllAttachmentsInfo(_invoice1Id);
+            var getResponse = proxy.GetAllAttachmentsInfo(_invHelper.InvoiceId1.GetValueOrDefault());
 
-            Assert.IsNotNull(getResponse);
-            Assert.IsTrue(getResponse.IsSuccessfull);
-            Assert.IsNotNull(getResponse.DataObject);
-            Assert.IsNotNull(getResponse.DataObject.Attachments);
-            Assert.IsTrue(getResponse.DataObject.Attachments.Count > 0);
+            Assert.NotNull(getResponse);
+            Assert.True(getResponse.IsSuccessfull);
+            Assert.NotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject.Attachments);
+            Assert.True(getResponse.DataObject.Attachments.Count > 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToGetAnAllAttachmentUsingOAuth()
         {
             ShouldBeAbleToAddSmallAttachmentUsingWsAccessKey();  // Ensure we add anattachment
@@ -200,154 +180,157 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoiceProxy(accessToken);
             var response = proxy.GetAllAttachmentsInfo(Convert.ToInt32(TestInvoiceId));
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject.Attachments);
-            Assert.IsTrue(response.DataObject.Attachments.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Attachments);
+            Assert.True(response.DataObject.Attachments.Count > 0);
 
             var attachmentResponse = proxy.GetAttachment(response.DataObject.Attachments[0].Id);
-            Assert.IsNotNull(attachmentResponse);
-            Assert.IsTrue(attachmentResponse.IsSuccessfull);
+            Assert.NotNull(attachmentResponse);
+            Assert.True(attachmentResponse.IsSuccessfull);
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToDeleteAnAttachment()
         {
             ShouldBeAbleToAddSmallAttachmentUsingWsAccessKey();  // Ensure we add an attachment
 
             var proxy = new InvoiceProxy();
             var response = proxy.GetAllAttachmentsInfo(Convert.ToInt32(TestInvoiceId));
-            Assert.IsTrue(response.IsSuccessfull && response.DataObject != null && response.DataObject.Attachments.Count > 0, "Getting all attachments failed. Status Code: " + ((int)response.StatusCode).ToString());
+            Assert.True(response.IsSuccessfull && response.DataObject != null && response.DataObject.Attachments.Count > 0, "Getting all attachments failed. Status Code: " + ((int)response.StatusCode).ToString());
 
             var attachmentResponse = proxy.DeleteAttachment(response.DataObject.Attachments[0].Id);
-            Assert.IsNotNull(attachmentResponse, "No response when deleting an attachment");
-            Assert.IsTrue(attachmentResponse.IsSuccessfull, "Adding an attachment was not successfull. Status Code:" + ((int)attachmentResponse.StatusCode).ToString());
+            Assert.NotNull(attachmentResponse);
+            Assert.True(attachmentResponse.IsSuccessfull, "Adding an attachment was not successfull. Status Code:" + ((int)attachmentResponse.StatusCode).ToString());
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesAll()
         {
             AssertInvoiceProxy();
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesOnePageOneRecord()
         {
             var response = AssertInvoiceProxy(pageNumber: 1, pageSize: 1);
-            Assert.AreEqual(1, response.DataObject.Invoices.Count, "Paging of 1 page and 1 record is returning the wrong number of records");
+            Assert.Equal(1, response.DataObject.Invoices.Count);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnDates()
         {
             //use a year ago and tomorrow as date filters to make sure the test invoice is picked up.
             AssertInvoiceProxy(fromDate: DateTime.Now.AddYears(-1), toDate: DateTime.Now.AddDays(1));
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnModifiedDates()
         {
             //use a year ago and tomorrow as date filters to make sure the test contact Carl O'Brien is picked up.
             AssertInvoiceProxy(lastModifiedFromDate: DateTime.Now.AddYears(-1), lastModifiedToDate: DateTime.Now.AddDays(1));
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnInvoiceNumber()
         {
             var invNumber = string.Format("Inv{0}", Guid.NewGuid());
 
             //Create and insert test invoice.
-            GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: invNumber, actuallyInsertAndVerifyResponse: true);
+            GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: invNumber, actuallyInsertAndVerifyResponse: true);
 
             var response = AssertInvoiceProxy(invoiceNumber: invNumber);
 
-            Assert.AreEqual(1, response.DataObject.Invoices.Count, "Incorrect number of invoices found.");
+            Assert.Equal(1, response.DataObject.Invoices.Count);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnPurchaseOrderNumber()
         {
             var purchaseOrderNumber = string.Format("Inv{0}", Guid.NewGuid());
 
             //Create and insert test invoice.
-            GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: purchaseOrderNumber, actuallyInsertAndVerifyResponse: true);
+            GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: purchaseOrderNumber, actuallyInsertAndVerifyResponse: true);
 
             var response = AssertInvoiceProxy(purchaseOrderNumber: purchaseOrderNumber);
 
-            Assert.AreEqual(1, response.DataObject.Invoices.Count, "Incorrect number of invoices found.");
+            Assert.Equal(1, response.DataObject.Invoices.Count);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnPaymentStatus()
         {
             AssertInvoiceProxy(paymentStatus: (int)PaymentStatusType.Unpaid);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnBillingContactId()
         {
+            var contactHelper = new ContactHelper(false);
             //Get Id of test contact associated with the invoice.
-            var contactResponse = ContactTests.VerifyTestContactExistsOrCreate(contactType: Ola.RestClient.ContactType.Customer);
+            var contactId = contactHelper.GetOrCreateContactCustomer();
+            var contactProxy = new Proxies.ContactProxy();
+            var contactResponse = contactProxy.GetContact(contactId);
 
-            var billingContactId = contactResponse.DataObject.Contacts[0].Id;
+            var billingContactId = contactResponse.DataObject.Id;
 
             //Create and insert test invoices for billing contact.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
-            var invoice2 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
+            var invoice2 = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, billingContactId: billingContactId);
 
             var proxy = new InvoiceProxy();
             proxy.InsertInvoice(invoice);
             proxy.InsertInvoice(invoice2);
 
-            AssertInvoiceProxy(billingContactId: contactResponse.DataObject.Contacts[0].Id);
+            AssertInvoiceProxy(billingContactId: contactResponse.DataObject.Id);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesFilterOnInvoiceStatus()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceType: InvoiceType.SaleOrder, invoiceStatus: InvoiceStatusType.Order.ToQueryParameter());
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceType: Constants.InvoiceType.SaleOrder, invoiceStatus: InvoiceStatusType.Order.ToQueryParameter());
             new InvoiceProxy().InsertInvoice(invoice);
 
             AssertInvoiceProxy(invoiceStatus: InvoiceStatusType.Order.ToQueryParameter());
         }
 
-        [Test]
+        [Fact]
         public void GetSingleInvoiceWithInvoiceId()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var insertResponse = new InvoiceProxy().InsertInvoice(invoice);
 
-            Assert.IsTrue(insertResponse.IsSuccessfull);
+            Assert.True(insertResponse.IsSuccessfull);
 
             var insertResult = insertResponse.DataObject;
 
             var tranid = insertResult.InsertedEntityId;
 
-            Assert.IsTrue(tranid > 0);
+            Assert.True(tranid > 0);
 
             var response = new InvoiceProxy().GetInvoice(tranid);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject._links);
-            Assert.IsTrue(response.DataObject._links.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesPageSize()
         {
             var proxy = new InvoicesProxy();
             var response = proxy.GetInvoices(pageNumber: 1, pageSize: 2);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.AreEqual(response.DataObject.Invoices.Count, 2);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.Equal(response.DataObject.Invoices.Count, 2);
         }
 
-        [Test]
+        [Fact]
         public void GetInvoicesSecondPage()
         {
             var proxy = new InvoicesProxy();
@@ -357,10 +340,10 @@ namespace Saasu.API.Client.IntegrationTests
 
             response = proxy.GetInvoices(pageNumber: 2);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
 
-            response.DataObject.Invoices.ForEach(i => Assert.IsFalse(idsFromPage1.Contains(i.TransactionId)));
+            response.DataObject.Invoices.ForEach(i => Assert.False(idsFromPage1.Contains(i.TransactionId)));
         }
 
 
@@ -373,66 +356,66 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- No Email
         ///		- Defined invoice number
         /// </summary>
-        [Test]
+        [Fact]
         public void InsertSaleWithServiceItemsNoEmailToContact()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var response = new InvoiceProxy().InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.IsNull(results.GeneratedInvoiceNumber);
-            Assert.IsFalse(results.SentToContact);
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.AreNotEqual(results.LastUpdatedId, null);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.Null(results.GeneratedInvoiceNumber);
+            Assert.False(results.SentToContact);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotEqual(results.LastUpdatedId, null);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getResponse = new InvoiceProxy().GetInvoice(results.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             VerifyInvoicesAreEqual(invoice, getResponse.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void InsertSaleAndCanUpdateUsingReturnedLastUpdateId()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.IsNull(results.GeneratedInvoiceNumber);
-            Assert.IsFalse(results.SentToContact);
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.AreNotEqual(results.LastUpdatedId, null);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.Null(results.GeneratedInvoiceNumber);
+            Assert.False(results.SentToContact);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotEqual(results.LastUpdatedId, null);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getResponse = proxy.GetInvoice(results.InsertedEntityId);
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             // Do an Update
             var getInvoice = getResponse.DataObject;
             getInvoice.Summary = "Update 1";
             var updateResponse = proxy.UpdateInvoice(getInvoice.TransactionId.Value, getInvoice);
-            Assert.IsTrue(updateResponse.IsSuccessfull);
+            Assert.True(updateResponse.IsSuccessfull);
 
             // Using the LastUpdatedId returned from the previous update, do another update
             getInvoice.Summary = "Update 2";
             getInvoice.LastUpdatedId = updateResponse.DataObject.LastUpdatedId;
             var updateResponse2 = proxy.UpdateInvoice(getInvoice.TransactionId.Value, getInvoice);
-            Assert.IsTrue(updateResponse2.IsSuccessfull);
+            Assert.True(updateResponse2.IsSuccessfull);
 
         }
 
@@ -443,57 +426,57 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- Email
         ///		- Auto invoice number
         /// </summary>
-        [Test]
+        [Fact]
         public void InsertSaleWithItemLayoutEmailToContactAndAutoNumberAndAutoPopulateFxRate()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true, autoPopulateFxRate: true);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true, autoPopulateFxRate: true);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
+            Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
             var results = response.DataObject;
 
-            Assert.IsNotNull(results.GeneratedInvoiceNumber);
-            Assert.IsTrue(results.SentToContact);
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.IsNotNull(results.LastUpdatedId);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.NotNull(results.GeneratedInvoiceNumber);
+            Assert.True(results.SentToContact);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotNull(results.LastUpdatedId);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(results.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             VerifyInvoicesAreEqual(invoice, getResponse.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void InsertSaleWithAutoPopulateFxRateShouldNotUsePassedInFxRate()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", autoPopulateFxRate: true, fxRate: 99);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", autoPopulateFxRate: true, fxRate: 99);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
+            Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
             var results = response.DataObject;
 
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.IsNotNull(results.LastUpdatedId);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotNull(results.LastUpdatedId);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(results.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject);
-            Assert.AreNotEqual(99, getResponse.DataObject.FxRate);
+            Assert.NotNull(getResponse.DataObject);
+            Assert.NotEqual(99, getResponse.DataObject.FxRate);
         }
 
         /// <summary>
@@ -503,28 +486,28 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- No Email
         ///		- Defined PO number
         /// </summary>
-        [Test]
+        [Fact]
         public void InsertPurchaseWithServiceItemsNoEmailToContact()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: false, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var response = new InvoiceProxy().InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.IsNull(results.GeneratedInvoiceNumber);
-            Assert.IsFalse(results.SentToContact);
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.AreNotEqual(results.LastUpdatedId, null);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.Null(results.GeneratedInvoiceNumber);
+            Assert.False(results.SentToContact);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotEqual(results.LastUpdatedId, null);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getResponse = new InvoiceProxy().GetInvoice(results.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             VerifyInvoicesAreEqual(invoice, getResponse.DataObject);
         }
@@ -536,71 +519,71 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- Email
         ///		- Auto PO number
         /// </summary>
-        [Test]
+        [Fact]
         public void InsertPurchaseWithItemLayoutEmailToContactAndAutoNumber()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "P", emailContact: true);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "P", emailContact: true);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
+            Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
             var results = response.DataObject;
 
-            Assert.IsNotNull(results.GeneratedInvoiceNumber);
-            Assert.IsTrue(results.SentToContact);
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.IsNotNull(results.LastUpdatedId);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.NotNull(results.GeneratedInvoiceNumber);
+            Assert.True(results.SentToContact);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotNull(results.LastUpdatedId);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(results.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             VerifyInvoicesAreEqual(invoice, getResponse.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void InsertDifferentCurrencyForMultiCurrencyFile()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", currency: "USD", fxRate: new decimal(1.50));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", currency: "USD", fxRate: new decimal(1.50));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull, string.Format("Inserting a multi currency invoice has failed.{0}", MultiCurrencyForbiddenMessage));
+            Assert.True(response.IsSuccessfull, string.Format("Inserting a multi currency invoice has failed.{0}", MultiCurrencyForbiddenMessage));
 
             var results = response.DataObject;
 
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
-            Assert.AreNotEqual(results.UtcLastModified, DateTime.MinValue);
-            Assert.AreNotEqual(results.LastUpdatedId, null);
-            Assert.AreNotEqual(results.LastUpdatedId.Trim(), string.Empty);
+            Assert.NotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.UtcLastModified, DateTime.MinValue);
+            Assert.NotEqual(results.LastUpdatedId, null);
+            Assert.NotEqual(results.LastUpdatedId.Trim(), string.Empty);
 
             //get invoice.
             var getResponse = new InvoiceProxy().GetInvoice(results.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             VerifyInvoicesAreEqual(invoice, getResponse.DataObject);
-            Assert.AreEqual(invoice.FxRate, getResponse.DataObject.FxRate);
+            Assert.Equal(invoice.FxRate, getResponse.DataObject.FxRate);
         }
 
-        [Test]
+        [Fact]
         public void InsertSaleWithQuickPayment()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             invoice.QuickPayment = new InvoiceQuickPaymentDetail
             {
                 DatePaid = DateTime.Now.AddDays(-4),
                 DateCleared = DateTime.Now.AddDays(-3),
-                BankedToAccountId = _BankAccountId,
+                BankedToAccountId = _invHelper.BankAccountId,
                 Amount = new decimal(10.00),
                 Reference = "Test quick payment reference",
                 Summary = "Test quick payment summary"
@@ -609,28 +592,28 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.AreNotEqual(response.DataObject.InsertedEntityId, 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotEqual(response.DataObject.InsertedEntityId, 0);
 
             //get invoice.
             var getResponse = proxy.GetInvoice(response.DataObject.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject.PaymentCount);
-            Assert.AreEqual(getResponse.DataObject.PaymentCount, (Int16)1);
-            Assert.AreEqual(getResponse.DataObject.AmountPaid, new decimal(10.00));
-            Assert.AreEqual(getResponse.DataObject.AmountOwed, (getResponse.DataObject.TotalAmount - getResponse.DataObject.AmountPaid));
+            Assert.NotNull(getResponse.DataObject.PaymentCount);
+            Assert.Equal(getResponse.DataObject.PaymentCount, (Int16)1);
+            Assert.Equal(getResponse.DataObject.AmountPaid, new decimal (10.00));
+            Assert.Equal(getResponse.DataObject.AmountOwed, (getResponse.DataObject.TotalAmount - getResponse.DataObject.AmountPaid));
         }
 
-        [Test]
+        [Fact]
         public void InsertPurchaseWithQuickPayment()
         {
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             invoice.QuickPayment = new InvoiceQuickPaymentDetail
             {
                 DatePaid = DateTime.Now.AddDays(-4),
                 DateCleared = DateTime.Now.AddDays(-3),
-                BankedToAccountId = _BankAccountId,
+                BankedToAccountId = _invHelper.BankAccountId,
                 Amount = new decimal(10.00),
                 Reference = "Test quick payment reference",
                 Summary = "Test quick payment summary"
@@ -639,16 +622,16 @@ namespace Saasu.API.Client.IntegrationTests
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.AreNotEqual(response.DataObject.InsertedEntityId, 0);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotEqual(response.DataObject.InsertedEntityId, 0);
 
             //get invoice.
             var getResponse = proxy.GetInvoice(response.DataObject.InsertedEntityId);
 
-            Assert.IsNotNull(getResponse.DataObject.PaymentCount);
-            Assert.AreEqual(getResponse.DataObject.PaymentCount, (Int16)1);
-            Assert.AreEqual(getResponse.DataObject.AmountPaid, new decimal(10.00));
-            Assert.AreEqual(getResponse.DataObject.AmountOwed, (getResponse.DataObject.TotalAmount - getResponse.DataObject.AmountPaid));
+            Assert.NotNull(getResponse.DataObject.PaymentCount);
+            Assert.Equal(getResponse.DataObject.PaymentCount, (Int16)1);
+            Assert.Equal(getResponse.DataObject.AmountPaid, new decimal (10.00));
+            Assert.Equal(getResponse.DataObject.AmountOwed, (getResponse.DataObject.TotalAmount - getResponse.DataObject.AmountPaid));
         }
 
         #endregion
@@ -660,16 +643,16 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- Service layout
         ///		- No Email sent
         /// </summary>
-        [Test]
+        [Fact]
         public void UpdateSaleWithServiceLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var insertResult = response.DataObject;
-            Assert.AreNotEqual(insertResult.InsertedEntityId, 0);
+            Assert.NotEqual(insertResult.InsertedEntityId, 0);
             var tranId = insertResult.InsertedEntityId;
 
             //Get the inserted invoice to pick up any default values which may have been assigned.
@@ -686,8 +669,8 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                 {
                     Description = "updated line item",
-                    AccountId = _IncomeAccountId2,
-                    TaxCode = TaxCode.SaleInputTaxed,
+                    AccountId = _invHelper.IncomeAccountId2,
+                    TaxCode = Constants.TaxCode.SaleInputTaxed,
                     TotalAmount = new decimal(100.00),
                     Tags = new List<string> { "update item tag 1", "update item tag 2" }
                 }
@@ -696,14 +679,14 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
 
-            Assert.IsFalse(updateResult.SentToContact);
-            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
-            Assert.IsNotNull(updateResult.LastUpdatedId);
-            Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
+            Assert.False(updateResult.SentToContact);
+            Assert.True(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
+            Assert.NotNull(updateResult.LastUpdatedId);
+            Assert.NotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
             //Get invoice after update.
             var getResponse = new InvoiceProxy().GetInvoice(tranId);
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             //Compare updated with original inserted invoice (which also now contains the updated changes).
             VerifyInvoicesAreEqual(insertedInvoice, getResponse.DataObject);
@@ -715,16 +698,16 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- Service layout
         ///		- Email
         /// </summary>
-        [Test]
+        [Fact]
         public void UpdateSaleWithItemLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
-            Assert.IsTrue(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
+            Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
             var insertResult = response.DataObject;
-            Assert.AreNotEqual(insertResult.InsertedEntityId, 0);
+            Assert.NotEqual(insertResult.InsertedEntityId, 0);
             var tranId = insertResult.InsertedEntityId;
 
             //Get the inserted invoice to pick up any default values which may have been assigned.
@@ -741,11 +724,11 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                         {
                             Description = "updated line item 1",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 20,
                             UnitPrice = new decimal(200.00),
                             PercentageDiscount = new decimal(15.00),
-                            InventoryId =  _InventorySaleItemId2,
+                            InventoryId =  _invHelper.InventorySaleItemId2,
                             Tags = new List<string> {"updated item tag 1", "updated item tag 2"}
 							//Attributes = GetItemAttributes()
 						},
@@ -754,14 +737,14 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
 
-            Assert.IsTrue(updateResult.SentToContact);
-            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
-            Assert.IsNotNull(updateResult.LastUpdatedId);
-            Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
+            Assert.True(updateResult.SentToContact);
+            Assert.True(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
+            Assert.NotNull(updateResult.LastUpdatedId);
+            Assert.NotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
             //Get invoice after update.
             var getResponse = new InvoiceProxy().GetInvoice(tranId);
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             //Compare updated with original inserted invoice (which also now contains the updated changes).
             VerifyInvoicesAreEqual(insertedInvoice, getResponse.DataObject);
@@ -773,16 +756,16 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- Service layout
         ///		- Email sent with insert, but not update.
         /// </summary>
-        [Test]
+        [Fact]
         public void UpdatePurchaseWithServiceLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var insertResult = response.DataObject;
-            Assert.AreNotEqual(insertResult.InsertedEntityId, 0);
+            Assert.NotEqual(insertResult.InsertedEntityId, 0);
             var tranId = insertResult.InsertedEntityId;
 
             //Get the inserted invoice to pick up any default values which may have been assigned.
@@ -799,8 +782,8 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                 {
                     Description = "updated line item",
-                    AccountId = _IncomeAccountId2,
-                    TaxCode = TaxCode.SaleInputTaxed,
+                    AccountId = _invHelper.IncomeAccountId2,
+                    TaxCode = Constants.TaxCode.SaleInputTaxed,
                     TotalAmount = new decimal(100.00),
                     Tags = new List<string> { "update item tag 1", "update item tag 2" }
                 }
@@ -809,14 +792,14 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
 
-            Assert.IsFalse(updateResult.SentToContact);
-            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
-            Assert.IsNotNull(updateResult.LastUpdatedId);
-            Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
+            Assert.False(updateResult.SentToContact);
+            Assert.True(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
+            Assert.NotNull(updateResult.LastUpdatedId);
+            Assert.NotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
             //Get invoice after update.
             var getResponse = new InvoiceProxy().GetInvoice(tranId);
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             //Compare updated with original inserted invoice (which also now contains the updated changes).
             VerifyInvoicesAreEqual(updateInvoice, getResponse.DataObject);
@@ -828,16 +811,16 @@ namespace Saasu.API.Client.IntegrationTests
         ///		- Service layout
         ///		- No email insert, but email sent in update.
         /// </summary>
-        [Test]
+        [Fact]
         public void UpdatePurchaseithItemLayoutAllFieldsUpdated()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "P", emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var response = new InvoiceProxy().InsertInvoice(invoice);
-            Assert.IsTrue(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
+            Assert.True(response.IsSuccessfull, string.Format("Inserting an item layout invoice has failed.{0}", ItemLayoutForbiddenMessage));
 
             var insertResult = response.DataObject;
-            Assert.AreNotEqual(insertResult.InsertedEntityId, 0);
+            Assert.NotEqual(insertResult.InsertedEntityId, 0);
             var tranId = insertResult.InsertedEntityId;
 
             //Get the inserted invoice to pick up any default values which may have been assigned.
@@ -853,11 +836,11 @@ namespace Saasu.API.Client.IntegrationTests
                 new InvoiceTransactionLineItem
                         {
                             Description = "upadated line item 1",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 20,
                             UnitPrice = new decimal(200.00),
                             PercentageDiscount = new decimal(15.00),
-                            InventoryId =  _InventoryPurchaseItemId2,
+                            InventoryId =  _invHelper.InventoryPurchaseItemId2,
                             Tags = new List<string> {"upadated item tag 1", "updated item tag 2"}
                         }
             };
@@ -865,33 +848,33 @@ namespace Saasu.API.Client.IntegrationTests
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, updateInvoice);
             var updateResult = updateResponse.DataObject;
 
-            Assert.IsTrue(updateResult.SentToContact);
-            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
-            Assert.IsNotNull(updateResult.LastUpdatedId);
-            Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
+            Assert.True(updateResult.SentToContact);
+            Assert.True(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
+            Assert.NotNull(updateResult.LastUpdatedId);
+            Assert.NotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
             //Get invoice after update.
             var getResponse = new InvoiceProxy().GetInvoice(tranId);
-            Assert.IsNotNull(getResponse.DataObject);
+            Assert.NotNull(getResponse.DataObject);
 
             //Compare updated with original inserted invoice (which also now contains the updated changes).
             VerifyInvoicesAreEqual(updateInvoice, getResponse.DataObject);
 
             // The invoice was updated with SendEmailToContact request, so the new response will have set the SentToContact flag whereas
             // the original inserted invoice will not.
-            Assert.AreNotEqual(insertedInvoice.SentToContact, getResponse.DataObject.SentToContact);
+            Assert.NotEqual(insertedInvoice.SentToContact, getResponse.DataObject.SentToContact);
         }
 
-        [Test]
+        [Fact]
         public void UpdateDifferentCurrencyForMultiCurrencyFile()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S");
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S");
             var response = new InvoiceProxy().InsertInvoice(invoice);
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var insertResult = response.DataObject;
-            Assert.AreNotEqual(insertResult.InsertedEntityId, 0);
+            Assert.NotEqual(insertResult.InsertedEntityId, 0);
             var tranId = insertResult.InsertedEntityId;
 
             //Get the inserted invoice to pick up any default values which may have been assigned.
@@ -903,190 +886,189 @@ namespace Saasu.API.Client.IntegrationTests
             insertedInvoice.FxRate = 1.5M;
 
             var updateResponse = new InvoiceProxy().UpdateInvoice(tranId, insertedInvoice);
-            Assert.IsTrue(updateResponse.IsSuccessfull, string.Format("Updating invoice with a different currency has failed.{0}", MultiCurrencyForbiddenMessage));
+            Assert.True(updateResponse.IsSuccessfull, string.Format("Updating invoice with a different currency has failed.{0}", MultiCurrencyForbiddenMessage));
 
             var updateResult = updateResponse.DataObject;
-            Assert.IsFalse(updateResult.SentToContact);
-            Assert.IsTrue(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
-            Assert.IsNotNull(updateResult.LastUpdatedId);
-            Assert.AreNotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
+            Assert.False(updateResult.SentToContact);
+            Assert.True(TestHelper.AssertDatetimesEqualWithVariance(updateResult.UtcLastModified.Date, DateTime.UtcNow.Date));
+            Assert.NotNull(updateResult.LastUpdatedId);
+            Assert.NotEqual(updateResult.LastUpdatedId.Trim(), string.Empty);
 
             //Get invoice after update.
             var getUpdatedResponse = new InvoiceProxy().GetInvoice(tranId);
-            Assert.IsNotNull(getUpdatedResponse.DataObject);
+            Assert.NotNull(getUpdatedResponse.DataObject);
 
             //Compare updated with original inserted invoice (which also now contains the updated changes).
             VerifyInvoicesAreEqual(insertedInvoice, getUpdatedResponse.DataObject);
-            Assert.AreEqual(insertedInvoice.FxRate, getUpdatedResponse.DataObject.FxRate);
+            Assert.Equal(insertedInvoice.FxRate, getUpdatedResponse.DataObject.FxRate);
         }
         #endregion
 
         #region Delete Tests
 
-        [Test]
+        [Fact]
         public void DeleteSaleInvoiceWithServiceLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.InsertedEntityId, 0);
             var tranId = results.InsertedEntityId;
 
             var invProxy = new InvoiceProxy();
 
             var deleteResponse = invProxy.DeleteInvoice(tranId);
 
-            Assert.IsTrue(deleteResponse.IsSuccessfull);
+            Assert.True(deleteResponse.IsSuccessfull);
             //get invoice, verify it has been deleted.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(tranId);
 
-            Assert.IsNull(getResponse.DataObject);
+            Assert.Null(getResponse.DataObject);
         }
 
-        [Test]
+        [Fact]
         public void DeleteSaleInvoiceWithItemLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.InsertedEntityId, 0);
             var tranId = results.InsertedEntityId;
 
             var invProxy = new InvoiceProxy();
 
             var deleteResponse = invProxy.DeleteInvoice(tranId);
 
-            Assert.IsTrue(deleteResponse.IsSuccessfull);
+            Assert.True(deleteResponse.IsSuccessfull);
             //get invoice, verify it has been deleted.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(tranId);
 
-            Assert.IsNull(getResponse.DataObject);
+            Assert.Null(getResponse.DataObject);
         }
 
         /// <summary>
         /// Defined purchase otder number
         /// </summary>
-        [Test]
+        [Fact]
         public void DeletePurchaseInvoiceWithServiceLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "P", emailContact: true, purchaseOrderNumber: string.Format("TestInv{0}", Guid.NewGuid()));
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.InsertedEntityId, 0);
             var tranId = results.InsertedEntityId;
 
             var invProxy = new InvoiceProxy();
 
             var deleteResponse = invProxy.DeleteInvoice(tranId);
 
-            Assert.IsTrue(deleteResponse.IsSuccessfull);
+            Assert.True(deleteResponse.IsSuccessfull);
             //get invoice, verify it has been deleted.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(tranId);
 
-            Assert.IsNull(getResponse.DataObject);
+            Assert.Null(getResponse.DataObject);
         }
 
         /// <summary>
         /// Auto numbered purchase otder number
         /// </summary>
-        [Test]
+        [Fact]
         public void DeletePurchaseInvoiceWithItemLayout()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Item, transactionType: "S", emailContact: true);
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Item, transactionType: "S", emailContact: true);
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.True(response.IsSuccessfull);
 
             var results = response.DataObject;
 
-            Assert.AreNotEqual(results.InsertedEntityId, 0);
+            Assert.NotEqual(results.InsertedEntityId, 0);
             var tranId = results.InsertedEntityId;
 
             var invProxy = new InvoiceProxy();
 
             var deleteResponse = invProxy.DeleteInvoice(tranId);
 
-            Assert.IsTrue(deleteResponse.IsSuccessfull);
+            Assert.True(deleteResponse.IsSuccessfull);
             //get invoice, verify it has been deleted.
             var getProxy = new InvoiceProxy();
             var getResponse = getProxy.GetInvoice(tranId);
 
-            Assert.IsNull(getResponse.DataObject);
+            Assert.Null(getResponse.DataObject);
         }
 
         #endregion
 
         #region Validation Tests
 
-        [Test]
+        [Fact]
         public void InvalidCurrencyInsert()
         {
             //Insert invoice.
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", currency: "TEST");
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", currency: "TEST");
 
             var proxy = new InvoiceProxy();
             var response = proxy.InsertInvoice(invoice);
 
-            Assert.IsFalse(response.IsSuccessfull);
-            Assert.IsNotNull(response.RawResponse);
-            Assert.IsTrue(response.RawResponse.Contains("Please include a valid currency"));
-            Assert.IsNotNull(response.ReasonCode);
-            Assert.AreEqual(response.ReasonCode.Trim().ToLower(), "bad request");
+            Assert.False(response.IsSuccessfull);
+            Assert.NotNull(response.RawResponse);
+            Assert.True(response.RawResponse.Contains("Please include a valid currency"));
+            Assert.NotNull(response.ReasonCode);
+            Assert.Equal(response.ReasonCode.Trim().ToLower(), "bad request");
         }
 
-        [Test]
+        [Fact]
         public void EmailInvoiceToBillingContact()
         {
-            var contactResponse = ContactTests.VerifyTestContactExistsOrCreate(contactType: Ola.RestClient.ContactType.Customer);
+            var contactHelper = new ContactHelper(false);
+            var billingContactId = contactHelper.GetOrCreateContactCustomer();
 
-            var billingContactId = contactResponse.DataObject.Contacts[0].Id;
-
-            var invoice = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, transactionType: "S", billingContactId: billingContactId, emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
+            var invoice = GetTestInsertInvoice(invoiceLayout: Constants.InvoiceLayout.Service, transactionType: "S", billingContactId: billingContactId, emailContact: false, invoiceNumber: string.Format("TestInv{0}", Guid.NewGuid()));
             var insertResponse = new InvoiceProxy().InsertInvoice(invoice);
 
-            Assert.IsTrue(insertResponse.IsSuccessfull);
+            Assert.True(insertResponse.IsSuccessfull);
 
             var insertResult = insertResponse.DataObject;
 
             var tranid = insertResult.InsertedEntityId;
 
-            Assert.IsTrue(tranid > 0);
+            Assert.True(tranid > 0);
 
             var response = new InvoiceProxy().EmailInvoice(tranid);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.AreEqual("Invoice has been emailed.", response.DataObject.StatusMessage);
-            Assert.IsNotNull(response.DataObject._links);
-            Assert.IsTrue(response.DataObject._links.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.Equal("Invoice has been emailed.", response.DataObject.StatusMessage);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0);
         }
 
 
@@ -1096,12 +1078,12 @@ namespace Saasu.API.Client.IntegrationTests
 
         private void VerifyInvoicesAreEqual(InvoiceTransactionDetail inv1, InvoiceTransactionDetail inv2)
         {
-            Assert.AreEqual(inv1.NotesInternal, inv2.NotesInternal, "Internal Notes are different");
-            Assert.AreEqual(inv1.NotesExternal, inv2.NotesExternal, "External Notes are different");
-            Assert.AreEqual(inv1.TemplateId, inv2.TemplateId, "TemplateIds are different");
-            Assert.AreEqual(inv1.Currency, inv2.Currency, "Currency is different");
-            Assert.AreEqual(inv1.TransactionType, inv2.TransactionType, "TransactionType is different");
-            Assert.AreEqual(inv1.AutoPopulateFxRate, inv2.AutoPopulateFxRate, "AutoPopulateFxRate is different");
+            Assert.Equal(inv1.NotesInternal, inv2.NotesInternal);
+            Assert.Equal(inv1.NotesExternal, inv2.NotesExternal);
+            Assert.Equal(inv1.TemplateId, inv2.TemplateId);
+            Assert.Equal(inv1.Currency, inv2.Currency);
+            Assert.Equal(inv1.TransactionType, inv2.TransactionType);
+            Assert.Equal(inv1.AutoPopulateFxRate, inv2.AutoPopulateFxRate);
 
             switch (inv1.TransactionType)
             {
@@ -1109,11 +1091,11 @@ namespace Saasu.API.Client.IntegrationTests
                     {
                         if (inv1.InvoiceNumber == AutoNumber)
                         {
-                            Assert.AreNotEqual(inv1.InvoiceNumber, inv2.InvoiceNumber, "InvoiceNumber are equal but expected to be different");
+                            Assert.False(inv1.InvoiceNumber == inv2.InvoiceNumber, "InvoiceNumber are equal but expected to be different");
                         }
                         else
                         {
-                            Assert.AreEqual(inv1.InvoiceNumber, inv2.InvoiceNumber, "InvoiceNumber is different");
+                            Assert.Equal(inv1.InvoiceNumber, inv2.InvoiceNumber);
                         }
                     }
                     break;
@@ -1121,11 +1103,11 @@ namespace Saasu.API.Client.IntegrationTests
                     {
                         if (inv1.PurchaseOrderNumber == AutoNumber)
                         {
-                            Assert.AreNotEqual(inv1.PurchaseOrderNumber, inv2.PurchaseOrderNumber, "Purchase Order Number are the same but expected to be different");
+                            Assert.False(inv1.PurchaseOrderNumber == inv2.PurchaseOrderNumber, "Purchase Order Number are the same but expected to be different");
                         }
                         else
                         {
-                            Assert.AreEqual(inv1.PurchaseOrderNumber, inv2.PurchaseOrderNumber, "Purchase Order number is different");
+                            Assert.Equal(inv1.PurchaseOrderNumber, inv2.PurchaseOrderNumber);
                         }
                     }
                     break;
@@ -1135,22 +1117,22 @@ namespace Saasu.API.Client.IntegrationTests
             // case this flag gets set as well
             //Assert.AreEqual(inv1.SentToContact, inv2.SentToContact);
 
-            Assert.AreEqual(inv1.RequiresFollowUp, inv2.RequiresFollowUp, "RequiresFollowUp is different");
+            Assert.Equal(inv1.RequiresFollowUp, inv2.RequiresFollowUp);
 
-            Assert.AreEqual(inv1.InvoiceType, inv2.InvoiceType, "InvoiceType is different");
-            Assert.AreEqual(inv1.Layout, inv2.Layout, "Layout is different");
-            Assert.AreEqual(inv1.Summary, inv2.Summary, "Summary is different");
+            Assert.Equal(inv1.InvoiceType, inv2.InvoiceType);
+            Assert.Equal(inv1.Layout, inv2.Layout);
+            Assert.Equal(inv1.Summary, inv2.Summary);
             //Assert.AreEqual(inv1.TotalAmountExcludingTax, inv2.TotalAmountExcludingTax);-- leave out as calcs currently come from items
             //Assert.AreEqual(inv1.TotalTaxAmount, inv2.TotalTaxAmount); -- leave out as calcs currently come from items
             //Assert.AreEqual(inv1.TotalAmountInclTax, inv2.TotalAmountInclTax); -- leave out as calcs currently come from items
             var inv1Date = Convert.ToDateTime(inv1.TransactionDate).Date;
             var inv2Date = Convert.ToDateTime(inv2.TransactionDate).Date;
-            Assert.AreEqual(inv1Date.Year, inv2Date.Year, "Year is different");
-            Assert.AreEqual(inv1Date.Month, inv2Date.Month, "Month is different");
-            Assert.AreEqual(inv1Date.Day, inv2Date.Day, "Day is different");
+            Assert.Equal(inv1Date.Year, inv2Date.Year);
+            Assert.Equal(inv1Date.Month, inv2Date.Month);
+            Assert.Equal(inv1Date.Day, inv2Date.Day);
             //Assert.AreEqual(Convert.ToDateTime(inv1.TransactionDate).Date, Convert.ToDateTime(inv2.TransactionDate).Date);
-            Assert.AreEqual(inv1.BillingContactId.GetValueOrDefault(), inv2.BillingContactId.GetValueOrDefault(), "BillingContactId is different");
-            Assert.AreEqual(inv1.ShippingContactId.GetValueOrDefault(), inv2.ShippingContactId.GetValueOrDefault(), "ShippingContactId is different");
+            Assert.Equal(inv1.BillingContactId.GetValueOrDefault(), inv2.BillingContactId.GetValueOrDefault());
+            Assert.Equal(inv1.ShippingContactId.GetValueOrDefault(), inv2.ShippingContactId.GetValueOrDefault());
 
             VerifyInvoiceItemsAreEqual(inv1.Layout, inv1.LineItems, inv2.LineItems);
             VerifyInvoiceTermsAreEqual(inv1.Terms, inv2.Terms);
@@ -1162,11 +1144,11 @@ namespace Saasu.API.Client.IntegrationTests
         {
             if (list1 == null || list2 == null)
             {
-                Assert.IsTrue(list1 == null && list2 == null, "One list is NULL and the other is not. Expected both to be NULL");
+                Assert.True(list1 == null && list2 == null, "One list is NULL and the other is not. Expected both to be NULL");
                 return;
             }
 
-            Assert.AreEqual(list1.Count, list2.Count, "Number of items are different");
+            Assert.Equal(list1.Count, list2.Count);
 
             if (layout == "S")
             {
@@ -1177,7 +1159,7 @@ namespace Saasu.API.Client.IntegrationTests
                         i.TaxCode == item.TaxCode
                         );
 
-                    Assert.IsNotNull(itemInList2, "Service item differs in first list");
+                    Assert.NotNull(itemInList2);
                 }
 
                 foreach (var item in list2)
@@ -1187,7 +1169,7 @@ namespace Saasu.API.Client.IntegrationTests
                         i.TaxCode == item.TaxCode
                         );
 
-                    Assert.IsNotNull(itemInList1, "Service item differs in second list");
+                    Assert.NotNull(itemInList1);
                 }
             }
             else
@@ -1204,7 +1186,7 @@ namespace Saasu.API.Client.IntegrationTests
                         );
 
 
-                    Assert.IsNotNull(itemInList2, "Line item differs in first list");
+                    Assert.NotNull(itemInList2);
                 }
 
                 foreach (var item in list2)
@@ -1218,7 +1200,7 @@ namespace Saasu.API.Client.IntegrationTests
                         i.InventoryId == item.InventoryId
                         );
 
-                    Assert.IsNotNull(itemInList1, "Line item differs in second list");
+                    Assert.NotNull(itemInList1);
                 }
             }
         }
@@ -1227,17 +1209,17 @@ namespace Saasu.API.Client.IntegrationTests
         {
             if (msg1 == null || msg2 == null)
             {
-                Assert.IsNull(msg1, "Expected first email message to be null");
-                Assert.IsNull(msg2, "Expected second email message to be null");
+                Assert.Null(msg1);
+                Assert.Null(msg2);
                 return;
             }
 
-            Assert.AreEqual(msg1.To, msg2.To, "Email 'to' is not equal");
-            Assert.AreEqual(msg1.From, msg2.From, "Email 'from' is not equal");
-            Assert.AreEqual(msg1.Cc, msg2.Cc, "Email 'Cc' is not equal");
-            Assert.AreEqual(msg1.Bcc, msg2.Bcc, "Email 'Bcc' is not equal");
-            Assert.AreEqual(msg1.Subject, msg2.Subject, "Email 'subject' is not equal");
-            Assert.AreEqual(msg1.Body, msg2.Body, "Email 'body' is not equal");
+            Assert.Equal(msg1.To, msg2.To);
+            Assert.Equal(msg1.From, msg2.From);
+            Assert.Equal(msg1.Cc, msg2.Cc);
+            Assert.Equal(msg1.Bcc, msg2.Bcc);
+            Assert.Equal(msg1.Subject, msg2.Subject);
+            Assert.Equal(msg1.Body, msg2.Body);
         }
 
         private void VerifyInvoiceAttachmentsAreEqual(List<FileAttachmentInfo> list1, List<FileAttachmentInfo> list2)
@@ -1245,21 +1227,21 @@ namespace Saasu.API.Client.IntegrationTests
             if (list1 == null || list2 == null || list1.Count == 0 || list2.Count == 0)
             {
                 //this is because an insert may have sent attachments as null but a GET will return them as empy list.
-                Assert.IsTrue(list1 == null || list1.Count == 0, "Expected no items but list1 had some");
-                Assert.IsTrue(list2 == null || list2.Count == 0, "Expected no items but list2 had some");
+                Assert.True(list1 == null || list1.Count == 0, "Expected no items but list1 had some");
+                Assert.True(list2 == null || list2.Count == 0, "Expected no items but list2 had some");
                 return;
             }
 
             foreach (var detail in list1)
             {
                 var detailInList2 = list2.SingleOrDefault(d => d.Id == detail.Id && d.Name == detail.Name && d.Description == detail.Description);
-                Assert.IsNotNull(detailInList2, "Attachments do not match");
+                Assert.NotNull(detailInList2);
             }
 
             foreach (var detail in list2)
             {
                 var detailInList1 = list1.SingleOrDefault(d => d.Id == detail.Id && d.Name == detail.Name && d.Description == detail.Description);
-                Assert.IsNotNull(detailInList1, "Attachments do not match");
+                Assert.NotNull(detailInList1);
             }
         }
 
@@ -1267,14 +1249,14 @@ namespace Saasu.API.Client.IntegrationTests
         {
             if (terms1 == null || terms2 == null)
             {
-                Assert.IsNull(terms1, "First Terms is not NULL");
-                Assert.IsNull(terms2, "Second terms is different");
+                Assert.Null(terms1);
+                Assert.Null(terms2);
                 return;
             }
 
-            Assert.AreEqual(terms1.Type, terms2.Type, "Terms type is different");
-            Assert.AreEqual(terms1.Interval, terms2.Interval, "Terms Interval is different");
-            Assert.AreEqual(terms1.IntervalType, terms2.IntervalType, "Terms Interval type is different");
+            Assert.Equal(terms1.Type, terms2.Type);
+            Assert.Equal(terms1.Interval, terms2.Interval);
+            Assert.Equal(terms1.IntervalType, terms2.IntervalType);
         }
 
         #endregion
@@ -1286,13 +1268,13 @@ namespace Saasu.API.Client.IntegrationTests
             var response = new InvoicesProxy().GetInvoices(pageNumber, pageSize, fromDate, toDate, lastModifiedFromDate, lastModifiedToDate, invoiceNumber, purchaseOrderNumber, transactionType, paymentStatus,
                 billingContactId, invoiceStatus, tags, tagFilterType);
 
-            Assert.IsNotNull(response, "Invoice response is null");
-            Assert.IsTrue(response.IsSuccessfull, "Invoice response not successfull");
-            Assert.IsNotNull(response.DataObject, "No data in invoice reposnse");
-            Assert.IsNotNull(response.DataObject.Invoices, "Empty invoices in response");
-            Assert.IsNotNull(response.DataObject._links, "Empty hypermedia links in response");
-            Assert.IsTrue(response.DataObject._links.Count > 0, "No hypermedia links in response");
-            Assert.IsTrue(response.DataObject.Invoices.Count > 0, "No invoices in response");
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull, "Invoice response not successfull");
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Invoices);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0, "No hypermedia links in response");
+            Assert.True(response.DataObject.Invoices.Count > 0, "No invoices in response");
 
             return response;
         }
@@ -1329,8 +1311,8 @@ namespace Saasu.API.Client.IntegrationTests
                 IsTaxInc = true,
                 RequiresFollowUp = requiresFollowUp,
                 TransactionDate = transactionDate ?? DateTime.Now.AddDays(-10),
-                BillingContactId = billingContactId ?? _BillingContactId,
-                ShippingContactId = shippingContactId ?? _ShippingContactId,
+                BillingContactId = billingContactId ?? _invHelper.BillingContactId,
+                ShippingContactId = shippingContactId ?? _invHelper.ShippingContactId,
                 FxRate = fxRate,
                 AutoPopulateFxRate = autoPopulateFxRate,
                 InvoiceStatus = invoiceStatus,
@@ -1341,13 +1323,13 @@ namespace Saasu.API.Client.IntegrationTests
             {
                 var response = new InvoiceProxy().InsertInvoice(invDetail);
 
-                Assert.IsNotNull(response, "Inserting an invoice did not return a response");
-                Assert.IsTrue(response.IsSuccessfull, "Inserting an invoice was not successfull. Status code: " + ((int)response.StatusCode).ToString());
-                Assert.IsNotNull(response.RawResponse, "No raw response returned as part of inserting an invoice");
+                Assert.NotNull(response);
+                Assert.True(response.IsSuccessfull, "Inserting an invoice was not successfull. Status code: " + ((int)response.StatusCode).ToString());
+                Assert.NotNull(response.RawResponse);
 
                 var serialized = response.DataObject;
 
-                Assert.IsTrue(serialized.InsertedEntityId > 0, "Invoice insert did not return an InsertedEntityId > 0");
+                Assert.True(serialized.InsertedEntityId > 0, "Invoice insert did not return an InsertedEntityId > 0");
 
                 invDetail.TransactionId = serialized.InsertedEntityId;
             }
@@ -1357,7 +1339,7 @@ namespace Saasu.API.Client.IntegrationTests
 
         private InvoiceTransactionDetail GetUpdatedInvoice(int tranId, string lastUpdatedId, bool emailToContact = false, InvoiceTransactionDetail invoiceToCopyFrom = null)
         {
-            Assert.IsTrue(tranId > 0, "A valid transactionId mus be passed into the GetUpdatedSaleInvoice method");
+            Assert.True(tranId > 0, "A valid transactionId mus be passed into the GetUpdatedSaleInvoice method");
 
             var returnInvoice = new InvoiceTransactionDetail();
 
@@ -1400,8 +1382,8 @@ namespace Saasu.API.Client.IntegrationTests
                 PurchaseOrderNumber = string.Format("PO{0}", Guid.NewGuid()),
                 Summary = "Summary Update",
                 RequiresFollowUp = true,
-                BillingContactId = _ShippingContactId, //swap the contacts
-                ShippingContactId = _BillingContactId,
+                BillingContactId = _invHelper.ShippingContactId, //swap the contacts
+                ShippingContactId = _invHelper.BillingContactId,
                 Tags = new List<string> { "updated header tag 1", "updated header tag 2" },
                 SendEmailToContact = emailToContact
             };
@@ -1417,16 +1399,16 @@ namespace Saasu.API.Client.IntegrationTests
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 1",
-                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-                            TaxCode = TaxCode.SaleInclGst,
+                            AccountId = tranType == "S" ? _invHelper.IncomeAccountId : _invHelper.ExpenseAccountId,
+                            TaxCode = Constants.TaxCode.SaleInclGst,
                             TotalAmount = new decimal(10.00),
                             Tags = new List<string> {"item tag 1", "item tag 2"}
                         },
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 2",
-                            AccountId = tranType == "S" ? _IncomeAccountId : _ExpenseAccountId,
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            AccountId = tranType == "S" ? _invHelper.IncomeAccountId : _invHelper.ExpenseAccountId,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             TotalAmount = new decimal(20.00),
                             Tags = new List<string> {"item tag 3", "item tag 4"}
                         }
@@ -1438,21 +1420,21 @@ namespace Saasu.API.Client.IntegrationTests
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 1",
-                            TaxCode = TaxCode.SaleInclGst,
+                            TaxCode = Constants.TaxCode.SaleInclGst,
                             Quantity = 2,
                             UnitPrice = new decimal(15.00),
                             PercentageDiscount = new decimal(3.00),
-                            InventoryId =  tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            InventoryId =  tranType == "S" ? _invHelper.InventorySaleItemId : _invHelper.InventoryPurchaseItemId,
                             Tags = new List<string> {"item tag 1", "item tag 2"}
                         },
                         new InvoiceTransactionLineItem
                         {
                             Description = "line item 2",
-                            TaxCode = TaxCode.SaleInputTaxed,
+                            TaxCode = Constants.TaxCode.SaleInputTaxed,
                             Quantity = 3,
                             UnitPrice = new decimal(25.00),
                             PercentageDiscount = new decimal(0.00),
-                            InventoryId = tranType == "S" ? _InventorySaleItemId : _InventoryPurchaseItemId,
+                            InventoryId = tranType == "S" ? _invHelper.InventorySaleItemId : _invHelper.InventoryPurchaseItemId,
                             Tags = new List<string> {"item tag 3", "item tag 4"}
                         }
 
@@ -1484,238 +1466,13 @@ namespace Saasu.API.Client.IntegrationTests
             return null;
         }
 
-        private void CreateTestContacts()
-        {
-            //Billing contact.
-            var response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "BillingContact");
 
-            if (response.DataObject.Contacts.Count == 0)
-            {
-                var dto = new Ola.RestClient.Dto.ContactDto
-                {
-                    GivenName = "TestAPIInvoice",
-                    FamilyName = "BillingContact"
-                };
 
-                Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
-                proxy.Insert(dto);
-            }
-            else
-            {
-                _BillingContactId = response.DataObject.Contacts[0].Id.Value;
-            }
 
-            //Shipping contact.
-            response = new ContactsProxy().GetContacts(givenName: "TestAPIInvoice", familyName: "ShippingContact");
 
-            if (response.DataObject.Contacts.Count == 0)
-            {
-                var dto = new Ola.RestClient.Dto.ContactDto
-                {
-                    GivenName = "TestAPIInvoice",
-                    FamilyName = "ShippingContact"
-                };
 
-                Ola.RestClient.Proxies.CrudProxy proxy = new Ola.RestClient.Proxies.ContactProxy();
-                proxy.Insert(dto);
-            }
-            else
-            {
-                _ShippingContactId = response.DataObject.Contacts[0].Id.Value;
-            }
-        }
 
-        private void CreateTestAccounts()
-        {
-            if (_IncomeAccountId == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Income,
-                    Name = "Income Account " + " " + System.Guid.NewGuid()
-                };
 
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _IncomeAccountId = dto.Uid;
-            }
-
-            if (_IncomeAccountId2 == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Income,
-                    Name = "Income Account " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _IncomeAccountId2 = dto.Uid;
-            }
-
-            if (_ExpenseAccountId == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Expense,
-                    Name = "Expense Account " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _ExpenseAccountId = dto.Uid;
-            }
-
-            if (_ExpenseAccountId2 == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Expense,
-                    Name = "Expense Account2 " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _ExpenseAccountId2 = dto.Uid;
-            }
-
-            if (_AssetAccountId == 0)
-            {
-                var dto = new TransactionCategoryDto
-                {
-                    Type = AccountType.Asset,
-                    Name = "Asset Account " + " " + System.Guid.NewGuid()
-                };
-
-                new Ola.RestClient.Proxies.TransactionCategoryProxy().Insert(dto);
-                _AssetAccountId = dto.Uid;
-            }
-
-            if (_BankAccountId == 0)
-            {
-                var acctname = "Bank Account " + " " + System.Guid.NewGuid();
-
-                var dto = new BankAccountDto
-                {
-                    BSB = "111111",
-                    AccountNumber = "22222222",
-                    Type = AccountType.Asset,
-                    Name = acctname,
-                    DisplayName = acctname
-                };
-
-                new Ola.RestClient.Proxies.BankAccountProxy().Insert(dto);
-                _BankAccountId = dto.Uid;
-            }
-        }
-
-        private void CreateTestInventoryItems()
-        {
-            var proxy = new InventoryItemProxy();
-
-            //sale items.
-            if (_InventorySaleItemId == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(5.00),
-                    BuyingPrice = new decimal(4.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(6.00),
-                    DefaultReOrderQuantity = 2,
-                    Description = "Test inventory sale item",
-                    IsActive = true,
-                    IsBought = false,
-                    IsBuyingPriceIncTax = false,
-                    IsSold = true,
-                    SaleIncomeAccountUid = _IncomeAccountId
-                };
-
-                proxy.Insert(dto);
-                _InventorySaleItemId = dto.Uid;
-            }
-
-            if (_InventorySaleItemId2 == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(25.00),
-                    BuyingPrice = new decimal(40.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(16.00),
-                    DefaultReOrderQuantity = 20,
-                    Description = "updated Test inventory sale item",
-                    IsActive = true,
-                    IsBought = false,
-                    IsBuyingPriceIncTax = false,
-                    IsSold = true,
-                    SaleIncomeAccountUid = _IncomeAccountId2
-                };
-
-                proxy.Insert(dto);
-                _InventorySaleItemId2 = dto.Uid;
-            }
-
-            //purchase items.
-            if (_InventoryPurchaseItemId == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(5.00),
-                    BuyingPrice = new decimal(4.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(6.00),
-                    DefaultReOrderQuantity = 2,
-                    Description = "Test inventory purchase item",
-                    IsActive = true,
-                    IsBought = true,
-                    IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountUid = _ExpenseAccountId
-                };
-
-                proxy.Insert(dto);
-                _InventoryPurchaseItemId = dto.Uid;
-            }
-
-            if (_InventoryPurchaseItemId2 == 0)
-            {
-                var dto = new InventoryItemDto
-                {
-                    AssetAccountUid = _AssetAccountId,
-                    AverageCost = new decimal(50.00),
-                    BuyingPrice = new decimal(40.00),
-                    Code = string.Format("Inv{0}", Guid.NewGuid().ToString().Substring(0, 20)),
-                    CurrentValue = new decimal(60.00),
-                    DefaultReOrderQuantity = 20,
-                    Description = "Updated test inventory purchase item",
-                    IsActive = true,
-                    IsBought = true,
-                    IsBuyingPriceIncTax = true,
-                    PurchaseExpenseAccountUid = _ExpenseAccountId2
-                };
-
-                proxy.Insert(dto);
-                _InventoryPurchaseItemId2 = dto.Uid;
-            }
-        }
-
-        //For test cases where we need at least a few invoices to exist.
-        private void CreatetestInvoices()
-        {
-            var inv1 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.IsNotNull(inv1);
-            Assert.Greater(inv1.TransactionId, 0);
-            _invoice1Id = Convert.ToInt32(inv1.TransactionId);
-
-            var inv2 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.IsNotNull(inv2);
-            Assert.Greater(inv2.TransactionId, 0);
-            _invoice2Id = Convert.ToInt32(inv2.TransactionId);
-
-            var inv3 = GetTestInsertInvoice(invoiceLayout: InvoiceLayout.Service, actuallyInsertAndVerifyResponse: true);
-            Assert.IsNotNull(inv3);
-            Assert.Greater(inv3.TransactionId, 0);
-            _invoice3Id = Convert.ToInt32(inv3.TransactionId);
-        }
 
         private static int? GetTestInvoiceId()
         {

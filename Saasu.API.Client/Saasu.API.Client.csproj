@@ -1,150 +1,52 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E3269577-F1A5-471D-829D-F63E6C3599A2}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Saasu.API.Client</RootNamespace>
-    <AssemblyName>Saasu.API.Client</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <Configurations>Debug;Release;CI</Configurations>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>Saasu.API.Dotnet.Sdk</PackageId>
+    <Authors>Saasu</Authors>
+    <Title>API SDK for the Saasu API</Title>
+    <Description>A client SDK for working with the Saasu API.</Description>
+    <PackageProjectUrl>https://github.com/saasu/api-sdk-dotnet</PackageProjectUrl>
+    <PackageTags>Saasu API SDK</PackageTags>
+    <Version>1.2</Version>
+    <Copyright>Saasu Pty. Ltd.</Copyright>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CI|AnyCPU'">
-    <OutputPath>bin\CI\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
-    <OutputPath>bin\Staging\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Activation" />
-    <Reference Include="System.ServiceModel.Web" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461'">
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="OctoPack" Version="3.6.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Config.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Config.settings</DependentUpon>
     </Compile>
-    <Compile Include="Proxies\AccountProxy.cs" />
-    <Compile Include="Proxies\AccountsProxy.cs" />
-    <Compile Include="Proxies\ActivitiesProxy.cs" />
-    <Compile Include="Proxies\ActivityProxy.cs" />
-    <Compile Include="Proxies\ContactAggregateProxy.cs" />
-    <Compile Include="Proxies\DeletedEntitiesProxy.cs" />
-    <Compile Include="Proxies\ItemAdjustmentProxy.cs" />
-    <Compile Include="Proxies\ItemAdjustmentsProxy.cs" />
-    <Compile Include="Proxies\ItemTransferProxy.cs" />
-    <Compile Include="Proxies\ItemTransfersProxy.cs" />
-    <Compile Include="Proxies\JournalProxy.cs" />
-    <Compile Include="Proxies\JournalsProxy.cs" />
-    <Compile Include="Proxies\UserProxy.cs" />
-    <Compile Include="Proxies\ContactProxy.cs" />
-    <Compile Include="Framework\AuthenticationType.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Framework\BaseProxy.cs" />
-    <Compile Include="Proxies\AuthorisationProxy.cs" />
-    <Compile Include="Proxies\FileIdentitiesProxy.cs" />
-    <Compile Include="Proxies\ContactsProxy.cs" />
-    <Compile Include="Proxies\FileIdentityProxy.cs" />
-    <Compile Include="Proxies\SearchProxy.cs" />
-    <Compile Include="Proxies\ItemProxy.cs" />
-    <Compile Include="Proxies\ItemsProxy.cs" />
-    <Compile Include="Proxies\PaymentProxy.cs" />
-    <Compile Include="Proxies\PaymentsProxy.cs" />
-    <Compile Include="Proxies\InvoiceProxy.cs" />
-    <Compile Include="Proxies\InvoicesProxy.cs" />
-    <Compile Include="Framework\ProxyResponse.cs" />
-    <Compile Include="Framework\RequestContentType.cs" />
-    <Compile Include="Proxies\CompanyProxy.cs" />
-    <Compile Include="Proxies\TaxCodeProxy.cs" />
-    <Compile Include="Proxies\CompaniesProxy.cs" />
-    <Compile Include="Proxies\TaxCodesProxy.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Config.settings">
+    <None Update="Config.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Config.Designer.cs</LastGenOutput>
     </None>
-    <None Include="packages.config" />
-    <None Include="Saasu.API.Client.nuspec" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Saasu.API.Core\Saasu.API.Core.csproj">
-      <Project>{17364BF1-4929-440F-B571-2067CF0635EC}</Project>
-      <Name>Saasu.API.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OctoPack.3.6.3\build\OctoPack.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OctoPack.3.6.3\build\OctoPack.targets'))" />
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))" />
+    </ItemGroup>
   </Target>
-  <Import Project="..\packages\OctoPack.3.6.3\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.6.3\build\OctoPack.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

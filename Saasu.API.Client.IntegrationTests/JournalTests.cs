@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using Xunit;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Framework;
 using Saasu.API.Core.Models.Contacts;
@@ -9,7 +9,6 @@ using System.Linq;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-    [TestFixture]
     public class JournalTests
     {
         private int _assetAccountId;
@@ -30,20 +29,20 @@ namespace Saasu.API.Client.IntegrationTests
             CreateTestJournals();
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsAll()
         {
             AssertJournalsProxy();
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsOnePageOneRecord()
         {
             var response = AssertJournalsProxy(pageNumber: 1, pageSize: 1);
-            Assert.AreEqual(1, response.DataObject.Journals.Count, "Paging of 1 page and 1 record is returning the wrong number of records");
+            Assert.Single(response.DataObject.Journals);
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsFilterOnDates()
         {
             var result = AssertJournalsProxy(fromDate: DateTime.Now.AddDays(-4), toDate: DateTime.Now.AddDays(1));
@@ -51,10 +50,10 @@ namespace Saasu.API.Client.IntegrationTests
             //verify test journal with tran date 5 days in the passed doesn't get picked up.
             var journalsFrom5DaysAgo = result.DataObject.Journals.Where(j => j.TransactionId == _testJournalTranId2).ToList();
            
-            Assert.AreEqual(journalsFrom5DaysAgo.Count, 0, "Journal transaction outside of FromDate filter was picked up");
+            Assert.Empty(journalsFrom5DaysAgo);
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsFilterOnModifiedDates()
         {
             var lastModifiedFromDate = DateTime.Now.AddDays(-1);
@@ -62,49 +61,49 @@ namespace Saasu.API.Client.IntegrationTests
 
             var result = AssertJournalsProxy(lastModifiedFromDate: lastModifiedFromDate, lastModifiedToDate: lastModififedToDate);
             //make sure at least the 2 test journals are picked up.
-            Assert.Greater(result.DataObject.Journals.Count, 1);
+            Assert.True(result.DataObject.Journals.Count > 1);
 
             var outofRangeJournals = result.DataObject.Journals.Where(j => j.LastModifiedDateUtc < lastModifiedFromDate).ToList();
 
-            Assert.AreEqual(outofRangeJournals.Count, 0, "Journal transaction outside of LastModifiedFromDate filter was picked up");
+            Assert.Empty(outofRangeJournals);
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsFilterOnContactId()
         {
             var result = AssertJournalsProxy(contactId: _contactId1);
             var journalsWithWrongContactId = result.DataObject.Journals.Where(j => j.JournalContactId == _contactId2).ToList();
-            Assert.AreEqual(journalsWithWrongContactId.Count, 0, "Journal transaction outside of JournalContactId filter was picked up");
+            Assert.Empty(journalsWithWrongContactId);
 
             //make sure test transaction 2 is not picked up as it has a different contact.
             journalsWithWrongContactId = result.DataObject.Journals.Where(j => j.TransactionId == _testJournalTranId2).ToList();
-            Assert.AreEqual(journalsWithWrongContactId.Count, 0, "Journal transaction outside of JournalContactId filter was picked up");
+            Assert.Empty(journalsWithWrongContactId);
         }
 
-        [Test]
+        [Fact]
         public void GetSingleJournalWithJournalId()
         {
             var response = new JournalProxy().GetJournal(_testJournalTranId1);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.IsNotNull(response.DataObject);
-            Assert.IsNotNull(response.DataObject._links);
-            Assert.IsTrue(response.DataObject._links.Count > 0);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0);
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsPageSize()
         {
             var proxy = new JournalsProxy();
             var response = proxy.GetJournals(pageNumber: 1, pageSize: 2);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
-            Assert.AreEqual(response.DataObject.Journals.Count, 2);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
+            Assert.Equal(response.DataObject.Journals.Count, 2);
         }
 
-        [Test]
+        [Fact]
         public void GetJournalsSecondPage()
         {
             var proxy = new JournalsProxy();
@@ -114,10 +113,10 @@ namespace Saasu.API.Client.IntegrationTests
 
             response = proxy.GetJournals(pageNumber: 2);
 
-            Assert.IsNotNull(response);
-            Assert.IsTrue(response.IsSuccessfull);
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull);
 
-            response.DataObject.Journals.ForEach(i => Assert.IsFalse(idsFromPage1.Contains(i.TransactionId)));
+            response.DataObject.Journals.ForEach(i => Assert.DoesNotContain(i.TransactionId, idsFromPage1));
         }
 
         public static ProxyResponse<JournalTransactionSummaryResponse> AssertJournalsProxy(int? pageNumber = null, int? pageSize = null, DateTime? fromDate = null, DateTime? toDate = null,
@@ -125,13 +124,13 @@ namespace Saasu.API.Client.IntegrationTests
         {
             var response = new JournalsProxy().GetJournals(pageNumber, pageSize, fromDate, toDate, lastModifiedFromDate, lastModifiedToDate, contactId, tags, tagFilterType);
 
-            Assert.IsNotNull(response, "Journal response is null");
-            Assert.IsTrue(response.IsSuccessfull, "Journal response not successfull");
-            Assert.IsNotNull(response.DataObject, "No data in journal reposnse");
-            Assert.IsNotNull(response.DataObject.Journals, "Empty journals in response");
-            Assert.IsNotNull(response.DataObject._links, "Empty hypermedia links in response");
-            Assert.IsTrue(response.DataObject._links.Count > 0, "No hypermedia links in response");
-            Assert.IsTrue(response.DataObject.Journals.Count > 0, "No journals in response");
+            Assert.NotNull(response);
+            Assert.True(response.IsSuccessfull, "Journal response not successfull");
+            Assert.NotNull(response.DataObject);
+            Assert.NotNull(response.DataObject.Journals);
+            Assert.NotNull(response.DataObject._links);
+            Assert.True(response.DataObject._links.Count > 0, "No hypermedia links in response");
+            Assert.True(response.DataObject.Journals.Count > 0, "No journals in response");
 
             return response;
         }
@@ -212,11 +211,11 @@ namespace Saasu.API.Client.IntegrationTests
         private void GetTestAccounts()
         {
             var assetAccountResponse = new AccountsProxy().GetAccounts(1, 25, true, false, "Asset", null, null);
-            Assert.Greater(assetAccountResponse.DataObject.Accounts.Count, 0, "You have to have at least one Asset account to run these tests.");
+            Assert.True(assetAccountResponse.DataObject.Accounts.Count > 0, "You have to have at least one Asset account to run these tests.");
             _assetAccountId = (int)assetAccountResponse.DataObject.Accounts[0].Id;
 
             var expenseAccountResponse = new AccountsProxy().GetAccounts(1, 25, true, false, "Expense", null, null);
-            Assert.Greater(expenseAccountResponse.DataObject.Accounts.Count, 0, "You have to have at least one Expense account to run these tests.");
+            Assert.True(expenseAccountResponse.DataObject.Accounts.Count > 0, "You have to have at least one Expense account to run these tests.");
             _expenseAccountId = (int)expenseAccountResponse.DataObject.Accounts[0].Id;
         }
 

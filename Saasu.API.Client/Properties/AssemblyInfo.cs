@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Saasu.API.Client")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A client SDK for working with the Saasu API.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("Saasu")]
 [assembly: AssemblyProduct("Saasu.API.Client")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCopyright("Saasu Pty. Ltd.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

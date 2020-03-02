@@ -1,4 +1,5 @@
-﻿using Saasu.API.Core.Framework;
+﻿using System;
+using Saasu.API.Core.Framework;
 using Saasu.API.Core.Globals;
 using Saasu.API.Core.Models.RequestFiltering;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Saasu.API.Client.Framework
@@ -301,19 +303,6 @@ namespace Saasu.API.Client.Framework
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
             }
 
-            MediaTypeFormatter mediaFormatter;
-
-            if (ContentType == RequestContentType.ApplicationXml)
-            {
-                mediaFormatter = new System.Net.Http.Formatting.XmlMediaTypeFormatter();
-
-            }
-            else
-            {
-                mediaFormatter = new System.Net.Http.Formatting.JsonMediaTypeFormatter();
-            }
-
-
             HttpResponseMessage responseMsg = null;
             if (OperationMethod == HttpMethod.Get)
             {
@@ -333,16 +322,35 @@ namespace Saasu.API.Client.Framework
                 //Note: Need to explicitly specify the content type here otherwise this call fails.
                 if (OperationMethod == HttpMethod.Put)
                 {
-                    responseMsg = client.PutAsync<T>(requestUri, postData, mediaFormatter).Result;
+                    if (ContentType == RequestContentType.ApplicationXml)
+                    {
+                        StringContent content = new StringContent(postData.Serialize(), Encoding.UTF8, "application/xml");
+                        responseMsg = client.PutAsync(requestUri, content).Result;
+                    }
+                    else
+                    {
+                        StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json");
+                        responseMsg = client.PutAsync(requestUri, content).Result;
+                    }
                 }
                 else
                 {
-                    responseMsg = client.PostAsync<T>(requestUri, postData, mediaFormatter).Result;
+                    if (ContentType == RequestContentType.ApplicationXml)
+                    {
+                        StringContent content = new StringContent(postData.Serialize(), Encoding.UTF8, "application/xml");
+                        responseMsg = client.PostAsync(requestUri, content).Result;
+                    }
+                    else
+                    {
+                        StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json");
+                        responseMsg = client.PostAsync(requestUri, content).Result;
+                    }
                 }
             }
 
             return responseMsg;
         }
+
 
         public T Deserialise<T>(string data) where T : class
         {
@@ -373,5 +381,35 @@ namespace Saasu.API.Client.Framework
         }
 
 
+    }
+
+    public static class Util
+    {
+        public static string Serialize<T>(this T value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+            try
+            {
+                var emptyNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+                var xmlSerializer = new XmlSerializer(typeof(T));
+                var settings = new XmlWriterSettings();
+                settings.Indent = true;
+                settings.OmitXmlDeclaration = true;
+
+                var stringWriter = new StringWriter();
+                using (var writer = XmlWriter.Create(stringWriter, settings))
+                {
+                    xmlSerializer.Serialize(writer, value, emptyNamespaces);
+                    return stringWriter.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred", ex);
+            }
+        }
     }
 }

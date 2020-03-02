@@ -1,17 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 using Saasu.API.Client.IntegrationTests.Helpers;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Models.ItemAdjustments;
 
 namespace Saasu.API.Client.IntegrationTests
 {
-	[TestFixture]
 	public class ItemAdjustmentTests
 	{
 
@@ -24,7 +23,7 @@ namespace Saasu.API.Client.IntegrationTests
 			_adjustmentHelper = new ItemAdjustmentHelper();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldInsertItemAdjustment()
 		{
 			//var itemCode = "test_w1";
@@ -40,26 +39,26 @@ namespace Saasu.API.Client.IntegrationTests
 			var adjustmentProxy = new ItemAdjustmentProxy();
 			var response = adjustmentProxy.InsertItemAdjustment(detail);
 
-			Assert.IsTrue(response.IsSuccessfull);
-			Assert.IsNotNull(response.DataObject);
-			Assert.IsTrue(response.DataObject.InsertedEntityId > 0);
-			Assert.GreaterOrEqual(response.DataObject.UtcLastModified, DateTime.Today.AddMinutes(-10).ToUniversalTime());
+			Assert.True(response.IsSuccessfull);
+			Assert.NotNull(response.DataObject);
+			Assert.True(response.DataObject.InsertedEntityId > 0);
+			Assert.True(response.DataObject.UtcLastModified >= DateTime.Today.AddMinutes(-10).ToUniversalTime());
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldFailOnInsertWithNoAdjustmentItems()
 		{
 			var detail = _adjustmentHelper.GetAdjustmentDetail(new List<AdjustmentItem>() );
 			var adjustmentProxy = new ItemAdjustmentProxy();
 			var response = adjustmentProxy.InsertItemAdjustment(detail);
 
-			Assert.IsFalse(response.IsSuccessfull);
-			Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
-			Assert.IsNull(response.DataObject);
-			Assert.IsTrue(response.RawResponse.Contains("Please specify AdjustmentItems for this transaction."));
+			Assert.False(response.IsSuccessfull);
+			Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+			Assert.Null(response.DataObject);
+			Assert.Contains("Please specify AdjustmentItems for this transaction.", response.RawResponse);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldGetExistingItemAdjustment()
 		{
 			var itemProxy = new ItemProxy();
@@ -75,33 +74,33 @@ namespace Saasu.API.Client.IntegrationTests
 			var insertResponse = adjustmentProxy.InsertItemAdjustment(detail);
 
 			var response = adjustmentProxy.GetItemAdjustment(insertResponse.DataObject.InsertedEntityId);
-			Assert.IsTrue(response.IsSuccessfull);
-			Assert.IsNotNull(response.DataObject);
-			Assert.IsTrue(response.DataObject.Id == insertResponse.DataObject.InsertedEntityId);
+			Assert.True(response.IsSuccessfull);
+			Assert.NotNull(response.DataObject);
+			Assert.True(response.DataObject.Id == insertResponse.DataObject.InsertedEntityId);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldFailGetItemAdjustmentWithBadId()
 		{
 			var adjustmentProxy = new ItemAdjustmentProxy();
 			var response = adjustmentProxy.GetItemAdjustment(-1);
 
-			Assert.IsFalse(response.IsSuccessfull);
-			Assert.IsNull(response.DataObject);
+			Assert.False(response.IsSuccessfull);
+			Assert.Null(response.DataObject);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldFailGetItemAdjustment()
 		{
 			var adjustmentProxy = new ItemAdjustmentProxy();
 			var response = adjustmentProxy.GetItemAdjustment(99999999);
 
-			Assert.IsFalse(response.IsSuccessfull);
-			Assert.IsNull(response.DataObject);
-			Assert.IsTrue(response.RawResponse.Contains("The requested transaction is not found."));
+			Assert.False(response.IsSuccessfull);
+			Assert.Null(response.DataObject);
+			Assert.True(response.RawResponse.Contains("The requested transaction is not found."));
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldUpdateExistingItemAdjustment()
 		{
 			var itemProxy = new ItemProxy();
@@ -129,21 +128,21 @@ namespace Saasu.API.Client.IntegrationTests
 			
 			var response = adjustmentProxy.UpdateItemAdjustment(detail, insertResponse.DataObject.InsertedEntityId);
 		
-			Assert.IsTrue(response.IsSuccessfull);
+			Assert.True(response.IsSuccessfull);
 
 			var updatedAdjustment = adjustmentProxy.GetItemAdjustment(insertResponse.DataObject.InsertedEntityId).DataObject;
 
-			Assert.IsTrue(updatedAdjustment.AdjustmentItems[0].Quantity == 5);
-			Assert.IsTrue(updatedAdjustment.Summary.Equals("Updated the summary."));
-			Assert.IsTrue(updatedAdjustment.Notes.Equals("Updated the notes."));
+			Assert.True(updatedAdjustment.AdjustmentItems[0].Quantity == 5);
+			Assert.True(updatedAdjustment.Summary.Equals("Updated the summary."));
+			Assert.True(updatedAdjustment.Notes.Equals("Updated the notes."));
 			//Assert.IsTrue(updatedAdjustment.Tags[0] == "Updated");
-			Assert.IsTrue(updateDate == updatedAdjustment.Date);
-			Assert.IsTrue(updatedAdjustment.RequiresFollowUp.Value);
+			Assert.True(updateDate == updatedAdjustment.Date);
+			Assert.True(updatedAdjustment.RequiresFollowUp.Value);
 
 
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldDeleteItemAdjustment()
 		{
 			var itemProxy = new ItemProxy();
@@ -160,10 +159,10 @@ namespace Saasu.API.Client.IntegrationTests
 
 			var response = adjustmentProxy.DeleteItemAdjustment(insertResponse.DataObject.InsertedEntityId);
 
-			Assert.IsTrue(response.IsSuccessfull);
+			Assert.True(response.IsSuccessfull);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldGetItemAdjustments()
 		{
 			var itemProxy = new ItemProxy();
@@ -182,16 +181,16 @@ namespace Saasu.API.Client.IntegrationTests
 
 
 			var response = new ItemAdjustmentsProxy().GetItemAdjustments();
-			Assert.IsNotNull(response);
-			Assert.IsTrue(response.IsSuccessfull);
-			Assert.IsNotNull(response.DataObject);
-			Assert.IsNotNull(response.DataObject.ItemAdjustments);
-			Assert.IsTrue(response.DataObject.ItemAdjustments.Count > 0);
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull);
+			Assert.NotNull(response.DataObject);
+			Assert.NotNull(response.DataObject.ItemAdjustments);
+			Assert.True(response.DataObject.ItemAdjustments.Count > 0);
 			//Assert.IsTrue(response.DataObject.ItemAdjustments.Exists(x => x.Id == insertResponse.DataObject.InsertedEntityId));
 
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldGetItemAdjustmentByDate()
 		{
 			var testDate = new DateTime(2016, 5, 8);
@@ -210,11 +209,11 @@ namespace Saasu.API.Client.IntegrationTests
 			var insertResponse = adjustmentProxy.InsertItemAdjustment(detail);
 
 			var response = new ItemAdjustmentsProxy().GetItemAdjustments(null, null, testDate.AddDays(-1), testDate.AddDays(1));
-			Assert.IsNotNull(response);
-			Assert.IsTrue(response.IsSuccessfull);
-			Assert.IsNotNull(response.DataObject);
-			Assert.IsNotNull(response.DataObject.ItemAdjustments);
-			Assert.IsTrue(response.DataObject.ItemAdjustments.Count > 0);
+			Assert.NotNull(response);
+			Assert.True(response.IsSuccessfull);
+			Assert.NotNull(response.DataObject);
+			Assert.NotNull(response.DataObject.ItemAdjustments);
+			Assert.True(response.DataObject.ItemAdjustments.Count > 0);
 
 		}
 

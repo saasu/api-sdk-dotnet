@@ -6,6 +6,7 @@ namespace Saasu.API.Core.Globals
 {
     public static class Constants
     {
+        public const string AutoNumber = "<auto number>";
         public static class TaxCode
         {
             public const string ExpInclGst = "G11";
@@ -44,6 +45,7 @@ namespace Saasu.API.Core.Globals
         {
             public const string Item = "I";
             public const string Service = "S";
+            public const string Purchase = "P";
         }
 
         public static class InvoiceType

@@ -28,7 +28,7 @@ namespace Saasu.API.Client.IntegrationTests
             var invoiceDetail = faker.Generate();
             var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
             Assert.True(response != null && response.IsSuccessfull);
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
 
             var results1 = searchProxy.Search(invoiceDetail.Summary, SearchScope.Transactions, 1, 25);
             Assert.NotNull(results1);
@@ -77,7 +77,7 @@ namespace Saasu.API.Client.IntegrationTests
             var invoiceDetail = faker.Generate();
             var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
             Assert.True(response != null && response.IsSuccessfull);
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
 
             var results1 = searchProxy.Search(invoiceDetail.Summary, SearchScope.Transactions, 1, 25);
             Assert.NotNull(results1);
@@ -122,7 +122,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void ShouldReturnContactsForScopedSearch()
         {
             var createdContactInfo = _searchHelper.CreateContact();
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
             
             var searchProxy = new SearchProxy();
             var results1 = searchProxy.Search($"{createdContactInfo.ContactDetail.GivenName} {createdContactInfo.ContactDetail.FamilyName}", SearchScope.Contacts, 1, 25);
@@ -155,7 +155,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void ShouldReturnInventoryItemsForScopedSearch()
         {
             var itemInfo = _searchHelper.CreatSaleInventoryItem();
-            Thread.Sleep(3000);
+            Thread.Sleep(5000);
             
             var searchProxy = new SearchProxy();
             var result1 = searchProxy.Search(itemInfo.ItemDetail.Description, SearchScope.InventoryItems, 1, 25);
@@ -192,7 +192,7 @@ namespace Saasu.API.Client.IntegrationTests
 
             _searchHelper.CreatSaleInventoryItem(invoiceDetail.Summary);
             _searchHelper.CreateContact(companyName: invoiceDetail.Summary);
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
 
 
             var searchProxy = new SearchProxy();
@@ -250,7 +250,7 @@ namespace Saasu.API.Client.IntegrationTests
         public void IndexedContactShouldMatchEntityData()
         {
             var contactInfo = _searchHelper.CreateContact();
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
 
             var searchProxy = new SearchProxy();
 
@@ -277,7 +277,7 @@ namespace Saasu.API.Client.IntegrationTests
             var searchProxy = new SearchProxy();
 
             var itemInfo = _searchHelper.CreatSaleInventoryItem();
-            Thread.Sleep(3000);
+            Thread.Sleep(5000);
 
             var searchResults = searchProxy.Search(itemInfo.ItemDetail.Code, SearchScope.InventoryItems, 1, 10);
             Assert.NotNull(searchResults.DataObject);
@@ -306,7 +306,7 @@ namespace Saasu.API.Client.IntegrationTests
             var purchaseInfo = _searchHelper.GetPurchaseInvoiceFaker(saleInfo.Summary).Generate();
             var purchaseResponse = invoiceProxy.InsertInvoice(purchaseInfo);
             Assert.True(purchaseResponse != null && purchaseResponse.IsSuccessfull);
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
 
 
             var searchProxy = new SearchProxy();
@@ -327,7 +327,7 @@ namespace Saasu.API.Client.IntegrationTests
             var purchaseInfo = _searchHelper.GetPurchaseInvoiceFaker(saleInfo.Summary).Generate();
             var purchaseResponse = invoiceProxy.InsertInvoice(purchaseInfo);
             Assert.True(purchaseResponse != null && purchaseResponse.IsSuccessfull);
-            Thread.Sleep(3000); // Need to wait for entities to be indexed
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
 
 
             var searchProxy = new SearchProxy();

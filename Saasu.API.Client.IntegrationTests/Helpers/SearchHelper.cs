@@ -159,6 +159,9 @@ namespace Saasu.API.Client.IntegrationTests.Helpers
 
         public Faker<InvoiceTransactionDetail> GetSaleInvoiceFaker(string summary = null)
         {
+            var billContact = CreateContact();
+            var shipContact = CreateContact();
+
             var saleItemFaker = new Faker<InvoiceTransactionLineItem>()
                 .RuleFor(i => i.Tags, f => f.Random.WordsArray(f.Random.Number(1, 3)).ToList())
                 .RuleFor(i => i.TotalAmount, f => decimal.Parse(f.Commerce.Price()))
@@ -182,8 +185,12 @@ namespace Saasu.API.Client.IntegrationTests.Helpers
                 .RuleFor(i => i.TotalAmount, (f, i) => i.LineItems.Sum(s => s.TotalAmount))
                 .RuleFor(i => i.IsTaxInc, true)
                 .RuleFor(i => i.TransactionDate, f => f.Date.Recent(3))
-                .RuleFor(i => i.BillingContactId, f => CreateContact().ContactId)
-                .RuleFor(i => i.ShippingContactId, f => CreateContact().ContactId)
+                .RuleFor(i => i.BillingContactId, f => billContact.ContactId)
+                .RuleFor(i => i.BillingContactFirstName, f => billContact.ContactDetail.GivenName)
+                .RuleFor(i => i.BillingContactLastName, f => billContact.ContactDetail.FamilyName)
+                .RuleFor(i => i.ShippingContactId, f => shipContact.ContactId)
+                .RuleFor(i => i.ShippingContactFirstName, f => shipContact.ContactDetail.GivenName)
+                .RuleFor(i => i.ShippingContactLastName, f => shipContact.ContactDetail.FamilyName)
                 .RuleFor(i => i.Tags, f => f.Random.WordsArray(f.Random.Number(1, 3)).ToList());
 
             return invoiceDetailFaker;
@@ -192,6 +199,9 @@ namespace Saasu.API.Client.IntegrationTests.Helpers
         
         public Faker<InvoiceTransactionDetail> GetPurchaseInvoiceFaker(string summary = null)
         {
+            var billContact = CreateContact();
+            var shipContact = CreateContact();
+
             var purchaseItemFaker = new Faker<InvoiceTransactionLineItem>()
                 .RuleFor(i => i.Tags, f => f.Random.WordsArray(f.Random.Number(1, 3)).ToList())
                 .RuleFor(i => i.TotalAmount, f => decimal.Parse(f.Commerce.Price()))
@@ -215,8 +225,12 @@ namespace Saasu.API.Client.IntegrationTests.Helpers
                 .RuleFor(i => i.TotalAmount, (f, i) => i.LineItems.Sum(s => s.TotalAmount))
                 .RuleFor(i => i.IsTaxInc, true)
                 .RuleFor(i => i.TransactionDate, f => f.Date.Recent(3))
-                .RuleFor(i => i.BillingContactId, f => CreateContact().ContactId)
-                .RuleFor(i => i.ShippingContactId, f => CreateContact().ContactId)
+                .RuleFor(i => i.BillingContactId, f => billContact.ContactId)
+                .RuleFor(i => i.BillingContactFirstName, f => billContact.ContactDetail.GivenName)
+                .RuleFor(i => i.BillingContactLastName, f => billContact.ContactDetail.FamilyName)
+                .RuleFor(i => i.ShippingContactId, f => shipContact.ContactId)
+                .RuleFor(i => i.ShippingContactFirstName, f => shipContact.ContactDetail.GivenName)
+                .RuleFor(i => i.ShippingContactLastName, f => shipContact.ContactDetail.FamilyName)
                 .RuleFor(i => i.Tags, f => f.Random.WordsArray(f.Random.Number(1, 3)).ToList());
 
             return invoiceDetailFaker;

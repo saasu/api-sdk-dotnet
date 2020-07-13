@@ -21,7 +21,7 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         [SkipByConfigurationFact]
-        public void ShouldReturnSaleTransactionForScopedSearch()
+        public void ShouldReturnSaleTransactionForScopedSearchBySummary()
         {
             var searchProxy = new SearchProxy();
             var faker = _searchHelper.GetSaleInvoiceFaker();
@@ -36,41 +36,95 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
             Assert.Equal(0, results1.DataObject.TotalContactsFound);
             Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
-
             Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
             
-            var results2 = searchProxy.Search($"{invoiceDetail.BillingContactFirstName} {invoiceDetail.BillingContactLastName}", SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results2);
-            Assert.True(results2.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results2.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results2.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
-            var results3 = searchProxy.Search(response.DataObject.GeneratedInvoiceNumber, SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results3);
-            Assert.True(results3.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results3.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results3.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
-            var results4 = searchProxy.Search(invoiceDetail.TotalAmount.Value.ToString(CultureInfo.InvariantCulture), SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results4);
-            Assert.True(results4.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results4.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results4.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
+        }
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnSaleTransactionForScopedSearchByContact()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetSaleInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search($"{invoiceDetail.BillingContactFirstName} {invoiceDetail.BillingContactLastName}", SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+        }
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnSaleTransactionForScopedSearchByInvoiceNumber()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetSaleInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search(response.DataObject.GeneratedInvoiceNumber, SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+
+        }
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnSaleTransactionForScopedSearchByTotalAmount()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetSaleInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search(invoiceDetail.TotalAmount.Value.ToString(CultureInfo.InvariantCulture), SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+
+        }
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnSaleTransactionForScopedSearchByCompany()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetSaleInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
             var companyProxy = new CompanyProxy();
             var proxy = new ContactProxy();
             var contact = proxy.GetContact(invoiceDetail.BillingContactId.Value);
             var company = companyProxy.GetCompany(contact.DataObject.CompanyId.Value);
-            
-            var results5 = searchProxy.Search(company.DataObject.Name, SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results5);
-            Assert.True(results5.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results5.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results5.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
+
+            var results1 = searchProxy.Search(company.DataObject.Name, SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
         }
+
         [SkipByConfigurationFact]
-        public void ShouldReturnPurchaseTransactionForScopedSearch()
+        public void ShouldReturnPurchaseTransactionForScopedSearchBySummary()
         {
             var searchProxy = new SearchProxy();
             var faker = _searchHelper.GetPurchaseInvoiceFaker();
@@ -85,39 +139,96 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
             Assert.Equal(0, results1.DataObject.TotalContactsFound);
             Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
-
             Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
-            var results2 = searchProxy.Search($"{invoiceDetail.BillingContactFirstName} {invoiceDetail.BillingContactLastName}", SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results2);
-            Assert.True(results2.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results2.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results2.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
-            var results3 = searchProxy.Search(response.DataObject.GeneratedInvoiceNumber, SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results3);
-            Assert.True(results3.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results3.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results3.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
-            var results4 = searchProxy.Search(invoiceDetail.TotalAmount.Value.ToString(CultureInfo.InvariantCulture), SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results4);
-            Assert.True(results4.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results4.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results4.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
+        }
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnPurchaseTransactionForScopedSearchByContact()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetPurchaseInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search($"{invoiceDetail.BillingContactFirstName} {invoiceDetail.BillingContactLastName}", SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+        }
+
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnPurchaseTransactionForScopedSearchByInvoiceNumber()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetPurchaseInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search(response.DataObject.GeneratedInvoiceNumber, SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+        }
+
+
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnPurchaseTransactionForScopedSearchByTotalAmount()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetPurchaseInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search(invoiceDetail.TotalAmount.Value.ToString(CultureInfo.InvariantCulture), SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+
+        }
+
+
+        [SkipByConfigurationFact]
+        public void ShouldReturnPurchaseTransactionForScopedSearchByCompany()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetPurchaseInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
             var companyProxy = new CompanyProxy();
             var proxy = new ContactProxy();
             var contact = proxy.GetContact(invoiceDetail.BillingContactId.Value);
             var company = companyProxy.GetCompany(contact.DataObject.CompanyId.Value);
-            
-            var results5 = searchProxy.Search(company.DataObject.Name, SearchScope.Transactions, 1, 25);
-            Assert.NotNull(results5);
-            Assert.True(results5.DataObject.Transactions.Count > 0, "No transactions returned.");
-            Assert.True(results5.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
-            Assert.Contains(results5.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
-            
+
+            var results1 = searchProxy.Search(company.DataObject.Name, SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+
         }
+
         [SkipByConfigurationFact]
         public void ShouldReturnContactsForScopedSearch()
         {

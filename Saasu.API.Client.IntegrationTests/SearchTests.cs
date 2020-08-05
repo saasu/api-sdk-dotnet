@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Xunit;
 using Saasu.API.Client.Proxies;
@@ -31,6 +32,26 @@ namespace Saasu.API.Client.IntegrationTests
             Thread.Sleep(5000); // Need to wait for entities to be indexed
 
             var results1 = searchProxy.Search(invoiceDetail.Summary, SearchScope.Transactions, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
+            Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+            Assert.Equal(0, results1.DataObject.TotalContactsFound);
+            Assert.Equal(0, results1.DataObject.TotalInventoryItemsFound);
+            Assert.Contains(results1.DataObject.Transactions, t => t.Id == response.DataObject.InsertedEntityId);
+            
+        }
+        
+        [SkipByConfigurationFact]
+        public void ShouldReturnSaleTransactionForMatchAllSearch()
+        {
+            var searchProxy = new SearchProxy();
+            var faker = _searchHelper.GetSaleInvoiceFaker(null, DateTime.Now);
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+            var results1 = searchProxy.Search("*:*", SearchScope.Transactions, 1, 100);
             Assert.NotNull(results1);
             Assert.True(results1.DataObject.Transactions.Count > 0, "No transactions returned.");
             Assert.True(results1.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
@@ -261,6 +282,21 @@ namespace Saasu.API.Client.IntegrationTests
             Assert.Contains(results3.DataObject.Contacts, c => c.Id == createdContactInfo.ContactId);
 
         }
+        
+        [SkipByConfigurationFact]
+        public void ShouldReturnContactsMatchAllSearch()
+        {
+            var createdContactInfo = _searchHelper.CreateContact();
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+            
+            var searchProxy = new SearchProxy();
+            var results1 = searchProxy.Search("*:*", SearchScope.Contacts, 1, 25);
+            Assert.NotNull(results1);
+            Assert.True(results1.DataObject.Contacts.Count > 0, "No contacts returned.");
+            Assert.True(results1.DataObject.TotalContactsFound > 0, "transaction count is 0.");
+            Assert.True(results1.DataObject.TotalTransactionsFound == 0, "Should not return transactions for search scoped to Contacts");
+            Assert.True(results1.DataObject.TotalInventoryItemsFound == 0, "Should not return items for search scoped to Contacts");
+        }
 
         [SkipByConfigurationFact]
         public void ShouldReturnInventoryItemsForScopedSearch()
@@ -294,6 +330,22 @@ namespace Saasu.API.Client.IntegrationTests
         }
 
         [SkipByConfigurationFact]
+        public void ShouldReturnInventoryItemsForMatchAllSearch()
+        {
+            var itemInfo = _searchHelper.CreatSaleInventoryItem();
+            Thread.Sleep(5000);
+            
+            var searchProxy = new SearchProxy();
+            var result1 = searchProxy.Search("*:*", SearchScope.InventoryItems, 1, 25);
+            Assert.NotNull(result1);
+            Assert.NotNull(result1.DataObject);
+            Assert.True(result1.DataObject.InventoryItems.Count > 0, "No inventory items returned.");
+            Assert.True(result1.DataObject.TotalInventoryItemsFound > 0, "Inventory item count is 0.");
+            Assert.True(result1.DataObject.TotalTransactionsFound == 0, "Should not return transactions for search scoped to Contacts");
+            Assert.True(result1.DataObject.TotalContactsFound == 0, "Should not return contacts for search scoped to Contacts");
+        }
+        
+        [SkipByConfigurationFact]
         public void ShouldReturnContactsTransactionsInventoryItemsForScopedAllSearch()
         {
             var faker = _searchHelper.GetSaleInvoiceFaker();
@@ -308,6 +360,31 @@ namespace Saasu.API.Client.IntegrationTests
 
             var searchProxy = new SearchProxy();
             var results = searchProxy.Search(invoiceDetail.Summary, SearchScope.All, 1, 25);
+            Assert.NotNull(results);
+            Assert.NotNull(results.DataObject);
+            Assert.True(results.DataObject.InventoryItems.Count > 0, "No inventory items returned.");
+            Assert.True(results.DataObject.Contacts.Count > 0, "No contacts returned.");
+            Assert.True(results.DataObject.InventoryItems.Count > 0, "No inventory items returned.");
+            Assert.True(results.DataObject.TotalInventoryItemsFound > 0, "Inventory item count is 0.");
+            Assert.True(results.DataObject.TotalContactsFound > 0, "transaction count is 0.");
+            Assert.True(results.DataObject.TotalTransactionsFound > 0, "transaction count is 0.");
+        }
+        
+        [SkipByConfigurationFact]
+        public void ShouldReturnContactsTransactionsInventoryItemsForMatchAll()
+        {
+            var faker = _searchHelper.GetSaleInvoiceFaker();
+            var invoiceDetail = faker.Generate();
+            var response = new InvoiceProxy().InsertInvoice(invoiceDetail);
+            Assert.True(response != null && response.IsSuccessfull);
+
+            _searchHelper.CreatSaleInventoryItem(invoiceDetail.Summary);
+            _searchHelper.CreateContact(companyName: invoiceDetail.Summary);
+            Thread.Sleep(5000); // Need to wait for entities to be indexed
+
+
+            var searchProxy = new SearchProxy();
+            var results = searchProxy.Search("*:*", SearchScope.All, 1, 25);
             Assert.NotNull(results);
             Assert.NotNull(results.DataObject);
             Assert.True(results.DataObject.InventoryItems.Count > 0, "No inventory items returned.");

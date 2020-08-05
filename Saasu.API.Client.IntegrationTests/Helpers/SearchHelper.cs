@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Bogus;
 using Saasu.API.Client.Proxies;
 using Saasu.API.Core.Globals;
@@ -157,7 +158,7 @@ namespace Saasu.API.Client.IntegrationTests.Helpers
             return (contact, result.DataObject.InsertedContactId);
         }
 
-        public Faker<InvoiceTransactionDetail> GetSaleInvoiceFaker(string summary = null)
+        public Faker<InvoiceTransactionDetail> GetSaleInvoiceFaker(string summary = null, DateTime? tranDate = null)
         {
             var billContact = CreateContact();
             var shipContact = CreateContact();
@@ -184,7 +185,7 @@ namespace Saasu.API.Client.IntegrationTests.Helpers
                 .RuleFor(i => i.Summary, f => summary ?? f.Lorem.Sentence(3))
                 .RuleFor(i => i.TotalAmount, (f, i) => i.LineItems.Sum(s => s.TotalAmount))
                 .RuleFor(i => i.IsTaxInc, true)
-                .RuleFor(i => i.TransactionDate, f => f.Date.Recent(3))
+                .RuleFor(i => i.TransactionDate, f => tranDate ?? f.Date.Recent(3))
                 .RuleFor(i => i.BillingContactId, f => billContact.ContactId)
                 .RuleFor(i => i.BillingContactFirstName, f => billContact.ContactDetail.GivenName)
                 .RuleFor(i => i.BillingContactLastName, f => billContact.ContactDetail.FamilyName)

@@ -26,6 +26,11 @@ namespace Saasu.API.Core.Models.Security
         /// The scope requested. For example, 'full'.
         /// </summary>
         public string scope { get; set; }
+        /// <summary>
+        /// The 2FA code / one-time password (OTP) that needs to be supplied if 2FA is enabled for user account.
+        /// This code is sent to user's registered mobile number when you initiate login.
+        /// </summary>
+        public string verification_code { get; set; }
     }
 
     /// <summary>
@@ -92,7 +97,7 @@ namespace Saasu.API.Core.Models.Security
         /// represent each file  that the authenticated user has access to in the form "full fileid:1 fileid:1234 fileid:567"
         /// </summary>
 		public string scope { get; set; }
-	}
+    }
 
     /// <summary>
     /// OAuth access grant error.

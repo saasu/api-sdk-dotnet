@@ -51,14 +51,14 @@ namespace Saasu.API.Client.Proxies
 		/// <param name="username"></param>
 		/// <param name="password"></param>
 		/// <returns></returns>
-		public ProxyResponse<OAuthAuthorisationGrantResponse> PasswordCredentialsGrantRequest(string username, string password, string scope = "")
+		public ProxyResponse<OAuthAuthorisationGrantResponse> PasswordCredentialsGrantRequest(string username, string password, string scope = "", bool check2FA = false, string vCode = "")
 		{
 			var result = new OAuthAuthorisationGrantResponse();
 
 			ContentType = RequestContentType.ApplicationJson;
-            var postBody = new OAuthPasswordCredentialsGrantRequest { grant_type = "password", password = password, username = username, scope = scope };
+            var postBody = new OAuthPasswordCredentialsGrantRequest { grant_type = "password", password = password, username = username, scope = scope, verification_code = vCode };
 			//var uri = base.GetRequestUri(string.Format("?grant_type=password&username={0}&password={1}&scope={2}",username,password,scope));
-            var uri = base.GetRequestUri("token");
+            var uri = base.GetRequestUri(check2FA ? "token-2fa"  : "token");
             var response = GetResponse(uri, postBody);
 			if (response.IsSuccessfull)
 			{
@@ -94,6 +94,17 @@ namespace Saasu.API.Client.Proxies
 			else
 			{
 				result.IsSuccessfull = false;
+				if (!string.IsNullOrWhiteSpace(response.RawResponse))
+                {
+#if NETSTANDARD2_0
+					var dto = JsonConvert.DeserializeObject<OAuthGrantRequestError>(response.RawResponse);
+					result.ErrorDetails = dto;
+#else
+					JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+					var dto = jsonSerializer.Deserialize<OAuthGrantRequestError>(response.RawResponse);
+					result.ErrorDetails = dto;
+#endif
+				}
 			}
 
 			var statusCode = result.IsSuccessfull ? HttpStatusCode.OK : HttpStatusCode.Unauthorized;

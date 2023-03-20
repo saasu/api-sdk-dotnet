@@ -11,15 +11,22 @@ using System.Linq;
 using System.Net;
 using Saasu.API.Client.IntegrationTests.Helpers;
 using Saasu.API.Core.Models.Company;
+using Xunit.Abstractions;
+using Saasu.API.Core.Globals;
+using System.IO;
+using Xunit.Sdk;
 
 namespace Saasu.API.Client.IntegrationTests
 {
     public class ContactTests : IClassFixture<ContactFixture>
     {
         private readonly ContactFixture _contactFixture;
-        public ContactTests(ContactFixture contactFixture)
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public ContactTests(ContactFixture contactFixture, ITestOutputHelper testOutputHelper)
         {
             _contactFixture = contactFixture;
+            _testOutputHelper = testOutputHelper;
         }
 
 
@@ -52,6 +59,58 @@ namespace Saasu.API.Client.IntegrationTests
 
             var proxy = new ContactsProxy(accessToken);
             AssertContactProxy(proxy);
+        }
+
+        [Fact]
+        public void GetContactsUsingOAuthWith2FA()
+        {
+            // 1. Use user cred that has 2FA enabled.
+            // 2. Call login method, passing in empty token. 
+            // 3. Server will send back 401 error: 2fa_code_required. 
+            // 4. Re-login. Passing in the 2fa verification code. If running this test manually, put in the code in 2FAToken.txt.
+            // 5. Should get access token back and be able to proceed. 
+
+            var authProxy = new AuthorisationProxy();
+            var scope = new AuthorisationScope[] { new AuthorisationScope { ScopeType = AuthorisationScopeType.Full } }.ToTextValues();
+            var tfaCodeFile = $@"{GetBaseDir()}\2FACode.txt";
+            var tfaCode = File.ReadAllText(tfaCodeFile).Trim();
+
+            _testOutputHelper.WriteLine($"Logging in. 2FA code/OTP: {tfaCode}");
+            var authResponse = authProxy.PasswordCredentialsGrantRequest(TestConfig.TestUser, TestConfig.TestUserPassword, scope, true, tfaCode);
+            // var authResponse = authProxy.PasswordCredentialsGrantRequest(, scope, true);
+
+            var result = authResponse.DataObject;
+            var errDetails = result.ErrorDetails;
+
+            if (result.IsSuccessfull)
+            {
+                var accessToken = result.AccessGrant.access_token;
+                _testOutputHelper.WriteLine($"SUCCESS. Token: {accessToken}.");
+                _testOutputHelper.WriteLine("Getting contacts using above token.");
+                var proxy = new ContactsProxy(accessToken);
+                AssertContactProxy(proxy);
+            }
+            else
+            {
+                _testOutputHelper.WriteLine($"FAILED. Error: {errDetails?.error}. Description: {errDetails?.error_description}");
+                if (string.IsNullOrEmpty(tfaCode))
+                {
+                    Assert.Equal("2fa_code_required", errDetails?.error);
+                }
+                else
+                {
+                    Assert.True(false, "Unexpected error. 2FA code specified.");
+                }
+            }
+        }
+
+        private string GetBaseDir()
+        {
+            var dir = AppDomain.CurrentDomain.BaseDirectory;
+            var idx = dir.IndexOf(@"\bin");
+            if (idx > -1)
+                dir = dir.Substring(0, dir.IndexOf(@"\bin"));
+            return dir;
         }
 
         [Fact]

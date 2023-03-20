@@ -75,7 +75,7 @@ namespace Saasu.API.Client.IntegrationTests
             var tfaCodeFile = $@"{GetBaseDir()}\2FACode.txt";
             var tfaCode = File.ReadAllText(tfaCodeFile).Trim();
 
-            _testOutputHelper.WriteLine($"Logging in. 2FA code/OTP: {tfaCode}");
+            _testOutputHelper.WriteLine($"Logging in. User: {TestConfig.TestUser}, password: {TestConfig.TestUserPassword}, 2FA code/OTP: {tfaCode}");
             var authResponse = authProxy.PasswordCredentialsGrantRequest(TestConfig.TestUser, TestConfig.TestUserPassword, scope, true, tfaCode);
             // var authResponse = authProxy.PasswordCredentialsGrantRequest(, scope, true);
 

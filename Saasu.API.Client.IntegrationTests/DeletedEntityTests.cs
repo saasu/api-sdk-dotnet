@@ -163,7 +163,9 @@ namespace Saasu.API.Client.IntegrationTests
         public void TestPaging()
         {
             var proxy = new DeletedEntitiesProxy();
-            var result = proxy.GetDeletedEntities(pageNumber: 1, pageSize: 3);
+            // One end time for both pages: a delete by a parallel test after it cannot shift page 2.
+            var toDate = DateTime.UtcNow;
+            var result = proxy.GetDeletedEntities(pageNumber: 1, pageSize: 3, utcDeletedToDate: toDate);
             Assert.True(result.DataObject != null, "Error with response object");
             Assert.True(result.DataObject.Entities != null, "Error with response object entity collection");
             Assert.True(result.DataObject.Entities.Count == 3);
@@ -175,7 +177,7 @@ namespace Saasu.API.Client.IntegrationTests
                 result.DataObject.Entities[2].EntityId
             };
 
-            result = proxy.GetDeletedEntities(pageNumber: 2, pageSize: 3);
+            result = proxy.GetDeletedEntities(pageNumber: 2, pageSize: 3, utcDeletedToDate: toDate);
             Assert.True(result.DataObject != null, "Error with response object, second request");
             Assert.True(result.DataObject.Entities != null, "Error with response object entity collection, second request");
 
